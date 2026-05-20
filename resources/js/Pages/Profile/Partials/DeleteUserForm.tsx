@@ -1,10 +1,13 @@
+import { setUserApiToken } from '@/auth/authToken';
+import { clearAuthUserCache } from '@/auth/useAuthUser';
 import DangerButton from '@/Components/DangerButton';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
-import { useForm } from '@inertiajs/react';
+import { userApiPost, type ApiEnvelope } from '@/api/userClient';
+import { router } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
 export default function DeleteUserForm({
@@ -13,40 +16,44 @@ export default function DeleteUserForm({
     className?: string;
 }) {
     const [confirmingUserDeletion, setConfirmingUserDeletion] = useState(false);
+    const [password, setPassword] = useState('');
+    const [processing, setProcessing] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const passwordInput = useRef<HTMLInputElement>(null);
 
-    const {
-        data,
-        setData,
-        delete: destroy,
-        processing,
-        reset,
-        errors,
-        clearErrors,
-    } = useForm({
-        password: '',
-    });
-
-    const confirmUserDeletion = () => {
-        setConfirmingUserDeletion(true);
-    };
-
-    const deleteUser: FormEventHandler = (e) => {
+    const deleteUser: FormEventHandler = async (e) => {
         e.preventDefault();
+        setProcessing(true);
+        setErrors({});
 
-        destroy(route('profile.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.current?.focus(),
-            onFinish: () => reset(),
-        });
+        try {
+            const res = await userApiPost<ApiEnvelope<null>>(
+                '/profile/profile-destroy',
+                { password },
+            );
+
+            if (!res.success) {
+                setErrors({ password: res.message });
+                passwordInput.current?.focus();
+
+                return;
+            }
+
+            setUserApiToken(null);
+            clearAuthUserCache();
+            closeModal();
+            router.visit(route('home'));
+        } catch {
+            setErrors({ password: 'Could not delete account.' });
+        } finally {
+            setProcessing(false);
+        }
     };
 
     const closeModal = () => {
         setConfirmingUserDeletion(false);
-
-        clearErrors();
-        reset();
+        setErrors({});
+        setPassword('');
     };
 
     return (
@@ -58,13 +65,11 @@ export default function DeleteUserForm({
 
                 <p className="mt-1 text-sm text-gray-600">
                     Once your account is deleted, all of its resources and data
-                    will be permanently deleted. Before deleting your account,
-                    please download any data or information that you wish to
-                    retain.
+                    will be permanently deleted.
                 </p>
             </header>
 
-            <DangerButton onClick={confirmUserDeletion}>
+            <DangerButton onClick={() => setConfirmingUserDeletion(true)}>
                 Delete Account
             </DangerButton>
 
@@ -75,10 +80,7 @@ export default function DeleteUserForm({
                     </h2>
 
                     <p className="mt-1 text-sm text-gray-600">
-                        Once your account is deleted, all of its resources and
-                        data will be permanently deleted. Please enter your
-                        password to confirm you would like to permanently delete
-                        your account.
+                        Please enter your password to confirm.
                     </p>
 
                     <div className="mt-6">
@@ -93,10 +95,8 @@ export default function DeleteUserForm({
                             type="password"
                             name="password"
                             ref={passwordInput}
-                            value={data.password}
-                            onChange={(e) =>
-                                setData('password', e.target.value)
-                            }
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             className="mt-1 block w-3/4"
                             isFocused
                             placeholder="Password"

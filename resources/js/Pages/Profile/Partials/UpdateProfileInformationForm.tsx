@@ -2,9 +2,11 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import { userApiPost, type ApiEnvelope } from '@/api/userClient';
+import { useAuthUser } from '@/auth/useAuthUser';
+import type { User } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -15,19 +17,43 @@ export default function UpdateProfileInformation({
     status?: string;
     className?: string;
 }) {
-    const user = usePage().props.auth.user;
+    const { user, refresh } = useAuthUser();
+    const [name, setName] = useState(user?.name ?? '');
+    const [email, setEmail] = useState(user?.email ?? '');
+    const [processing, setProcessing] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
-            email: user.email,
-        });
-
-    const submit: FormEventHandler = (e) => {
+    const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setProcessing(true);
+        setErrors({});
+        setRecentlySuccessful(false);
 
-        patch(route('profile.update'));
+        try {
+            const res = await userApiPost<ApiEnvelope<User>>(
+                '/profile/profile-update',
+                { name, email },
+            );
+
+            if (!res.success) {
+                setErrors({ email: res.message });
+
+                return;
+            }
+
+            await refresh();
+            setRecentlySuccessful(true);
+        } catch {
+            setErrors({ email: 'Could not update profile.' });
+        } finally {
+            setProcessing(false);
+        }
     };
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <section className={className}>
@@ -37,7 +63,8 @@ export default function UpdateProfileInformation({
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
+                    Update your account&apos;s profile information and email
+                    address.
                 </p>
             </header>
 
@@ -48,10 +75,9 @@ export default function UpdateProfileInformation({
                     <TextInput
                         id="name"
                         className="mt-1 block w-full"
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         required
-                        isFocused
                         autoComplete="name"
                     />
 
@@ -65,8 +91,8 @@ export default function UpdateProfileInformation({
                         id="email"
                         type="email"
                         className="mt-1 block w-full"
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                         autoComplete="username"
                     />
@@ -78,22 +104,14 @@ export default function UpdateProfileInformation({
                     <div>
                         <p className="mt-2 text-sm text-gray-800">
                             Your email address is unverified.
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
-                                className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                            >
-                                Click here to re-send the verification email.
-                            </Link>
                         </p>
+                    </div>
+                )}
 
-                        {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
-                            </div>
-                        )}
+                {status === 'verification-link-sent' && (
+                    <div className="mt-2 text-sm font-medium text-green-600">
+                        A new verification link has been sent to your email
+                        address.
                     </div>
                 )}
 
@@ -107,9 +125,7 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">
-                            Saved.
-                        </p>
+                        <p className="text-sm text-gray-600">Saved.</p>
                     </Transition>
                 </div>
             </form>

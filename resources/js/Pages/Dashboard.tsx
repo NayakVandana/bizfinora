@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
+import { useAuthUser } from '@/auth/useAuthUser';
+import { Head, Link } from '@inertiajs/react';
 
 export default function Dashboard() {
+    const { user, currentCompany, companies } = useAuthUser();
+
     return (
         <AuthenticatedLayout
             header={
@@ -16,7 +19,43 @@ export default function Dashboard() {
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900">
-                            You're logged in!
+                            <p>
+                                Welcome, <strong>{user?.name}</strong>.
+                            </p>
+
+                            {currentCompany ? (
+                                <p className="mt-2">
+                                    Active company:{' '}
+                                    <strong>{currentCompany.name}</strong>
+                                </p>
+                            ) : (
+                                <p className="mt-2 text-amber-700">
+                                    No active company selected.{' '}
+                                    <Link
+                                        href={route('companies.index')}
+                                        className="underline"
+                                    >
+                                        Create or select a company
+                                    </Link>
+                                    .
+                                </p>
+                            )}
+
+                            <p className="mt-4 text-sm text-gray-600">
+                                You belong to {companies.length}{' '}
+                                {companies.length === 1
+                                    ? 'company'
+                                    : 'companies'}
+                                . Use the company menu in the header to switch,
+                                or{' '}
+                                <Link
+                                    href={route('companies.index')}
+                                    className="text-indigo-600 underline hover:text-indigo-800"
+                                >
+                                    manage companies
+                                </Link>
+                                .
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -1,18 +1,40 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
+import CompanySwitcher from '@/Components/CompanySwitcher';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { useAuthUser } from '@/auth/useAuthUser';
+import { Link, router } from '@inertiajs/react';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { requireAuthPage } from '@/utils/requireAuth';
 
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
-    const user = usePage().props.auth.user;
+    const { user, loading, logout } = useAuthUser();
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    useEffect(() => {
+        if (!loading) {
+            requireAuthPage();
+        }
+    }, [loading]);
+
+    const handleLogout = async () => {
+        await logout();
+        router.visit(route('login'));
+    };
+
+    if (loading || !user) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-gray-100 text-gray-500">
+                Loading…
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -33,11 +55,18 @@ export default function Authenticated({
                                 >
                                     Dashboard
                                 </NavLink>
+                                <NavLink
+                                    href={route('companies.index')}
+                                    active={route().current('companies.index')}
+                                >
+                                    Companies
+                                </NavLink>
                             </div>
                         </div>
 
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center">
-                            <div className="relative ms-3">
+                        <div className="hidden sm:ms-6 sm:flex sm:items-center sm:gap-3">
+                            <CompanySwitcher />
+                            <div className="relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
                                         <span className="inline-flex rounded-md">
@@ -69,13 +98,13 @@ export default function Authenticated({
                                         >
                                             Profile
                                         </Dropdown.Link>
-                                        <Dropdown.Link
-                                            href={route('logout')}
-                                            method="post"
-                                            as="button"
+                                        <button
+                                            type="button"
+                                            onClick={() => void handleLogout()}
+                                            className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                                         >
                                             Log Out
-                                        </Dropdown.Link>
+                                        </button>
                                     </Dropdown.Content>
                                 </Dropdown>
                             </div>
@@ -137,6 +166,16 @@ export default function Authenticated({
                         >
                             Dashboard
                         </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('companies.index')}
+                            active={route().current('companies.index')}
+                        >
+                            Companies
+                        </ResponsiveNavLink>
+                    </div>
+
+                    <div className="border-t border-gray-200 px-4 py-3">
+                        <CompanySwitcher />
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
@@ -153,13 +192,13 @@ export default function Authenticated({
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
                             </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
+                            <button
+                                type="button"
+                                onClick={() => void handleLogout()}
+                                className="block w-full px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
                             >
                                 Log Out
-                            </ResponsiveNavLink>
+                            </button>
                         </div>
                     </div>
                 </div>

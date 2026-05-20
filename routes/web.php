@@ -1,9 +1,15 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
+/*
+|--------------------------------------------------------------------------
+| Web routes — Inertia page renders only (no business POST/PATCH here).
+| Data & mutations: routes/api.php, user-api.php, company-api.php, admin-api.php
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -12,16 +18,15 @@ Route::get('/', function () {
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
-});
+})->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+Route::get('/companies', fn () => Inertia::render('Companies/Index'))->name('companies.index');
+
+Route::get('/profile', fn () => Inertia::render('Profile/Edit', [
+    'mustVerifyEmail' => false,
+    'status' => null,
+]))->name('profile.edit');
 
 require __DIR__.'/auth.php';
