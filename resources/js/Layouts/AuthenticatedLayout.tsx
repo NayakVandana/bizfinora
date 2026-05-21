@@ -259,8 +259,8 @@ export default function Authenticated({
             ) : null}
 
             <div className="flex min-w-0 flex-1 flex-col">
-                <header className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-3">
+                <header className="flex min-h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
                         <button
                             type="button"
                             onClick={() => setMobileNavOpen(true)}
@@ -282,7 +282,7 @@ export default function Authenticated({
                             </svg>
                         </button>
                         {header ? (
-                            <div className="min-w-0">{header}</div>
+                            <div className="min-w-0 flex-1">{header}</div>
                         ) : (
                             <Link
                                 href={route('dashboard')}

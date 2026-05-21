@@ -59,14 +59,9 @@ export default function InvoicesIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                        Invoices
-                    </h2>
-                    <Link href={route('invoices.create')}>
-                        <PrimaryButton>New invoice</PrimaryButton>
-                    </Link>
-                </div>
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Invoices
+                </h2>
             }
         >
             <Head title="Invoices" />
@@ -74,6 +69,14 @@ export default function InvoicesIndex() {
             <div className="py-8">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
                     <div className="overflow-hidden rounded-lg bg-white shadow">
+                        <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <p className="text-sm text-gray-600">
+                                Create, edit, and download invoices (INR)
+                            </p>
+                            <Link href={route('invoices.create')}>
+                                <PrimaryButton>New invoice</PrimaryButton>
+                            </Link>
+                        </div>
                         {loading ? (
                             <p className="p-6 text-gray-500">Loading…</p>
                         ) : rows.length === 0 ? (
@@ -106,7 +109,9 @@ export default function InvoicesIndex() {
                                         <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">
                                             Total
                                         </th>
-                                        <th className="px-4 py-3" />
+                                        <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
