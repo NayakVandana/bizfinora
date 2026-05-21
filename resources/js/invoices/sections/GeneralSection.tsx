@@ -51,14 +51,6 @@ export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
                     </select>
                 </div>
                 <div>
-                    <InputLabel value="Language" />
-                    <TextInput
-                        className="mt-1 block w-full"
-                        value={draft.language}
-                        onChange={(e) => onChange({ language: e.target.value })}
-                    />
-                </div>
-                <div>
                     <InputLabel value="Issue date" />
                     <TextInput
                         type="date"
@@ -98,12 +90,6 @@ export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
                         <option value="DD/MM/YYYY">DD/MM/YYYY</option>
                         <option value="MM/DD/YYYY">MM/DD/YYYY</option>
                     </select>
-                </div>
-                <div>
-                    <InputLabel value="Currency" />
-                    <p className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
-                        Indian Rupee (INR) — Rs.
-                    </p>
                 </div>
             </div>
 
