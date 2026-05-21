@@ -111,7 +111,7 @@ export default function InvoicesCreate() {
             <Head title="Create invoice" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8">
                     {!draft ? (
                         <p className="text-gray-500">Loading builder…</p>
                     ) : (

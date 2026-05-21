@@ -1,5 +1,6 @@
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import InvoiceEditorLayout from '@/invoices/InvoiceEditorLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import BuyerSection from './sections/BuyerSection';
@@ -110,23 +111,41 @@ export default function InvoiceBuilder({
         });
     };
 
-    return (
-        <div className="grid gap-6 lg:grid-cols-2">
-            <div className="max-h-[calc(100vh-8rem)] space-y-3 overflow-y-auto rounded-lg bg-white p-4 shadow-sm">
-                <div className="flex flex-wrap gap-2">
-                    <PrimaryButton type="button" disabled={saving} onClick={onSave}>
-                        {saving ? 'Saving…' : 'Save invoice'}
-                    </PrimaryButton>
-                    <SecondaryButton type="button" onClick={onDownload}>
-                        Download PDF
-                    </SecondaryButton>
-                    {onEnableShare ? (
-                        <SecondaryButton type="button" onClick={onEnableShare}>
-                            {shareUrl ? 'Refresh share link' : 'Create share link'}
-                        </SecondaryButton>
-                    ) : null}
-                </div>
+    const actions = (
+        <>
+            <PrimaryButton
+                type="button"
+                disabled={saving}
+                onClick={onSave}
+                className="w-full justify-center lg:w-auto"
+            >
+                {saving ? 'Saving…' : 'Save invoice'}
+            </PrimaryButton>
+            <SecondaryButton
+                type="button"
+                onClick={onDownload}
+                className="w-full justify-center lg:w-auto"
+            >
+                Download PDF
+            </SecondaryButton>
+            {onEnableShare ? (
+                <SecondaryButton
+                    type="button"
+                    onClick={onEnableShare}
+                    className="w-full justify-center lg:w-auto"
+                >
+                    {shareUrl ? 'Refresh share link' : 'Create share link'}
+                </SecondaryButton>
+            ) : null}
+        </>
+    );
 
+    return (
+        <InvoiceEditorLayout
+            actions={actions}
+            preview={<InvoicePreview draft={draft} />}
+            form={
+                <>
                 {shareUrl ? (
                     <div className="rounded border border-indigo-100 bg-indigo-50 p-3 text-sm">
                         <p className="font-medium text-indigo-900">Shareable link</p>
@@ -175,14 +194,8 @@ export default function InvoiceBuilder({
                     onChange={update}
                     onDocChange={updateDoc}
                 />
-            </div>
-
-            <div className="sticky top-4 h-[calc(100vh-6rem)]">
-                <p className="mb-2 text-sm font-medium text-gray-700">
-                    Live PDF preview
-                </p>
-                <InvoicePreview draft={draft} />
-            </div>
-        </div>
+                </>
+            }
+        />
     );
 }

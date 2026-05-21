@@ -12,6 +12,7 @@ import {
 } from '@/invoices/customTemplatesApi';
 import { buildTemplatePreviewDraft } from '@/invoices/buildTemplatePreviewDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
+import InvoiceEditorLayout from '@/invoices/InvoiceEditorLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
 import { invoiceTypeLabel } from '@/invoices/invoiceTypes';
 import {
@@ -154,8 +155,53 @@ export default function TemplateEdit({ templateId }: Props) {
                     ) : error && !template ? (
                         <p className="mt-6 text-red-600">{error}</p>
                     ) : (
-                        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-                            <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
+                        <div className="mt-6">
+                            <InvoiceEditorLayout
+                                editTabLabel="Edit template"
+                                previewLabel="Live preview"
+                                actions={
+                                    <>
+                                        <PrimaryButton
+                                            disabled={saving}
+                                            onClick={() => void save()}
+                                            className="w-full justify-center lg:w-auto"
+                                        >
+                                            {saving ? 'Saving…' : 'Save template'}
+                                        </PrimaryButton>
+                                        <SecondaryButton
+                                            disabled={!previewDraft || downloading}
+                                            onClick={async () => {
+                                                if (!previewDraft) {
+                                                    return;
+                                                }
+                                                setDownloading(true);
+                                                try {
+                                                    await downloadInvoicePdf(
+                                                        previewDraft,
+                                                    );
+                                                } finally {
+                                                    setDownloading(false);
+                                                }
+                                            }}
+                                            className="w-full justify-center lg:w-auto"
+                                        >
+                                            {downloading
+                                                ? 'Preparing PDF…'
+                                                : 'Download PDF'}
+                                        </SecondaryButton>
+                                    </>
+                                }
+                                preview={
+                                    previewDraft && seller ? (
+                                        <InvoicePreview draft={previewDraft} />
+                                    ) : (
+                                        <div className="flex h-[min(50vh,400px)] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                            Preview unavailable
+                                        </div>
+                                    )
+                                }
+                                form={
+                                    <div className="space-y-6">
                                 <p className="text-sm text-gray-600">
                                     Customize labels, notes, and other content
                                     for this template. The invoice format stays
@@ -306,51 +352,9 @@ export default function TemplateEdit({ templateId }: Props) {
                                     />
                                 </div>
 
-                                <div className="flex flex-wrap gap-2">
-                                    <PrimaryButton
-                                        disabled={saving}
-                                        onClick={() => void save()}
-                                    >
-                                        {saving ? 'Saving…' : 'Save template'}
-                                    </PrimaryButton>
-                                    <SecondaryButton
-                                        disabled={!previewDraft || downloading}
-                                        onClick={async () => {
-                                            if (!previewDraft) {
-                                                return;
-                                            }
-                                            setDownloading(true);
-                                            try {
-                                                await downloadInvoicePdf(
-                                                    previewDraft,
-                                                );
-                                            } finally {
-                                                setDownloading(false);
-                                            }
-                                        }}
-                                    >
-                                        {downloading
-                                            ? 'Preparing PDF…'
-                                            : 'Download PDF'}
-                                    </SecondaryButton>
-                                </div>
-                            </div>
-
-                            <div className="lg:sticky lg:top-4 lg:self-start">
-                                <p className="mb-2 text-sm font-medium text-gray-700">
-                                    Live preview
-                                </p>
-                                {previewDraft && seller ? (
-                                    <InvoicePreview
-                                        draft={previewDraft}
-                                        variant="fit"
-                                    />
-                                ) : (
-                                    <div className="flex h-[640px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
-                                        Preview unavailable
                                     </div>
-                                )}
-                            </div>
+                                }
+                            />
                         </div>
                     )}
                 </div>

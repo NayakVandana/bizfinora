@@ -87,9 +87,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
                 ) : !draft ? (
                     <p className="text-gray-500">Loading preview…</p>
                 ) : (
-                    <div className="h-[80vh]">
-                        <InvoicePreview draft={draft} />
-                    </div>
+                    <InvoicePreview draft={draft} />
                 )}
             </main>
         </div>

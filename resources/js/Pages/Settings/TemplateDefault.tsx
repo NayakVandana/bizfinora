@@ -3,6 +3,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
+import InvoiceEditorLayout from '@/invoices/InvoiceEditorLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import InvoiceTypePicker from '@/invoices/InvoiceTypePicker';
@@ -79,8 +80,57 @@ export default function TemplateDefault() {
                     {loading ? (
                         <p className="text-gray-500">Loading…</p>
                     ) : (
-                        <div className="grid gap-6 lg:grid-cols-2">
-                            <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
+                        <InvoiceEditorLayout
+                            editTabLabel="Default template"
+                            previewLabel={`Live preview — ${invoiceTypeLabel(invoiceType)}`}
+                            actions={
+                                <>
+                                    <PrimaryButton
+                                        disabled={
+                                            saving ||
+                                            invoiceType === savedInvoiceType
+                                        }
+                                        onClick={() => void save()}
+                                        className="w-full justify-center lg:w-auto"
+                                    >
+                                        {saving
+                                            ? 'Saving…'
+                                            : 'Save default template'}
+                                    </PrimaryButton>
+                                    <SecondaryButton
+                                        disabled={!previewDraft || downloading}
+                                        onClick={async () => {
+                                            if (!previewDraft) {
+                                                return;
+                                            }
+                                            setDownloading(true);
+                                            try {
+                                                await downloadInvoicePdf(
+                                                    previewDraft,
+                                                );
+                                            } finally {
+                                                setDownloading(false);
+                                            }
+                                        }}
+                                        className="w-full justify-center lg:w-auto"
+                                    >
+                                        {downloading
+                                            ? 'Preparing PDF…'
+                                            : 'Download PDF'}
+                                    </SecondaryButton>
+                                </>
+                            }
+                            preview={
+                                previewDraft ? (
+                                    <InvoicePreview draft={previewDraft} />
+                                ) : (
+                                    <div className="flex h-[min(50vh,400px)] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                        Preview unavailable
+                                    </div>
+                                )
+                            }
+                            form={
+                                <div className="space-y-6">
                                 <p className="text-sm text-gray-600">
                                     Choose the default invoice type for new
                                     invoices. Preview updates as you select —
@@ -136,60 +186,9 @@ export default function TemplateDefault() {
                                     ) : null}
                                 </p>
 
-                                <div className="flex flex-wrap gap-2">
-                                    <PrimaryButton
-                                        disabled={
-                                            saving ||
-                                            invoiceType === savedInvoiceType
-                                        }
-                                        onClick={() => void save()}
-                                    >
-                                        {saving
-                                            ? 'Saving…'
-                                            : 'Save default template'}
-                                    </PrimaryButton>
-                                    <SecondaryButton
-                                        disabled={!previewDraft || downloading}
-                                        onClick={async () => {
-                                            if (!previewDraft) {
-                                                return;
-                                            }
-                                            setDownloading(true);
-                                            try {
-                                                await downloadInvoicePdf(
-                                                    previewDraft,
-                                                );
-                                            } finally {
-                                                setDownloading(false);
-                                            }
-                                        }}
-                                    >
-                                        {downloading
-                                            ? 'Preparing PDF…'
-                                            : 'Download PDF'}
-                                    </SecondaryButton>
                                 </div>
-                            </div>
-
-                            <div className="lg:sticky lg:top-4 lg:self-start">
-                                <div className="mb-2 flex items-center justify-between gap-2">
-                                    <p className="text-sm font-medium text-gray-700">
-                                        Live preview —{' '}
-                                        {invoiceTypeLabel(invoiceType)}
-                                    </p>
-                                </div>
-                                {previewDraft ? (
-                                    <InvoicePreview
-                                        draft={previewDraft}
-                                        variant="fit"
-                                    />
-                                ) : (
-                                    <div className="flex h-[640px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
-                                        Preview unavailable
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                            }
+                        />
                     )}
                 </div>
             </div>

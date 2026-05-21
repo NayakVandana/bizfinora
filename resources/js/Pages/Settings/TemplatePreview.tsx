@@ -1,6 +1,7 @@
 import InputLabel from '@/Components/InputLabel';
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import InvoiceEditorLayout from '@/invoices/InvoiceEditorLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import InvoiceTypePicker from '@/invoices/InvoiceTypePicker';
@@ -38,8 +39,43 @@ export default function TemplatePreviewPage() {
                     {loading ? (
                         <p className="text-gray-500">Loading…</p>
                     ) : (
-                        <div className="grid gap-6 lg:grid-cols-2">
-                            <div className="space-y-4 rounded-lg bg-white p-6 shadow-sm lg:max-w-md">
+                        <InvoiceEditorLayout
+                            editTabLabel="Invoice types"
+                            previewLabel={invoiceTypeLabel(invoiceType)}
+                            actions={
+                                <SecondaryButton
+                                    disabled={!previewDraft || downloading}
+                                    onClick={async () => {
+                                        if (!previewDraft) {
+                                            return;
+                                        }
+                                        setDownloading(true);
+                                        try {
+                                            await downloadInvoicePdf(
+                                                previewDraft,
+                                            );
+                                        } finally {
+                                            setDownloading(false);
+                                        }
+                                    }}
+                                    className="w-full justify-center lg:w-auto"
+                                >
+                                    {downloading
+                                        ? 'Preparing PDF…'
+                                        : 'Download PDF'}
+                                </SecondaryButton>
+                            }
+                            preview={
+                                previewDraft ? (
+                                    <InvoicePreview draft={previewDraft} />
+                                ) : (
+                                    <div className="flex h-[min(50vh,400px)] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                        Preview unavailable
+                                    </div>
+                                )
+                            }
+                            form={
+                                <div className="space-y-4 lg:max-w-md">
                                 <p className="text-sm text-gray-600">
                                     Browse all invoice types — preview only,
                                     nothing is saved. Set your company default
@@ -71,44 +107,9 @@ export default function TemplatePreviewPage() {
                                         : 'Modern'}
                                 </p>
 
-                                <SecondaryButton
-                                    disabled={!previewDraft || downloading}
-                                    onClick={async () => {
-                                        if (!previewDraft) {
-                                            return;
-                                        }
-                                        setDownloading(true);
-                                        try {
-                                            await downloadInvoicePdf(
-                                                previewDraft,
-                                            );
-                                        } finally {
-                                            setDownloading(false);
-                                        }
-                                    }}
-                                >
-                                    {downloading
-                                        ? 'Preparing PDF…'
-                                        : 'Download PDF'}
-                                </SecondaryButton>
-                            </div>
-
-                            <div className="lg:sticky lg:top-4 lg:self-start">
-                                <p className="mb-2 text-sm font-medium text-gray-700">
-                                    {invoiceTypeLabel(invoiceType)}
-                                </p>
-                                {previewDraft ? (
-                                    <InvoicePreview
-                                        draft={previewDraft}
-                                        variant="fit"
-                                    />
-                                ) : (
-                                    <div className="flex h-[640px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
-                                        Preview unavailable
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                                </div>
+                            }
+                        />
                     )}
                 </div>
             </div>

@@ -38,10 +38,10 @@ export default function ItemsSection({
             {draft.document.items.map((item, index) => (
                 <div
                     key={index}
-                    className="grid gap-2 rounded border border-gray-100 p-2 sm:grid-cols-12"
+                    className="grid gap-2 rounded border border-gray-100 p-3 sm:grid-cols-12 sm:p-2"
                 >
                     <TextInput
-                        className="sm:col-span-4"
+                        className="w-full sm:col-span-4"
                         placeholder="Description"
                         value={item.description}
                         onChange={(e) =>
@@ -102,10 +102,10 @@ export default function ItemsSection({
                     ) : null}
                     <button
                         type="button"
-                        className="text-sm text-red-600 sm:col-span-2"
+                        className="w-full rounded-md border border-red-100 py-2 text-sm text-red-600 hover:bg-red-50 sm:col-span-2 sm:border-0 sm:py-0 sm:hover:bg-transparent"
                         onClick={() => onRemoveItem(index)}
                     >
-                        Remove
+                        Remove line
                     </button>
                 </div>
             ))}

@@ -495,10 +495,7 @@ export default function TemplatesIndex() {
 
                             <div className="max-h-[70vh] overflow-y-auto">
                                 {previewDraft ? (
-                                    <InvoicePreview
-                                        draft={previewDraft}
-                                        variant="fit"
-                                    />
+                                    <InvoicePreview draft={previewDraft} />
                                 ) : (
                                     <div className="flex h-[480px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
                                         Preview unavailable

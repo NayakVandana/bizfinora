@@ -269,8 +269,8 @@ export default function Authenticated({
             ) : null}
 
             <div className="flex min-w-0 flex-1 flex-col">
-                <header className="flex min-h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8">
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                <header className="flex min-h-16 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 py-2 sm:px-6 sm:py-0 lg:px-8">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
                         <button
                             type="button"
                             onClick={() => setMobileNavOpen(true)}
@@ -302,7 +302,7 @@ export default function Authenticated({
                             </Link>
                         )}
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:w-auto sm:gap-3">
                         <CompanySwitcher />
                         <UserMenu onLogout={() => void handleLogout()} />
                     </div>
