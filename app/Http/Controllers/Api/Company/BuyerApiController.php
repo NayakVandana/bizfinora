@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Company;
 use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Company;
+use App\Support\IndianMobileValidator;
 use App\Support\InvoicePresentation;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,14 +34,16 @@ class BuyerApiController extends Controller
     public function postBuyerStore(Request $request)
     {
         try {
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+
             $validation = Validator::make($request->all(), $this->buyerRules());
+            IndianMobileValidator::attachAfter($validation);
+            IndianMobileValidator::attachDuplicateBuyerPhone($validation, $company->id);
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
             }
-
-            /** @var Company $company */
-            $company = $request->attributes->get('company');
 
             $buyer = Buyer::query()->create([
                 ...$validation->validated(),
@@ -61,20 +64,29 @@ class BuyerApiController extends Controller
     public function postBuyerUpdate(Request $request)
     {
         try {
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+
+            $buyerId = (int) $request->input('id');
+
             $validation = Validator::make($request->all(), [
                 'id' => ['required', 'integer'],
                 ...$this->buyerRules(),
             ]);
+            IndianMobileValidator::attachAfter($validation);
+            IndianMobileValidator::attachDuplicateBuyerPhone(
+                $validation,
+                $company->id,
+                $buyerId,
+            );
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
             }
 
-            /** @var Company $company */
-            $company = $request->attributes->get('company');
             $buyer = Buyer::query()
                 ->where('company_id', $company->id)
-                ->find($request->input('id'));
+                ->find($buyerId);
 
             if ($buyer === null) {
                 return $this->sendJsonResponse(false, 'Buyer not found.', null, 200);
@@ -130,7 +142,7 @@ class BuyerApiController extends Controller
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'phone' => ['nullable', 'string', 'max:10'],
             'tax_id' => ['nullable', 'string', 'max:100'],
             'tax_id_label' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:2000'],

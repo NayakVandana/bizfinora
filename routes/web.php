@@ -32,6 +32,10 @@ Route::get('/profile', fn () => Inertia::render('Profile/Edit', [
 ]))->name('profile.edit');
 
 Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.index');
+Route::get('/buyers/create', fn () => Inertia::render('Buyers/Create'))->name('buyers.create');
+Route::get('/buyers/{id}/edit', fn (int $id) => Inertia::render('Buyers/Edit', ['buyerId' => $id]))
+    ->whereNumber('id')
+    ->name('buyers.edit');
 
 Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplateDefault'))->name('settings.templates');
 

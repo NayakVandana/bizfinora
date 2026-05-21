@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Support\CompanyMembership;
 use App\Support\CompanyPresentation;
+use App\Support\IndianMobileValidator;
 use App\Support\InvoiceTypes;
 use Exception;
 use Illuminate\Http\Request;
@@ -79,19 +80,22 @@ class CompanyContextApiController extends Controller
                 'tax_id' => ['nullable', 'string', 'max:100'],
                 'tax_id_label' => ['nullable', 'string', 'max:50'],
                 'email' => ['nullable', 'email', 'max:255'],
-                'phone' => ['nullable', 'string', 'max:50'],
+                'phone' => ['nullable', 'string', 'max:10'],
                 'account_number' => ['nullable', 'string', 'max:100'],
                 'swift_bic' => ['nullable', 'string', 'max:50'],
                 'logo_data_url' => ['nullable', 'string'],
                 'seller_notes' => ['nullable', 'string', 'max:5000'],
             ]);
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+
+            IndianMobileValidator::attachAfter($validation);
+            IndianMobileValidator::attachDuplicateCompanyPhone($validation, $company->id);
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
             }
 
-            /** @var Company $company */
-            $company = $request->attributes->get('company');
             $user = $request->user();
             $membership = $user->companies()->where('companies.id', $company->id)->first();
 

@@ -6,6 +6,11 @@ import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import type { CompanySellerProfile } from '@/invoices/types';
+import {
+    normalizeIndianMobile,
+    phoneDigits,
+    validateIndianMobileOptional,
+} from '@/utils/indianPhone';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -15,6 +20,7 @@ export default function CompanyProfile() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         void companyApiPost<ApiEnvelope<CompanySellerProfile>>(
@@ -63,9 +69,16 @@ export default function CompanyProfile() {
             return;
         }
 
+        const phoneError = validateIndianMobileOptional(profile.phone ?? '');
+        if (phoneError) {
+            setFieldErrors({ phone: phoneError });
+            return;
+        }
+
         setSaving(true);
         setMessage(null);
         setError(null);
+        setFieldErrors({});
 
         try {
             const res = await companyApiPost<ApiEnvelope<CompanySellerProfile>>(
@@ -76,7 +89,8 @@ export default function CompanyProfile() {
                     tax_id: profile.tax_id ?? '',
                     tax_id_label: profile.tax_id_label ?? 'GSTIN',
                     email: profile.email ?? '',
-                    phone: profile.phone ?? '',
+                    phone:
+                        normalizeIndianMobile(profile.phone ?? '') ?? '',
                     account_number: profile.account_number ?? '',
                     swift_bic: profile.swift_bic ?? '',
                     logo_data_url: profile.logo_data_url,
@@ -100,7 +114,20 @@ export default function CompanyProfile() {
                 });
                 setMessage('Company profile saved.');
             } else {
-                setError(res.message ?? 'Save failed.');
+                const data = res.data as unknown as Record<
+                    string,
+                    unknown
+                > | null;
+                const phoneMsg = Array.isArray(data?.phone)
+                    ? String(data.phone[0])
+                    : typeof data?.phone === 'string'
+                      ? data.phone
+                      : null;
+                if (phoneMsg) {
+                    setFieldErrors({ phone: phoneMsg });
+                } else {
+                    setError(res.message ?? 'Save failed.');
+                }
             }
         } finally {
             setSaving(false);
@@ -208,11 +235,30 @@ export default function CompanyProfile() {
                                 <div>
                                     <InputLabel value="Phone" />
                                     <TextInput
+                                        type="tel"
+                                        inputMode="numeric"
+                                        maxLength={10}
                                         className="mt-1 block w-full"
                                         value={profile.phone ?? ''}
-                                        onChange={(e) =>
-                                            update({ phone: e.target.value })
-                                        }
+                                        placeholder="10-digit mobile number"
+                                        onChange={(e) => {
+                                            update({
+                                                phone: phoneDigits(
+                                                    e.target.value,
+                                                ).slice(0, 10),
+                                            });
+                                            if (fieldErrors.phone) {
+                                                setFieldErrors((prev) => {
+                                                    const next = { ...prev };
+                                                    delete next.phone;
+                                                    return next;
+                                                });
+                                            }
+                                        }}
+                                    />
+                                    <InputError
+                                        message={fieldErrors.phone}
+                                        className="mt-1"
                                     />
                                 </div>
                             </div>
