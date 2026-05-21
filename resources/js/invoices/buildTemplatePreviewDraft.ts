@@ -3,8 +3,11 @@ import {
     emptyParty,
     partyFromSeller,
 } from './defaultDraft';
+import { APP_CURRENCY } from './currency';
+import { formatForInvoiceType } from './invoiceFormatConfig';
+import { applyInvoiceTypeToDraft } from './invoiceTypes';
 import type { CompanyTaxSettings } from './taxPresets';
-import type { InvoiceDraft, InvoiceTemplate, PartyDetails } from './types';
+import type { InvoiceDraft, InvoiceLineItem, PartyDetails } from './types';
 
 function demoSeller(seller: PartyDetails): PartyDetails {
     return partyFromSeller({
@@ -16,7 +19,8 @@ function demoSeller(seller: PartyDetails): PartyDetails {
         tax_id_label: seller.tax_id_label ?? 'VAT no',
         address:
             seller.address?.trim() ||
-            '10 Commerce Street\nLondon, UK',
+            '10 Commerce Street\nMumbai, India',
+        country: seller.country?.trim() || 'India',
     });
 }
 
@@ -29,20 +33,147 @@ function demoBuyer(): PartyDetails {
         tax_id: 'GB123456789',
         tax_id_label: 'VAT no',
         address: '123 Client Street\nLondon, UK',
+        country: 'United Kingdom',
     };
+}
+
+function previewItemsForType(
+    invoiceType: string,
+    taxRate: number,
+): InvoiceLineItem[] {
+    const format = formatForInvoiceType(invoiceType);
+
+    if (format === 'timesheet') {
+        return [
+            {
+                description: 'Application development',
+                quantity: 32,
+                unit: 'hrs',
+                unit_price: 90,
+                tax_rate: 0,
+            },
+            {
+                description: 'Project management',
+                quantity: 8,
+                unit: 'hrs',
+                unit_price: 75,
+                tax_rate: 0,
+            },
+        ];
+    }
+
+    if (invoiceType === 'gst') {
+        return [
+            {
+                description: 'SaaS platform license',
+                quantity: 1,
+                unit: '998314',
+                unit_price: 12000,
+                tax_rate: 18,
+            },
+            {
+                description: 'On-site implementation',
+                quantity: 5,
+                unit: '998313',
+                unit_price: 3500,
+                tax_rate: 18,
+            },
+        ];
+    }
+
+    if (format === 'tax') {
+        return [
+            {
+                description: 'Professional services',
+                quantity: 1,
+                unit: 'pcs',
+                unit_price: 2500,
+                tax_rate: taxRate,
+            },
+            {
+                description: 'Support package',
+                quantity: 12,
+                unit: 'mo',
+                unit_price: 199,
+                tax_rate: taxRate,
+            },
+        ];
+    }
+
+    if (format === 'trade') {
+        return [
+            {
+                description: 'Electronic components — Model X42',
+                quantity: 500,
+                unit: 'pcs',
+                unit_price: 12.5,
+                tax_rate: 0,
+            },
+            {
+                description: 'Packaging and freight prep',
+                quantity: 1,
+                unit: 'lot',
+                unit_price: 850,
+                tax_rate: 0,
+            },
+        ];
+    }
+
+    if (invoiceType === 'receipt') {
+        return [
+            {
+                description: 'Invoice PREVIEW-001 — full settlement',
+                quantity: 1,
+                unit: 'pcs',
+                unit_price: 1450,
+                tax_rate: 0,
+            },
+        ];
+    }
+
+    if (invoiceType === 'credit_memo') {
+        return [
+            {
+                description: 'Return of defective units (credit)',
+                quantity: 10,
+                unit: 'pcs',
+                unit_price: 45,
+                tax_rate: taxRate,
+            },
+        ];
+    }
+
+    return [
+        {
+            description: 'Consulting services',
+            quantity: 8,
+            unit: 'hrs',
+            unit_price: 125,
+            tax_rate: taxRate,
+        },
+        {
+            description: 'Materials & supplies',
+            quantity: 1,
+            unit: 'lot',
+            unit_price: 450,
+            tax_rate: taxRate,
+        },
+    ];
 }
 
 /** Sample invoice used to preview template layouts in settings and picker UI. */
 export function buildTemplatePreviewDraft(
     seller: PartyDetails,
-    template: InvoiceTemplate,
+    invoiceType: string,
     taxSettings?: CompanyTaxSettings | null,
 ): InvoiceDraft {
     const enrichedSeller = demoSeller(seller);
     const taxRate =
         (taxSettings?.default_tax_rate ?? 0) > 0
             ? taxSettings!.default_tax_rate
-            : 20;
+            : invoiceType === 'gst'
+              ? 18
+              : 20;
 
     const base = buildDefaultDraft(
         enrichedSeller,
@@ -50,34 +181,25 @@ export function buildTemplatePreviewDraft(
         (seller as PartyDetails & { logo_data_url?: string | null })
             .logo_data_url ?? null,
         taxSettings,
-        template,
+        undefined,
+        invoiceType,
     );
+
+    const items = previewItemsForType(invoiceType, taxRate);
 
     return {
         ...base,
-        currency: base.currency || 'USD',
-        header_notes: 'Sample invoice for template preview',
+        ...applyInvoiceTypeToDraft(base, invoiceType),
+        currency: APP_CURRENCY,
         document: {
             ...base.document,
             seller: enrichedSeller,
             buyer: demoBuyer(),
-            items: [
-                {
-                    description: 'Consulting services',
-                    quantity: 8,
-                    unit: 'hrs',
-                    unit_price: 125,
-                    tax_rate: taxRate,
-                },
-                {
-                    description: 'Materials & supplies',
-                    quantity: 1,
-                    unit: 'lot',
-                    unit_price: 450,
-                    tax_rate: taxRate,
-                },
-            ],
-            payment_terms: 'Payment due within 14 days.',
+            items,
+            payment_terms:
+                formatForInvoiceType(invoiceType) === 'trade'
+                    ? 'FOB · Payment within 30 days of BL date.'
+                    : 'Payment due within 14 days.',
             notes: 'Thank you for your business.',
         },
     };

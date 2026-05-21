@@ -1,3 +1,4 @@
+import { APP_CURRENCY } from './currency';
 import type { InvoiceDraft } from './types';
 
 /** Payload shape expected by company invoice store/update APIs. */
@@ -15,10 +16,11 @@ export function serializeInvoiceDraft(draft: InvoiceDraft): Record<string, unkno
         issue_date: draft.issue_date,
         due_date: draft.due_date || null,
         date_of_service: draft.date_of_service || null,
-        currency: draft.currency,
+        currency: APP_CURRENCY,
         language: draft.language,
         date_format: draft.date_format ?? 'YYYY-MM-DD',
         template: draft.template,
+        invoice_type: draft.invoice_type ?? 'standard',
         tax_type: draft.tax_type,
         tax_label: draft.tax_label,
         tax_rate: draft.tax_rate,

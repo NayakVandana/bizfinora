@@ -19,7 +19,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [shareUrl, setShareUrl] = useState<string | null>(null);
-
     useEffect(() => {
         Promise.all([
             companyApiPost<ApiEnvelope<InvoicePayload>>(

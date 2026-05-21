@@ -30,6 +30,7 @@ class Company extends Model
         'tax_calculation_mode',
         'tax_per_line',
         'default_invoice_template',
+        'default_invoice_type',
     ];
 
     protected function casts(): array

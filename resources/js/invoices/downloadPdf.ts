@@ -35,7 +35,12 @@ export async function downloadInvoicePdf(draft: InvoiceDraft): Promise<void> {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${draft.invoice_number || 'invoice'}.pdf`;
+    const safeNumber = (draft.invoice_number || 'invoice').replace(
+        /[^\w.-]+/g,
+        '-',
+    );
+    const type = draft.invoice_type ?? 'standard';
+    link.download = `${type}-${safeNumber}.pdf`;
     link.click();
     URL.revokeObjectURL(url);
 }

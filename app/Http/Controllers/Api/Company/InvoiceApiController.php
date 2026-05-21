@@ -7,6 +7,7 @@ use App\Models\Buyer;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Support\InvoiceCalculator;
+use App\Support\InvoiceTypes;
 use App\Support\InvoiceDocumentMapper;
 use App\Support\InvoicePresentation;
 use Exception;
@@ -115,11 +116,14 @@ class InvoiceApiController extends Controller
             return $this->sendJsonResponse(true, 'Invoice meta fetched successfully.', [
                 'seller' => InvoicePresentation::sellerFromCompany($company),
                 'next_invoice_number' => Invoice::nextInvoiceNumber($company->id),
-                'currencies' => ['USD', 'EUR', 'GBP', 'INR', 'AUD', 'CAD', 'SGD', 'AED'],
+                'currencies' => ['INR'],
+                'default_currency' => 'INR',
                 'templates' => [
                     ['id' => 'stripe', 'label' => 'Modern (Stripe-style)'],
                     ['id' => 'classic', 'label' => 'Classic'],
                 ],
+                'invoice_types' => InvoiceTypes::listForApi(),
+                'default_invoice_type' => $company->default_invoice_type ?? 'standard',
                 'tax_types' => config('tax.types'),
                 'tax_calculation_modes' => config('tax.calculation_modes'),
                 'tax_settings' => [
@@ -229,9 +233,10 @@ class InvoiceApiController extends Controller
                 'status' => ['required', 'string', Rule::in(['draft', 'sent', 'paid'])],
                 'issue_date' => ['required', 'date'],
                 'due_date' => ['nullable', 'date'],
-                'currency' => ['required', 'string', 'size:3'],
+                'currency' => ['nullable', 'string', Rule::in(['INR'])],
                 'language' => ['nullable', 'string', 'max:5'],
                 'template' => ['required', 'string', Rule::in(['stripe', 'classic'])],
+                'invoice_type' => ['nullable', 'string', Rule::in(InvoiceTypes::ids())],
                 'tax_type' => ['required', 'string', Rule::in(['none', 'vat', 'gst', 'sales_tax', 'custom'])],
                 'tax_label' => ['nullable', 'string', 'max:50'],
                 'tax_rate' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -309,10 +314,11 @@ class InvoiceApiController extends Controller
                     'issue_date' => $data['issue_date'],
                     'due_date' => $data['due_date'] ?? null,
                     'date_of_service' => $data['date_of_service'] ?? null,
-                    'currency' => strtoupper($data['currency']),
+                    'currency' => 'INR',
                     'language' => $data['language'] ?? 'en',
                     'date_format' => $data['date_format'] ?? 'YYYY-MM-DD',
                     'template' => $data['template'],
+                    'invoice_type' => $data['invoice_type'] ?? 'standard',
                     'tax_type' => $data['tax_type'],
                     'tax_label' => $data['tax_label'] ?? 'Tax',
                     'tax_rate' => $data['tax_rate'] ?? 0,

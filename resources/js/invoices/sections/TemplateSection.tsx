@@ -1,7 +1,9 @@
 import InputLabel from '@/Components/InputLabel';
-import TemplatePicker from '../TemplatePicker';
+import { formatForInvoiceType } from '../invoiceFormatConfig';
+import InvoiceTypePicker from '../InvoiceTypePicker';
+import { applyInvoiceTypeToDraft, invoiceTypeLabel } from '../invoiceTypes';
 import Accordion from './Accordion';
-import type { InvoiceDraft, InvoiceTemplate } from '../types';
+import type { InvoiceDraft } from '../types';
 
 type Props = {
     draft: InvoiceDraft;
@@ -9,20 +11,28 @@ type Props = {
 };
 
 export default function TemplateSection({ draft, onChange }: Props) {
+    const selectType = (typeId: string) => {
+        onChange(applyInvoiceTypeToDraft(draft, typeId));
+    };
+
     return (
-        <Accordion title="Template" defaultOpen>
+        <Accordion title="Invoice template" defaultOpen>
             <p className="text-sm text-gray-600">
-                Pick a layout — the live PDF preview updates on the right when
-                you switch options.
+                Each type generates a different PDF format (columns, tax
+                blocks, trade fields, etc.). Preview updates on the right for{' '}
+                <strong>
+                    {invoiceTypeLabel(draft.invoice_type ?? 'standard')}
+                </strong>{' '}
+                ({formatForInvoiceType(draft.invoice_type ?? 'standard')}{' '}
+                format).
             </p>
             <div>
-                <InputLabel value="Preview options" />
+                <InputLabel value="Invoice type" />
                 <div className="mt-2">
-                    <TemplatePicker
-                        value={draft.template}
-                        onChange={(template: InvoiceTemplate) =>
-                            onChange({ template })
-                        }
+                    <InvoiceTypePicker
+                        value={draft.invoice_type ?? 'standard'}
+                        onChange={selectType}
+                        mode="preview"
                     />
                 </div>
             </div>

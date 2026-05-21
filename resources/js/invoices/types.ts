@@ -64,6 +64,7 @@ export interface InvoiceDraft {
     language: string;
     date_format?: string;
     template: InvoiceTemplate;
+    invoice_type: string;
     tax_type: TaxType;
     tax_label: string;
     tax_rate: number;

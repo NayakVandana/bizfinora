@@ -16,6 +16,7 @@ type Meta = {
     next_invoice_number: string;
     tax_settings?: CompanyTaxSettings;
     default_template?: 'stripe' | 'classic';
+    default_invoice_type?: string;
 };
 
 export default function InvoicesCreate() {
@@ -44,6 +45,7 @@ export default function InvoicesCreate() {
                         (seller as { logo_data_url?: string }).logo_data_url,
                         metaRes.data.tax_settings,
                         metaRes.data.default_template ?? 'stripe',
+                        metaRes.data.default_invoice_type ?? 'standard',
                     ),
                 );
             }

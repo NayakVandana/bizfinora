@@ -101,16 +101,9 @@ export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
                 </div>
                 <div>
                     <InputLabel value="Currency" />
-                    <TextInput
-                        className="mt-1 block w-full uppercase"
-                        value={draft.currency}
-                        maxLength={3}
-                        onChange={(e) =>
-                            onChange({
-                                currency: e.target.value.toUpperCase(),
-                            })
-                        }
-                    />
+                    <p className="mt-1 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700">
+                        Indian Rupee (INR) — Rs.
+                    </p>
                 </div>
             </div>
 

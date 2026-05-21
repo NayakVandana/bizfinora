@@ -62,6 +62,7 @@ class InvoicePresentation
             'language' => $invoice->language,
             'date_format' => $invoice->date_format ?? 'YYYY-MM-DD',
             'template' => $invoice->template,
+            'invoice_type' => $invoice->invoice_type ?? 'standard',
             'tax_type' => $invoice->tax_type,
             'tax_label' => $invoice->tax_label,
             'tax_rate' => (float) $invoice->tax_rate,

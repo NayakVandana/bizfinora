@@ -1,24 +1,27 @@
 import InputLabel from '@/Components/InputLabel';
+import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
-import TemplatePicker from '@/invoices/TemplatePicker';
+import { downloadInvoicePdf } from '@/invoices/downloadPdf';
+import InvoiceTypePicker from '@/invoices/InvoiceTypePicker';
 import { buildTemplatePreviewDraft } from '@/invoices/buildTemplatePreviewDraft';
-import { templateLabel } from '@/invoices/templatePresets';
+import { invoiceTypeLabel } from '@/invoices/invoiceTypes';
 import { Head, Link } from '@inertiajs/react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTemplatePreviewData } from './useTemplatePreviewData';
 
 export default function TemplatePreviewPage() {
-    const { template, setTemplate, seller, taxSettings, loading } =
+    const { invoiceType, setInvoiceType, layout, seller, taxSettings, loading } =
         useTemplatePreviewData();
+    const [downloading, setDownloading] = useState(false);
 
     const previewDraft = useMemo(() => {
         if (!seller) {
             return null;
         }
 
-        return buildTemplatePreviewDraft(seller, template, taxSettings);
-    }, [seller, template, taxSettings]);
+        return buildTemplatePreviewDraft(seller, invoiceType, taxSettings);
+    }, [seller, invoiceType, taxSettings]);
 
     return (
         <AuthenticatedLayout
@@ -38,9 +41,9 @@ export default function TemplatePreviewPage() {
                         <div className="grid gap-6 lg:grid-cols-2">
                             <div className="space-y-4 rounded-lg bg-white p-6 shadow-sm lg:max-w-md">
                                 <p className="text-sm text-gray-600">
-                                    Preview only — switching options here does
-                                    not change your saved default. Set the
-                                    default on{' '}
+                                    Browse all invoice types — preview only,
+                                    nothing is saved. Set your company default
+                                    on{' '}
                                     <Link
                                         href={route('settings.templates')}
                                         className="font-medium text-indigo-600 underline hover:text-indigo-800"
@@ -51,20 +54,48 @@ export default function TemplatePreviewPage() {
                                 </p>
 
                                 <div>
-                                    <InputLabel value="Preview layout" />
+                                    <InputLabel value="Invoice type" />
                                     <div className="mt-2">
-                                        <TemplatePicker
-                                            value={template}
-                                            onChange={setTemplate}
+                                        <InvoiceTypePicker
+                                            value={invoiceType}
+                                            onChange={setInvoiceType}
                                             mode="preview"
                                         />
                                     </div>
                                 </div>
+
+                                <p className="text-xs text-gray-500">
+                                    Layout:{' '}
+                                    {layout === 'classic'
+                                        ? 'Classic'
+                                        : 'Modern'}
+                                </p>
+
+                                <SecondaryButton
+                                    disabled={!previewDraft || downloading}
+                                    onClick={async () => {
+                                        if (!previewDraft) {
+                                            return;
+                                        }
+                                        setDownloading(true);
+                                        try {
+                                            await downloadInvoicePdf(
+                                                previewDraft,
+                                            );
+                                        } finally {
+                                            setDownloading(false);
+                                        }
+                                    }}
+                                >
+                                    {downloading
+                                        ? 'Preparing PDF…'
+                                        : 'Download PDF'}
+                                </SecondaryButton>
                             </div>
 
                             <div className="lg:sticky lg:top-4 lg:self-start">
                                 <p className="mb-2 text-sm font-medium text-gray-700">
-                                    {templateLabel(template)}
+                                    {invoiceTypeLabel(invoiceType)}
                                 </p>
                                 {previewDraft ? (
                                     <InvoicePreview

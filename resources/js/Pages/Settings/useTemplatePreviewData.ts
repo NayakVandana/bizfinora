@@ -1,10 +1,12 @@
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
+import { getInvoiceType } from '@/invoices/invoiceTypes';
 import type { CompanyTaxSettings } from '@/invoices/taxPresets';
-import type { InvoiceTemplate, PartyDetails } from '@/invoices/types';
+import type { PartyDetails } from '@/invoices/types';
 import { useEffect, useState } from 'react';
 
 type TemplateSettings = {
-    default_invoice_template: InvoiceTemplate;
+    default_invoice_type?: string;
+    default_invoice_template?: string;
     default_tax_type?: string;
     default_tax_label?: string;
     default_tax_rate?: number;
@@ -15,11 +17,12 @@ type TemplateSettings = {
 type Meta = {
     seller: PartyDetails;
     tax_settings?: CompanyTaxSettings;
+    default_invoice_type?: string;
 };
 
 export function useTemplatePreviewData() {
-    const [template, setTemplate] = useState<InvoiceTemplate>('stripe');
-    const [savedTemplate, setSavedTemplate] = useState<InvoiceTemplate>('stripe');
+    const [invoiceType, setInvoiceType] = useState('standard');
+    const [savedInvoiceType, setSavedInvoiceType] = useState('standard');
     const [seller, setSeller] = useState<PartyDetails | null>(null);
     const [taxSettings, setTaxSettings] = useState<CompanyTaxSettings | null>(
         null,
@@ -34,12 +37,10 @@ export function useTemplatePreviewData() {
             ),
             companyApiPost<ApiEnvelope<Meta>>('/invoices/invoice-meta', {}),
         ]).then(([companyRes, metaRes]) => {
+            let type = 'standard';
+
             if (companyRes.success && companyRes.data) {
-                const value = companyRes.data.default_invoice_template;
-                if (value === 'stripe' || value === 'classic') {
-                    setTemplate(value);
-                    setSavedTemplate(value);
-                }
+                type = companyRes.data.default_invoice_type ?? 'standard';
                 setTaxSettings({
                     default_tax_type:
                         (companyRes.data.default_tax_type as CompanyTaxSettings['default_tax_type']) ??
@@ -55,21 +56,33 @@ export function useTemplatePreviewData() {
                     tax_per_line: Boolean(companyRes.data.tax_per_line ?? false),
                 });
             }
-            if (metaRes.success && metaRes.data?.seller) {
-                setSeller(metaRes.data.seller);
+            if (metaRes.success && metaRes.data) {
+                if (metaRes.data.default_invoice_type) {
+                    type = metaRes.data.default_invoice_type;
+                }
+                if (metaRes.data.seller) {
+                    setSeller(metaRes.data.seller);
+                }
                 if (metaRes.data.tax_settings) {
                     setTaxSettings(metaRes.data.tax_settings);
                 }
             }
+
+            setInvoiceType(type);
+            setSavedInvoiceType(type);
             setLoading(false);
         });
     }, []);
 
+    const layout =
+        getInvoiceType(invoiceType)?.layout ?? 'stripe';
+
     return {
-        template,
-        setTemplate,
-        savedTemplate,
-        setSavedTemplate,
+        invoiceType,
+        setInvoiceType,
+        savedInvoiceType,
+        setSavedInvoiceType,
+        layout,
         seller,
         taxSettings,
         loading,

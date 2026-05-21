@@ -1,3 +1,5 @@
+import { APP_CURRENCY, normalizeCurrency } from './currency';
+import { applyInvoiceTypeToDraft } from './invoiceTypes';
 import type { CompanyTaxSettings } from './taxPresets';
 import type { InvoiceDraft, InvoiceTemplate, PartyDetails } from './types';
 
@@ -40,22 +42,24 @@ export function buildDefaultDraft(
     logoDataUrl?: string | null,
     taxSettings?: CompanyTaxSettings | null,
     template: InvoiceTemplate = 'stripe',
+    invoiceType: string = 'standard',
 ): InvoiceDraft {
     const today = new Date().toISOString().slice(0, 10);
     const due = new Date();
     due.setDate(due.getDate() + 14);
 
-    return {
+    const base: InvoiceDraft = {
         invoice_number: invoiceNumber,
         invoice_number_label: 'Invoice #',
         status: 'draft',
         issue_date: today,
         due_date: due.toISOString().slice(0, 10),
         date_of_service: today,
-        currency: 'USD',
+        currency: APP_CURRENCY,
         language: 'en',
         date_format: 'YYYY-MM-DD',
         template,
+        invoice_type: invoiceType,
         tax_type: taxSettings?.default_tax_type ?? 'vat',
         tax_label: taxSettings?.default_tax_label ?? 'VAT',
         tax_rate: taxSettings?.default_tax_rate ?? 0,
@@ -93,6 +97,8 @@ export function buildDefaultDraft(
             discount_amount: 0,
         },
     };
+
+    return { ...base, ...applyInvoiceTypeToDraft(base, invoiceType) };
 }
 
 export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDraft {
@@ -111,10 +117,13 @@ export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDra
         issue_date: String(data.issue_date ?? ''),
         due_date: String(data.due_date ?? ''),
         date_of_service: String(data.date_of_service ?? ''),
-        currency: String(data.currency ?? 'USD'),
+        currency: normalizeCurrency(
+            data.currency as string | undefined,
+        ),
         language: String(data.language ?? 'en'),
         date_format: String(data.date_format ?? 'YYYY-MM-DD'),
         template: data.template as InvoiceDraft['template'],
+        invoice_type: String(data.invoice_type ?? 'standard'),
         tax_type: data.tax_type as InvoiceDraft['tax_type'],
         tax_label: String(data.tax_label ?? 'Tax'),
         tax_rate: Number(data.tax_rate ?? 0),

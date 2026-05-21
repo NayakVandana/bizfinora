@@ -6,10 +6,12 @@ export function TaxTotalsBlock({
     draft,
     totals,
     boxStyle,
+    amountDueLabel = 'Amount due',
 }: {
     draft: InvoiceDraft;
     totals: InvoiceTotals;
     boxStyle?: ViewProps['style'];
+    amountDueLabel?: string;
 }) {
     const showSummary =
         draft.vat_summary_visible !== false &&
@@ -72,7 +74,9 @@ export function TaxTotalsBlock({
                     marginTop: 8,
                 }}
             >
-                <Text style={{ fontWeight: 700, fontSize: 12 }}>Amount due</Text>
+                <Text style={{ fontWeight: 700, fontSize: 12 }}>
+                    {amountDueLabel}
+                </Text>
                 <Text style={{ fontWeight: 700, fontSize: 12 }}>
                     {formatMoney(totals.total, draft.currency)}
                 </Text>

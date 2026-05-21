@@ -20,7 +20,21 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
         })
             .then((res) => {
                 if (res.success && res.data) {
-                    const { document, template, tax_type, tax_label, tax_rate, currency, language, issue_date, due_date, status, buyer_id, invoice_number } = res.data;
+                    const {
+                        document,
+                        template,
+                        invoice_type,
+                        tax_type,
+                        tax_label,
+                        tax_rate,
+                        currency,
+                        language,
+                        issue_date,
+                        due_date,
+                        status,
+                        buyer_id,
+                        invoice_number,
+                    } = res.data;
                     setDraft({
                         invoice_number,
                         status,
@@ -29,6 +43,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
                         currency,
                         language,
                         template,
+                        invoice_type: invoice_type ?? 'standard',
                         tax_type,
                         tax_label,
                         tax_rate,

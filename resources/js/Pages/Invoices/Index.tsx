@@ -1,5 +1,9 @@
 import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
+import { downloadInvoicePdf } from '@/invoices/downloadPdf';
+import { formatMoney } from '@/invoices/formatMoney';
+import type { InvoiceDraft } from '@/invoices/types';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -23,6 +27,24 @@ type Paginated = {
 export default function InvoicesIndex() {
     const [rows, setRows] = useState<InvoiceRow[]>([]);
     const [loading, setLoading] = useState(true);
+    const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
+    const downloadInvoice = async (id: number) => {
+        setDownloadingId(id);
+        try {
+            const res = await companyApiPost<
+                ApiEnvelope<InvoiceDraft & { id: number }>
+            >('/invoices/invoice-show', { id });
+            if (res.success && res.data) {
+                const draft = invoicePayloadToDraft(
+                    res.data as unknown as Record<string, unknown>,
+                );
+                await downloadInvoicePdf(draft);
+            }
+        } finally {
+            setDownloadingId(null);
+        }
+    };
 
     useEffect(() => {
         companyApiPost<ApiEnvelope<Paginated>>('/invoices/invoices-list', {})
@@ -105,19 +127,38 @@ export default function InvoicesIndex() {
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-right text-sm">
-                                                {row.currency}{' '}
-                                                {row.total.toFixed(2)}
+                                                {formatMoney(row.total)}
                                             </td>
-                                            <td className="px-4 py-3 text-right">
+                                            <td className="px-4 py-3 text-right text-sm">
                                                 <Link
                                                     href={route(
                                                         'invoices.edit',
                                                         row.id,
                                                     )}
-                                                    className="text-sm text-indigo-600 hover:text-indigo-800"
+                                                    className="text-indigo-600 hover:text-indigo-800"
                                                 >
                                                     Edit
                                                 </Link>
+                                                <span className="mx-2 text-gray-300">
+                                                    |
+                                                </span>
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        downloadingId ===
+                                                        row.id
+                                                    }
+                                                    onClick={() =>
+                                                        void downloadInvoice(
+                                                            row.id,
+                                                        )
+                                                    }
+                                                    className="text-indigo-600 hover:text-indigo-800 disabled:opacity-50"
+                                                >
+                                                    {downloadingId === row.id
+                                                        ? 'PDF…'
+                                                        : 'Download'}
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}

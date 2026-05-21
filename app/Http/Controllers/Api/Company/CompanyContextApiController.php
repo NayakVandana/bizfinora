@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Support\CompanyMembership;
 use App\Support\CompanyPresentation;
+use App\Support\InvoiceTypes;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -151,7 +152,8 @@ class CompanyContextApiController extends Controller
     {
         try {
             $validation = Validator::make($request->all(), [
-                'default_invoice_template' => ['required', 'string', Rule::in(['stripe', 'classic'])],
+                'default_invoice_type' => ['required', 'string', Rule::in(InvoiceTypes::ids())],
+                'default_invoice_template' => ['nullable', 'string', Rule::in(['stripe', 'classic'])],
             ]);
 
             if ($validation->fails()) {
@@ -167,7 +169,12 @@ class CompanyContextApiController extends Controller
                 return $this->sendJsonResponse(false, 'Only company owners can update template settings.', null, 200);
             }
 
-            $company->update($validation->validated());
+            $data = $validation->validated();
+            $typeId = $data['default_invoice_type'];
+            $data['default_invoice_template'] = $data['default_invoice_template']
+                ?? InvoiceTypes::layoutFor($typeId);
+
+            $company->update($data);
 
             return $this->sendJsonResponse(
                 true,

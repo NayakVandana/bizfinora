@@ -3,6 +3,10 @@ import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { PartyBlock } from './shared';
 import { TaxTotalsBlock } from './TaxTotalsBlock';
+import {
+    accentColorForDraft,
+    documentTitleForDraft,
+} from './invoiceTypePresentation';
 
 const styles = StyleSheet.create({
     page: { fontFamily: 'Helvetica', fontSize: 10, color: '#0a2540' },
@@ -67,11 +71,13 @@ export function StripeTemplate({
     totals: InvoiceTotals;
 }) {
     const { document: doc } = draft;
+    const title = documentTitleForDraft(draft.invoice_type ?? 'standard');
+    const barColor = accentColorForDraft(draft.invoice_type ?? 'standard');
 
     return (
         <Document>
             <Page size="A4" style={styles.page}>
-                <View style={styles.bar} />
+                <View style={[styles.bar, { backgroundColor: barColor }]} />
                 <View style={styles.content}>
                     <View style={styles.headerRow}>
                         <View style={{ maxWidth: '55%' }}>
@@ -86,7 +92,7 @@ export function StripeTemplate({
                                     }}
                                 />
                             ) : null}
-                            <Text style={styles.title}>Invoice</Text>
+                            <Text style={styles.title}>{title}</Text>
                             <Text style={styles.meta}>
                                 {draft.invoice_number_label ?? 'Invoice #'}{' '}
                                 {draft.invoice_number}

@@ -1,6 +1,5 @@
 import type { InvoiceDraft, InvoiceTotals } from './types';
-import { ClassicTemplate } from './templates/ClassicTemplate';
-import { StripeTemplate } from './templates/StripeTemplate';
+import { UnifiedInvoicePdf } from './templates/UnifiedInvoicePdf';
 
 export function InvoicePdfDocument({
     draft,
@@ -9,9 +8,5 @@ export function InvoicePdfDocument({
     draft: InvoiceDraft;
     totals: InvoiceTotals;
 }) {
-    if (draft.template === 'classic') {
-        return <ClassicTemplate draft={draft} totals={totals} />;
-    }
-
-    return <StripeTemplate draft={draft} totals={totals} />;
+    return <UnifiedInvoicePdf draft={draft} totals={totals} />;
 }

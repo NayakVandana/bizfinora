@@ -1,31 +1,35 @@
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoicePreview from '@/invoices/InvoicePreview';
-import TemplatePicker from '@/invoices/TemplatePicker';
+import { downloadInvoicePdf } from '@/invoices/downloadPdf';
+import InvoiceTypePicker from '@/invoices/InvoiceTypePicker';
 import { buildTemplatePreviewDraft } from '@/invoices/buildTemplatePreviewDraft';
-import { templateLabel } from '@/invoices/templatePresets';
-import type { InvoiceTemplate } from '@/invoices/types';
+import { invoiceTypeLabel } from '@/invoices/invoiceTypes';
 import { Head } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { useTemplatePreviewData } from './useTemplatePreviewData';
 
 type TemplateSettings = {
-    default_invoice_template: InvoiceTemplate;
+    default_invoice_type: string;
+    default_invoice_template: string;
 };
 
 export default function TemplateDefault() {
     const {
-        template,
-        setTemplate,
-        savedTemplate,
-        setSavedTemplate,
+        invoiceType,
+        setInvoiceType,
+        savedInvoiceType,
+        setSavedInvoiceType,
+        layout,
         seller,
         taxSettings,
         loading,
     } = useTemplatePreviewData();
     const [saving, setSaving] = useState(false);
+    const [downloading, setDownloading] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
 
     const previewDraft = useMemo(() => {
@@ -33,8 +37,8 @@ export default function TemplateDefault() {
             return null;
         }
 
-        return buildTemplatePreviewDraft(seller, template, taxSettings);
-    }, [seller, template, taxSettings]);
+        return buildTemplatePreviewDraft(seller, invoiceType, taxSettings);
+    }, [seller, invoiceType, taxSettings]);
 
     const save = async () => {
         setSaving(true);
@@ -42,14 +46,17 @@ export default function TemplateDefault() {
         try {
             const res = await companyApiPost<ApiEnvelope<TemplateSettings>>(
                 '/company/company-template-settings-update',
-                { default_invoice_template: template },
+                {
+                    default_invoice_type: invoiceType,
+                    default_invoice_template: layout,
+                },
             );
             if (res.success) {
-                setSavedTemplate(template);
+                setSavedInvoiceType(invoiceType);
             }
             setMessage(
                 res.success
-                    ? 'Default template saved for your active company.'
+                    ? 'Default invoice template saved for your active company.'
                     : (res.message ?? 'Save failed.'),
             );
         } finally {
@@ -75,9 +82,9 @@ export default function TemplateDefault() {
                         <div className="grid gap-6 lg:grid-cols-2">
                             <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
                                 <p className="text-sm text-gray-600">
-                                    Choose a default layout for new invoices.
-                                    The preview updates as you select an
-                                    option — save when you are ready.
+                                    Choose the default invoice type for new
+                                    invoices. Preview updates as you select —
+                                    save when ready.
                                 </p>
 
                                 {message ? (
@@ -87,11 +94,11 @@ export default function TemplateDefault() {
                                 ) : null}
 
                                 <div>
-                                    <InputLabel value="Default for new invoices" />
+                                    <InputLabel value="Invoice type (30 templates)" />
                                     <div className="mt-2">
-                                        <TemplatePicker
-                                            value={template}
-                                            onChange={setTemplate}
+                                        <InvoiceTypePicker
+                                            value={invoiceType}
+                                            onChange={setInvoiceType}
                                             mode="preview"
                                         />
                                     </div>
@@ -99,32 +106,70 @@ export default function TemplateDefault() {
 
                                 <p className="text-sm text-gray-700">
                                     Selected:{' '}
-                                    <strong>{templateLabel(template)}</strong>
-                                    {savedTemplate !== template ? (
+                                    <strong>
+                                        {invoiceTypeLabel(invoiceType)}
+                                    </strong>
+                                    <span className="text-gray-500">
+                                        {' '}
+                                        ({layout === 'classic'
+                                            ? 'Classic'
+                                            : 'Modern'}{' '}
+                                        layout)
+                                    </span>
+                                    {savedInvoiceType !== invoiceType ? (
                                         <span className="text-amber-700">
                                             {' '}
                                             (unsaved — saved default is{' '}
-                                            {templateLabel(savedTemplate)})
+                                            {invoiceTypeLabel(
+                                                savedInvoiceType,
+                                            )}
+                                            )
                                         </span>
                                     ) : null}
                                 </p>
 
-                                <PrimaryButton
-                                    disabled={
-                                        saving || template === savedTemplate
-                                    }
-                                    onClick={() => void save()}
-                                >
-                                    {saving
-                                        ? 'Saving…'
-                                        : 'Save default template'}
-                                </PrimaryButton>
+                                <div className="flex flex-wrap gap-2">
+                                    <PrimaryButton
+                                        disabled={
+                                            saving ||
+                                            invoiceType === savedInvoiceType
+                                        }
+                                        onClick={() => void save()}
+                                    >
+                                        {saving
+                                            ? 'Saving…'
+                                            : 'Save default template'}
+                                    </PrimaryButton>
+                                    <SecondaryButton
+                                        disabled={!previewDraft || downloading}
+                                        onClick={async () => {
+                                            if (!previewDraft) {
+                                                return;
+                                            }
+                                            setDownloading(true);
+                                            try {
+                                                await downloadInvoicePdf(
+                                                    previewDraft,
+                                                );
+                                            } finally {
+                                                setDownloading(false);
+                                            }
+                                        }}
+                                    >
+                                        {downloading
+                                            ? 'Preparing PDF…'
+                                            : 'Download PDF'}
+                                    </SecondaryButton>
+                                </div>
                             </div>
 
                             <div className="lg:sticky lg:top-4 lg:self-start">
-                                <p className="mb-2 text-sm font-medium text-gray-700">
-                                    Live preview — {templateLabel(template)}
-                                </p>
+                                <div className="mb-2 flex items-center justify-between gap-2">
+                                    <p className="text-sm font-medium text-gray-700">
+                                        Live preview —{' '}
+                                        {invoiceTypeLabel(invoiceType)}
+                                    </p>
+                                </div>
                                 {previewDraft ? (
                                     <InvoicePreview
                                         draft={previewDraft}

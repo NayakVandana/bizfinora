@@ -20,6 +20,7 @@ class Invoice extends Model
         'currency',
         'language',
         'template',
+        'invoice_type',
         'tax_type',
         'tax_label',
         'tax_rate',

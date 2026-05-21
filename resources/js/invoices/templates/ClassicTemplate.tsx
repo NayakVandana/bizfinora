@@ -3,6 +3,7 @@ import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { baseStyles, PartyBlock } from './shared';
 import { TaxTotalsBlock } from './TaxTotalsBlock';
+import { documentTitleForDraft } from './invoiceTypePresentation';
 
 export function ClassicTemplate({
     draft,
@@ -12,6 +13,7 @@ export function ClassicTemplate({
     totals: InvoiceTotals;
 }) {
     const { document: doc } = draft;
+    const title = documentTitleForDraft(draft.invoice_type ?? 'standard');
 
     return (
         <Document>
@@ -24,7 +26,7 @@ export function ClassicTemplate({
                                 style={{ width: 120, height: 48, objectFit: 'contain', marginBottom: 8 }}
                             />
                         ) : null}
-                        <Text style={baseStyles.h1}>INVOICE</Text>
+                        <Text style={baseStyles.h1}>{title}</Text>
                         <Text style={baseStyles.muted}>#{draft.invoice_number}</Text>
                     </View>
                     <View style={{ textAlign: 'right' }}>
