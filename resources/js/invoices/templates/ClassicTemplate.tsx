@@ -66,7 +66,9 @@ export function ClassicTemplate({
                 })}
 
                 <View style={{ marginTop: 16, alignItems: 'flex-end', width: '100%' }}>
-                    <TaxTotalsBlock draft={draft} totals={totals} />
+                    <View style={{ width: 240 }}>
+                        <TaxTotalsBlock draft={draft} totals={totals} />
+                    </View>
                 </View>
 
                 <View style={[baseStyles.row, { marginTop: 24 }]}>

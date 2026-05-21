@@ -31,6 +31,10 @@ Route::get('/profile', fn () => Inertia::render('Profile/Edit', [
 
 Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.index');
 
+Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplateDefault'))->name('settings.templates');
+
+Route::get('/settings/templates/preview', fn () => Inertia::render('Settings/TemplatePreview'))->name('settings.templates.preview');
+
 Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
 
 Route::get('/invoices', fn () => Inertia::render('Invoices/Index'))->name('invoices.index');

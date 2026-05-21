@@ -129,6 +129,7 @@ class InvoiceApiController extends Controller
                     'tax_calculation_mode' => $company->tax_calculation_mode ?? 'exclusive',
                     'tax_per_line' => (bool) ($company->tax_per_line ?? false),
                 ],
+                'default_template' => $company->default_invoice_template ?? 'stripe',
             ], 200);
         } catch (Exception $e) {
             return $this->sendError($e);

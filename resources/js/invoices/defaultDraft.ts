@@ -1,5 +1,5 @@
 import type { CompanyTaxSettings } from './taxPresets';
-import type { InvoiceDraft, PartyDetails } from './types';
+import type { InvoiceDraft, InvoiceTemplate, PartyDetails } from './types';
 
 export function emptyParty(): PartyDetails {
     return {
@@ -39,6 +39,7 @@ export function buildDefaultDraft(
     invoiceNumber: string,
     logoDataUrl?: string | null,
     taxSettings?: CompanyTaxSettings | null,
+    template: InvoiceTemplate = 'stripe',
 ): InvoiceDraft {
     const today = new Date().toISOString().slice(0, 10);
     const due = new Date();
@@ -54,7 +55,7 @@ export function buildDefaultDraft(
         currency: 'USD',
         language: 'en',
         date_format: 'YYYY-MM-DD',
-        template: 'stripe',
+        template,
         tax_type: taxSettings?.default_tax_type ?? 'vat',
         tax_label: taxSettings?.default_tax_label ?? 'VAT',
         tax_rate: taxSettings?.default_tax_rate ?? 0,

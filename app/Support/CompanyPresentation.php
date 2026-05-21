@@ -32,6 +32,7 @@ class CompanyPresentation
             'default_tax_rate' => (float) ($company->default_tax_rate ?? 0),
             'tax_calculation_mode' => $company->tax_calculation_mode ?? 'exclusive',
             'tax_per_line' => (bool) ($company->tax_per_line ?? false),
+            'default_invoice_template' => $company->default_invoice_template ?? 'stripe',
             'created_at' => $company->created_at?->toIso8601String(),
             'updated_at' => $company->updated_at?->toIso8601String(),
         ];

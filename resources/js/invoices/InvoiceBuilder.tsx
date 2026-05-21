@@ -4,6 +4,7 @@ import InvoicePreview from '@/invoices/InvoicePreview';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import BuyerSection from './sections/BuyerSection';
 import GeneralSection from './sections/GeneralSection';
+import TemplateSection from './sections/TemplateSection';
 import ItemsSection from './sections/ItemsSection';
 import TaxSettingsSection from './sections/TaxSettingsSection';
 import type { CompanyTaxSettings } from './taxPresets';
@@ -168,6 +169,7 @@ export default function InvoiceBuilder({
                     </div>
                 ) : null}
 
+                <TemplateSection draft={draft} onChange={update} />
                 <GeneralSection
                     draft={draft}
                     onChange={update}

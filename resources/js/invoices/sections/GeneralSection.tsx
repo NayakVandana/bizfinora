@@ -1,7 +1,7 @@
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import Accordion from './Accordion';
-import type { InvoiceDraft, InvoiceTemplate } from '../types';
+import type { InvoiceDraft } from '../types';
 
 type Props = {
     draft: InvoiceDraft;
@@ -111,21 +111,6 @@ export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
                             })
                         }
                     />
-                </div>
-                <div>
-                    <InputLabel value="Template" />
-                    <select
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        value={draft.template}
-                        onChange={(e) =>
-                            onChange({
-                                template: e.target.value as InvoiceTemplate,
-                            })
-                        }
-                    >
-                        <option value="stripe">Modern (Stripe-style)</option>
-                        <option value="classic">Classic</option>
-                    </select>
                 </div>
             </div>
 

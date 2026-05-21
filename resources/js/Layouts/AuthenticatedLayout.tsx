@@ -7,36 +7,63 @@ import { Link, router } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { requireAuthPage } from '@/utils/requireAuth';
 
-type NavItem = {
+type NavLinkItem = {
+    type: 'link';
     href: string;
     label: string;
     isActive: () => boolean;
 };
 
-function useNavItems(): NavItem[] {
+type NavHeading = {
+    type: 'heading';
+    label: string;
+};
+
+type NavEntry = NavLinkItem | NavHeading;
+
+function useNavEntries(): NavEntry[] {
     return [
         {
+            type: 'link',
             href: route('dashboard'),
             label: 'Dashboard',
             isActive: () => Boolean(route().current('dashboard')),
         },
         {
+            type: 'link',
             href: route('companies.index'),
             label: 'Companies',
             isActive: () => Boolean(route().current('companies.index')),
         },
         {
+            type: 'link',
             href: route('buyers.index'),
             label: 'Buyers',
             isActive: () => Boolean(route().current('buyers.index')),
         },
         {
+            type: 'link',
             href: route('invoices.index'),
             label: 'Invoices',
             isActive: () =>
                 Boolean(route().current()?.startsWith('invoices.')),
         },
+        { type: 'heading', label: 'Templates' },
         {
+            type: 'link',
+            href: route('settings.templates'),
+            label: 'Default template',
+            isActive: () => route().current() === 'settings.templates',
+        },
+        {
+            type: 'link',
+            href: route('settings.templates.preview'),
+            label: 'Preview',
+            isActive: () =>
+                route().current() === 'settings.templates.preview',
+        },
+        {
+            type: 'link',
             href: route('settings.tax'),
             label: 'Tax',
             isActive: () => Boolean(route().current('settings.tax')),
@@ -45,24 +72,33 @@ function useNavItems(): NavItem[] {
 }
 
 function SidebarNav({
-    items,
+    entries,
     onNavigate,
 }: {
-    items: NavItem[];
+    entries: NavEntry[];
     onNavigate?: () => void;
 }) {
     return (
         <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4">
-            {items.map((item) => (
-                <ResponsiveNavLink
-                    key={item.label}
-                    href={item.href}
-                    active={item.isActive()}
-                    onClick={onNavigate}
-                >
-                    {item.label}
-                </ResponsiveNavLink>
-            ))}
+            {entries.map((entry) =>
+                entry.type === 'heading' ? (
+                    <p
+                        key={entry.label}
+                        className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 first:mt-0"
+                    >
+                        {entry.label}
+                    </p>
+                ) : (
+                    <ResponsiveNavLink
+                        key={entry.label}
+                        href={entry.href}
+                        active={entry.isActive()}
+                        onClick={onNavigate}
+                    >
+                        {entry.label}
+                    </ResponsiveNavLink>
+                ),
+            )}
         </nav>
     );
 }
@@ -115,7 +151,7 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { user, loading, logout } = useAuthUser();
-    const navItems = useNavItems();
+    const navEntries = useNavEntries();
 
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -147,7 +183,7 @@ export default function Authenticated({
                         <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
                     </Link>
                 </div>
-                <SidebarNav items={navItems} />
+                <SidebarNav entries={navEntries} />
             </aside>
 
             {/* Mobile sidebar overlay */}
@@ -191,7 +227,7 @@ export default function Authenticated({
                             </button>
                         </div>
                         <SidebarNav
-                            items={navItems}
+                            entries={navEntries}
                             onNavigate={() => setMobileNavOpen(false)}
                         />
                         <div className="border-t border-gray-200 px-4 py-3">

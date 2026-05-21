@@ -146,4 +146,37 @@ class CompanyContextApiController extends Controller
             return $this->sendError($e);
         }
     }
+
+    public function postCompanyTemplateSettingsUpdate(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'default_invoice_template' => ['required', 'string', Rule::in(['stripe', 'classic'])],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+            $user = $request->user();
+            $membership = $user->companies()->where('companies.id', $company->id)->first();
+
+            if ($membership === null || $membership->pivot->role !== CompanyMembership::ROLE_OWNER) {
+                return $this->sendJsonResponse(false, 'Only company owners can update template settings.', null, 200);
+            }
+
+            $company->update($validation->validated());
+
+            return $this->sendJsonResponse(
+                true,
+                'Template settings saved successfully.',
+                CompanyPresentation::format($company->fresh(), CompanyMembership::ROLE_OWNER, true),
+                200,
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
 }

@@ -10,6 +10,7 @@ Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(
     Route::post('/company/company-update', [CompanyContextApiController::class, 'postCompanyUpdate']);
     Route::post('/company/company-profile-update', [CompanyContextApiController::class, 'postCompanyProfileUpdate']);
     Route::post('/company/company-tax-settings-update', [CompanyContextApiController::class, 'postCompanyTaxSettingsUpdate']);
+    Route::post('/company/company-template-settings-update', [CompanyContextApiController::class, 'postCompanyTemplateSettingsUpdate']);
 
     Route::post('/buyers/buyers-list', [BuyerApiController::class, 'postBuyersList']);
     Route::post('/buyers/buyer-store', [BuyerApiController::class, 'postBuyerStore']);

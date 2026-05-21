@@ -29,6 +29,7 @@ class Company extends Model
         'default_tax_rate',
         'tax_calculation_mode',
         'tax_per_line',
+        'default_invoice_template',
     ];
 
     protected function casts(): array

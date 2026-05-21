@@ -1,37 +1,63 @@
-import { Document, Image, Page, Text, View } from '@react-pdf/renderer';
+import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { PartyBlock } from './shared';
 import { TaxTotalsBlock } from './TaxTotalsBlock';
 
-const styles = {
+const styles = StyleSheet.create({
     page: { fontFamily: 'Helvetica', fontSize: 10, color: '#0a2540' },
     bar: { height: 6, backgroundColor: '#fbbf24' },
     content: { padding: 36 },
-    title: { fontSize: 28, fontWeight: 700, color: '#0a2540', marginBottom: 8 },
-    meta: { color: '#425466', marginBottom: 20 },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
+    title: { fontSize: 28, fontWeight: 700, color: '#0a2540', marginBottom: 4 },
+    meta: { color: '#425466', fontSize: 10 },
+    amountDue: { fontWeight: 700, fontSize: 14, color: '#0a2540' },
+    parties: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+    },
     tableHead: {
-        flexDirection: 'row' as const,
+        flexDirection: 'row',
         borderBottomWidth: 1,
         borderBottomColor: '#e6ebf1',
         paddingBottom: 8,
-        marginBottom: 4,
+        marginBottom: 2,
         color: '#425466',
         fontSize: 9,
     },
     tableRow: {
-        flexDirection: 'row' as const,
+        flexDirection: 'row',
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#f6f9fc',
     },
+    colDesc: { width: '50%', paddingRight: 8 },
+    colQty: { width: '15%', textAlign: 'right' },
+    colPrice: { width: '17%', textAlign: 'right' },
+    colTotal: { width: '18%', textAlign: 'right' },
+    totalsWrap: {
+        marginTop: 12,
+        alignItems: 'flex-end',
+    },
     totalBox: {
-        marginTop: 16,
-        padding: 16,
+        width: 240,
+        padding: 14,
         backgroundColor: '#f6f9fc',
         borderRadius: 4,
     },
-};
+    footer: {
+        flexDirection: 'row',
+        marginTop: 20,
+        justifyContent: 'space-between',
+    },
+    footerNotes: { maxWidth: '70%' },
+    noteText: { color: '#425466', fontSize: 9, lineHeight: 1.4 },
+});
 
 export function StripeTemplate({
     draft,
@@ -47,68 +73,111 @@ export function StripeTemplate({
             <Page size="A4" style={styles.page}>
                 <View style={styles.bar} />
                 <View style={styles.content}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                        <View>
+                    <View style={styles.headerRow}>
+                        <View style={{ maxWidth: '55%' }}>
                             {doc.logo_data_url ? (
                                 <Image
                                     src={doc.logo_data_url}
-                                    style={{ width: 100, height: 40, marginBottom: 12, objectFit: 'contain' }}
+                                    style={{
+                                        width: 100,
+                                        height: 40,
+                                        marginBottom: 12,
+                                        objectFit: 'contain',
+                                    }}
                                 />
                             ) : null}
                             <Text style={styles.title}>Invoice</Text>
-                            <Text style={styles.meta}>#{draft.invoice_number}</Text>
+                            <Text style={styles.meta}>
+                                {draft.invoice_number_label ?? 'Invoice #'}{' '}
+                                {draft.invoice_number}
+                            </Text>
+                            <Text style={styles.meta}>
+                                Issued {draft.issue_date}
+                                {draft.due_date
+                                    ? ` · Due ${draft.due_date}`
+                                    : ''}
+                            </Text>
                         </View>
-                        <View style={{ textAlign: 'right', marginTop: 8 }}>
-                            <Text style={{ fontWeight: 700 }}>{formatMoney(totals.total, draft.currency)}</Text>
-                            <Text style={styles.meta}>due {draft.due_date || draft.issue_date}</Text>
+                        <View style={{ textAlign: 'right' }}>
+                            <Text style={styles.amountDue}>
+                                {formatMoney(totals.total, draft.currency)}
+                            </Text>
+                            <Text style={styles.meta}>Amount due</Text>
                         </View>
                     </View>
 
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 24 }}>
+                    <View style={styles.parties}>
                         <PartyBlock title="From" party={doc.seller} />
                         <PartyBlock title="Bill to" party={doc.buyer} />
                     </View>
 
                     <View style={styles.tableHead}>
-                        <Text style={{ width: '50%' }}>Description</Text>
-                        <Text style={{ width: '15%', textAlign: 'right' }}>Qty</Text>
-                        <Text style={{ width: '17%', textAlign: 'right' }}>Unit price</Text>
-                        <Text style={{ width: '18%', textAlign: 'right' }}>Amount</Text>
+                        <Text style={styles.colDesc}>Description</Text>
+                        <Text style={styles.colQty}>Qty</Text>
+                        <Text style={styles.colPrice}>Unit price</Text>
+                        <Text style={styles.colTotal}>Amount</Text>
                     </View>
 
                     {doc.items.map((item, index) => {
                         const line =
-                            Math.round(item.quantity * item.unit_price * 100) / 100;
+                            Math.round(
+                                item.quantity * item.unit_price * 100,
+                            ) / 100;
 
                         return (
                             <View key={index} style={styles.tableRow}>
-                                <Text style={{ width: '50%' }}>{item.description}</Text>
-                                <Text style={{ width: '15%', textAlign: 'right' }}>{item.quantity}</Text>
-                                <Text style={{ width: '17%', textAlign: 'right' }}>
-                                    {formatMoney(item.unit_price, draft.currency)}
-                                </Text>
-                                <Text style={{ width: '18%', textAlign: 'right' }}>
-                                    {formatMoney(line, draft.currency)}
-                                </Text>
+                                <View style={styles.colDesc}>
+                                    <Text>{item.description}</Text>
+                                </View>
+                                <View style={styles.colQty}>
+                                    <Text>{item.quantity}</Text>
+                                </View>
+                                <View style={styles.colPrice}>
+                                    <Text>
+                                        {formatMoney(
+                                            item.unit_price,
+                                            draft.currency,
+                                        )}
+                                    </Text>
+                                </View>
+                                <View style={styles.colTotal}>
+                                    <Text>
+                                        {formatMoney(line, draft.currency)}
+                                    </Text>
+                                </View>
                             </View>
                         );
                     })}
 
-                    <TaxTotalsBlock
-                        draft={draft}
-                        totals={totals}
-                        boxStyle={styles.totalBox}
-                    />
+                    <View style={styles.totalsWrap}>
+                        <TaxTotalsBlock
+                            draft={draft}
+                            totals={totals}
+                            boxStyle={styles.totalBox}
+                        />
+                    </View>
 
-                    <View style={{ flexDirection: 'row', marginTop: 20, justifyContent: 'space-between' }}>
-                        <View style={{ maxWidth: '70%' }}>
-                            {doc.notes ? <Text style={{ color: '#425466', marginBottom: 6 }}>{doc.notes}</Text> : null}
+                    <View style={styles.footer}>
+                        <View style={styles.footerNotes}>
+                            {doc.notes ? (
+                                <Text style={styles.noteText}>{doc.notes}</Text>
+                            ) : null}
                             {doc.payment_terms ? (
-                                <Text style={{ color: '#425466' }}>{doc.payment_terms}</Text>
+                                <Text
+                                    style={[
+                                        styles.noteText,
+                                        { marginTop: doc.notes ? 6 : 0 },
+                                    ]}
+                                >
+                                    {doc.payment_terms}
+                                </Text>
                             ) : null}
                         </View>
                         {doc.qr_data_url ? (
-                            <Image src={doc.qr_data_url} style={{ width: 72, height: 72 }} />
+                            <Image
+                                src={doc.qr_data_url}
+                                style={{ width: 72, height: 72 }}
+                            />
                         ) : null}
                     </View>
                 </View>
