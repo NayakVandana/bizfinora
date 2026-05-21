@@ -1,21 +1,123 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import CompanySwitcher from '@/Components/CompanySwitcher';
 import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { Link, router } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { requireAuthPage } from '@/utils/requireAuth';
 
+type NavItem = {
+    href: string;
+    label: string;
+    isActive: () => boolean;
+};
+
+function useNavItems(): NavItem[] {
+    return [
+        {
+            href: route('dashboard'),
+            label: 'Dashboard',
+            isActive: () => Boolean(route().current('dashboard')),
+        },
+        {
+            href: route('companies.index'),
+            label: 'Companies',
+            isActive: () => Boolean(route().current('companies.index')),
+        },
+        {
+            href: route('buyers.index'),
+            label: 'Buyers',
+            isActive: () => Boolean(route().current('buyers.index')),
+        },
+        {
+            href: route('invoices.index'),
+            label: 'Invoices',
+            isActive: () =>
+                Boolean(route().current()?.startsWith('invoices.')),
+        },
+        {
+            href: route('settings.tax'),
+            label: 'Tax',
+            isActive: () => Boolean(route().current('settings.tax')),
+        },
+    ];
+}
+
+function SidebarNav({
+    items,
+    onNavigate,
+}: {
+    items: NavItem[];
+    onNavigate?: () => void;
+}) {
+    return (
+        <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4">
+            {items.map((item) => (
+                <ResponsiveNavLink
+                    key={item.label}
+                    href={item.href}
+                    active={item.isActive()}
+                    onClick={onNavigate}
+                >
+                    {item.label}
+                </ResponsiveNavLink>
+            ))}
+        </nav>
+    );
+}
+
+function UserMenu({ onLogout }: { onLogout: () => void }) {
+    const { user } = useAuthUser();
+
+    return (
+        <Dropdown>
+            <Dropdown.Trigger>
+                <span className="inline-flex rounded-md">
+                    <button
+                        type="button"
+                        className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                    >
+                        {user?.name}
+                        <svg
+                            className="-me-0.5 ms-2 h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                    </button>
+                </span>
+            </Dropdown.Trigger>
+            <Dropdown.Content>
+                <Dropdown.Link href={route('profile.edit')}>
+                    Profile
+                </Dropdown.Link>
+                <button
+                    type="button"
+                    onClick={onLogout}
+                    className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                >
+                    Log Out
+                </button>
+            </Dropdown.Content>
+        </Dropdown>
+    );
+}
+
 export default function Authenticated({
     header,
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { user, loading, logout } = useAuthUser();
+    const navItems = useNavItems();
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
     useEffect(() => {
         if (!loading) {
@@ -37,133 +139,49 @@ export default function Authenticated({
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
+        <div className="min-h-screen bg-gray-100 lg:flex">
+            {/* Desktop sidebar */}
+            <aside className="hidden w-56 shrink-0 flex-col border-r border-gray-200 bg-white lg:flex">
+                <div className="flex h-16 items-center border-b border-gray-100 px-4">
+                    <Link href={route('dashboard')}>
+                        <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
+                    </Link>
+                </div>
+                <SidebarNav items={navItems} />
+            </aside>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
-                                    Dashboard
-                                </NavLink>
-                                <NavLink
-                                    href={route('companies.index')}
-                                    active={route().current('companies.index')}
-                                >
-                                    Companies
-                                </NavLink>
-                                <NavLink
-                                    href={route('buyers.index')}
-                                    active={route().current('buyers.index')}
-                                >
-                                    Buyers
-                                </NavLink>
-                                <NavLink
-                                    href={route('invoices.index')}
-                                    active={Boolean(
-                                        route()
-                                            .current()
-                                            ?.startsWith('invoices.'),
-                                    )}
-                                >
-                                    Invoices
-                                </NavLink>
-                                <NavLink
-                                    href={route('settings.tax')}
-                                    active={route().current('settings.tax')}
-                                >
-                                    Tax
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:ms-6 sm:flex sm:items-center sm:gap-3">
-                            <CompanySwitcher />
-                            <div className="relative">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
-                                        <button
-                                            type="button"
-                                            onClick={() => void handleLogout()}
-                                            className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-                                        >
-                                            Log Out
-                                        </button>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
+            {/* Mobile sidebar overlay */}
+            {mobileNavOpen ? (
+                <div
+                    className="fixed inset-0 z-40 lg:hidden"
+                    role="presentation"
+                    onClick={() => setMobileNavOpen(false)}
+                >
+                    <div className="absolute inset-0 bg-gray-600/50" />
+                    <aside
+                        className="relative flex h-full w-56 flex-col bg-white shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
+                            <Link
+                                href={route('dashboard')}
+                                onClick={() => setMobileNavOpen(false)}
+                            >
+                                <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
+                            </Link>
                             <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                                type="button"
+                                onClick={() => setMobileNavOpen(false)}
+                                className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                                aria-label="Close menu"
                             >
                                 <svg
-                                    className="h-6 w-6"
+                                    className="h-5 w-5"
                                     stroke="currentColor"
                                     fill="none"
                                     viewBox="0 0 24 24"
                                 >
                                     <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeWidth="2"
@@ -172,91 +190,80 @@ export default function Authenticated({
                                 </svg>
                             </button>
                         </div>
-                    </div>
-                </div>
-
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
-                            Dashboard
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('companies.index')}
-                            active={route().current('companies.index')}
-                        >
-                            Companies
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('buyers.index')}
-                            active={route().current('buyers.index')}
-                        >
-                            Buyers
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('invoices.index')}
-                            active={Boolean(
-                                route()
-                                    .current()
-                                    ?.startsWith('invoices.'),
-                            )}
-                        >
-                            Invoices
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink
-                            href={route('settings.tax')}
-                            active={route().current('settings.tax')}
-                        >
-                            Tax
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="border-t border-gray-200 px-4 py-3">
-                        <CompanySwitcher />
-                    </div>
-
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
+                        <SidebarNav
+                            items={navItems}
+                            onNavigate={() => setMobileNavOpen(false)}
+                        />
+                        <div className="border-t border-gray-200 px-4 py-3">
+                            <CompanySwitcher />
+                        </div>
+                        <div className="mt-auto border-t border-gray-200 px-4 py-4">
+                            <p className="text-sm font-medium text-gray-800">
                                 {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                            </p>
+                            <p className="text-xs text-gray-500">{user.email}</p>
+                            <div className="mt-2 space-y-1">
+                                <ResponsiveNavLink
+                                    href={route('profile.edit')}
+                                    onClick={() => setMobileNavOpen(false)}
+                                >
+                                    Profile
+                                </ResponsiveNavLink>
+                                <button
+                                    type="button"
+                                    onClick={() => void handleLogout()}
+                                    className="block w-full px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                                >
+                                    Log Out
+                                </button>
                             </div>
                         </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <button
-                                type="button"
-                                onClick={() => void handleLogout()}
-                                className="block w-full px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-                            >
-                                Log Out
-                            </button>
-                        </div>
-                    </div>
+                    </aside>
                 </div>
-            </nav>
+            ) : null}
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
+            <div className="flex min-w-0 flex-1 flex-col">
+                <header className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 lg:px-8">
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setMobileNavOpen(true)}
+                            className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 lg:hidden"
+                            aria-label="Open menu"
+                        >
+                            <svg
+                                className="h-6 w-6"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            </svg>
+                        </button>
+                        {header ? (
+                            <div className="min-w-0">{header}</div>
+                        ) : (
+                            <Link
+                                href={route('dashboard')}
+                                className="lg:hidden"
+                            >
+                                <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
+                            </Link>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <CompanySwitcher />
+                        <UserMenu onLogout={() => void handleLogout()} />
                     </div>
                 </header>
-            )}
 
-            <main>{children}</main>
+                <main className="flex-1">{children}</main>
+            </div>
         </div>
     );
 }
