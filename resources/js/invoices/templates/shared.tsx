@@ -47,13 +47,17 @@ export function PartyBlock({
     role?: PartyVisibilityRole;
 }) {
     const lines = partyDetailLines(party, visibility, role);
+    const heading =
+        role === 'buyer'
+            ? party.company_name?.trim() || party.name
+            : party.name;
 
     return (
         <View style={{ width: '48%' }}>
             <Text style={{ fontSize: 9, color: '#6b7280', marginBottom: 4 }}>
                 {title}
             </Text>
-            <Text style={{ fontWeight: 700, marginBottom: 4 }}>{party.name}</Text>
+            <Text style={{ fontWeight: 700, marginBottom: 4 }}>{heading}</Text>
             {lines.map((line, i) => (
                 <Text key={i} style={{ fontSize: 9, color: '#374151' }}>
                     {line}

@@ -76,10 +76,19 @@ export default function BuyersIndex() {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-4 py-3 text-left font-medium text-gray-600">
-                                            Name
+                                            Company
+                                        </th>
+                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                            Owner
+                                        </th>
+                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                            Mobile
                                         </th>
                                         <th className="px-4 py-3 text-left font-medium text-gray-600">
                                             Email
+                                        </th>
+                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                            GST
                                         </th>
                                         <th className="px-4 py-3 text-right font-medium text-gray-600">
                                             Actions
@@ -90,10 +99,19 @@ export default function BuyersIndex() {
                                     {buyers.map((b) => (
                                         <tr key={b.id}>
                                             <td className="px-4 py-3">
-                                                {b.name}
+                                                {b.company_name ?? b.name}
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-600">
+                                                {b.name ?? '—'}
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-600">
+                                                {b.phone ?? '—'}
                                             </td>
                                             <td className="px-4 py-3 text-gray-600">
                                                 {b.email ?? '—'}
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-600">
+                                                {b.gst ?? '—'}
                                             </td>
                                             <td className="space-x-2 px-4 py-3 text-right">
                                                 <Link

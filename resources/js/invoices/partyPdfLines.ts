@@ -14,6 +14,14 @@ export function partyDetailLines(
 ): string[] {
     const lines: string[] = [];
 
+    if (
+        role === 'buyer' &&
+        party.name?.trim() &&
+        isFieldVisible(visibility, prefix(role, 'owner_name'), true)
+    ) {
+        lines.push(`Owner: ${party.name.trim()}`);
+    }
+
     const address =
         party.address?.trim() ||
         [party.address_line1, party.address_line2, party.city, party.country]
@@ -32,11 +40,23 @@ export function partyDetailLines(
     }
 
     if (
+        party.gst?.trim() &&
+        isFieldVisible(visibility, prefix(role, 'gst'), true)
+    ) {
+        lines.push(`GSTIN: ${party.gst.trim()}`);
+    } else if (
         party.tax_id?.trim() &&
         isFieldVisible(visibility, prefix(role, 'tax_id'), true)
     ) {
         const label = party.tax_id_label?.trim() || 'Tax ID';
         lines.push(`${label}: ${party.tax_id.trim()}`);
+    }
+
+    if (
+        party.pan?.trim() &&
+        isFieldVisible(visibility, prefix(role, 'pan'), true)
+    ) {
+        lines.push(`PAN: ${party.pan.trim()}`);
     }
 
     if (

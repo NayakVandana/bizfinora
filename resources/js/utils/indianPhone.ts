@@ -21,6 +21,21 @@ export function validateIndianMobileOptional(phone: string): string | null {
         return null;
     }
 
+    return validateIndianMobileDigits(trimmed);
+}
+
+/** Required 10-digit Indian mobile (6–9). */
+export function validateIndianMobileRequired(phone: string): string | null {
+    const trimmed = phone.trim();
+
+    if (!trimmed) {
+        return 'Mobile number is required.';
+    }
+
+    return validateIndianMobileDigits(trimmed);
+}
+
+function validateIndianMobileDigits(trimmed: string): string | null {
     const digits = phoneDigits(trimmed);
 
     if (digits.length !== 10) {

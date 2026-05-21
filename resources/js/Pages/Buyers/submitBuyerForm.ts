@@ -2,6 +2,7 @@ import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import type { BuyerFormState } from './buyerForm';
 import { normalizeIndianMobile } from '@/utils/indianPhone';
+import { normalizeGst, normalizePan } from '@/utils/indianTaxId';
 import {
     mapBuyerApiErrors,
     validateBuyerForm,
@@ -20,10 +21,15 @@ export async function submitBuyerForm(
         return { ok: false, errors: clientErrors };
     }
 
-    const phone = normalizeIndianMobile(form.phone ?? '');
+    const phone = normalizeIndianMobile(form.phone);
     const payload = {
-        ...form,
+        company_name: form.company_name.trim(),
+        name: form.name.trim(),
+        email: form.email.trim(),
         phone: phone ?? '',
+        address: form.address.trim(),
+        gst: normalizeGst(form.gst) || null,
+        pan: normalizePan(form.pan) || null,
         id: form.id,
     };
 

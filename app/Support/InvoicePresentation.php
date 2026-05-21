@@ -15,11 +15,14 @@ class InvoicePresentation
     {
         return [
             'id' => $buyer->id,
-            'name' => $buyer->name,
+            'company_name' => $buyer->company_name ?? '',
+            'name' => $buyer->name ?? '',
             'email' => $buyer->email,
             'phone' => $buyer->phone,
-            'tax_id' => $buyer->tax_id,
-            'tax_id_label' => $buyer->tax_id_label ?? 'VAT no',
+            'gst' => $buyer->gst,
+            'pan' => $buyer->pan,
+            'tax_id' => $buyer->gst ?: $buyer->tax_id,
+            'tax_id_label' => $buyer->gst ? 'GSTIN' : ($buyer->tax_id_label ?? 'GSTIN'),
             'address' => $buyer->address,
             'address_line1' => $buyer->address_line1,
             'address_line2' => $buyer->address_line2,

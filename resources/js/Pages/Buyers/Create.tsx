@@ -15,7 +15,6 @@ export default function BuyersCreate() {
 
     const save = async () => {
         setSaving(true);
-        setErrors({});
         try {
             const result = await submitBuyerForm(form);
             if (result.ok) {
@@ -67,7 +66,7 @@ export default function BuyersCreate() {
                         <div className="mt-6">
                             <PrimaryButton
                                 type="button"
-                                disabled={saving || !form.name.trim()}
+                                disabled={saving}
                                 onClick={() => void save()}
                             >
                                 {saving ? 'Saving…' : 'Create'}

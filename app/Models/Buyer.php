@@ -10,9 +10,12 @@ class Buyer extends Model
 {
     protected $fillable = [
         'company_id',
+        'company_name',
         'name',
         'email',
         'phone',
+        'gst',
+        'pan',
         'tax_id',
         'tax_id_label',
         'address',

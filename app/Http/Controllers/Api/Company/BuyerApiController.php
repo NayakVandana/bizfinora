@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Company;
 use App\Support\IndianMobileValidator;
+use App\Support\IndianTaxIdValidator;
 use App\Support\InvoicePresentation;
 use Exception;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -38,15 +40,14 @@ class BuyerApiController extends Controller
             $company = $request->attributes->get('company');
 
             $validation = Validator::make($request->all(), $this->buyerRules());
-            IndianMobileValidator::attachAfter($validation);
-            IndianMobileValidator::attachDuplicateBuyerPhone($validation, $company->id);
+            $this->attachBuyerValidators($validation, $company->id);
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
             }
 
             $buyer = Buyer::query()->create([
-                ...$validation->validated(),
+                ...$this->prepareBuyerPayload($validation->validated()),
                 'company_id' => $company->id,
             ]);
 
@@ -73,12 +74,7 @@ class BuyerApiController extends Controller
                 'id' => ['required', 'integer'],
                 ...$this->buyerRules(),
             ]);
-            IndianMobileValidator::attachAfter($validation);
-            IndianMobileValidator::attachDuplicateBuyerPhone(
-                $validation,
-                $company->id,
-                $buyerId,
-            );
+            $this->attachBuyerValidators($validation, $company->id, $buyerId);
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
@@ -92,7 +88,7 @@ class BuyerApiController extends Controller
                 return $this->sendJsonResponse(false, 'Buyer not found.', null, 200);
             }
 
-            $buyer->update(collect($validation->validated())->except('id')->all());
+            $buyer->update($this->prepareBuyerPayload($validation->validated()));
 
             return $this->sendJsonResponse(
                 true,
@@ -140,21 +136,72 @@ class BuyerApiController extends Controller
     private function buyerRules(): array
     {
         return [
+            'company_name' => ['required', 'string', 'max:255'],
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:10'],
-            'tax_id' => ['nullable', 'string', 'max:100'],
-            'tax_id_label' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:2000'],
-            'address_line1' => ['nullable', 'string', 'max:255'],
-            'address_line2' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
-            'postal_code' => ['nullable', 'string', 'max:20'],
-            'country' => ['nullable', 'string', 'max:100'],
-            'account_number' => ['nullable', 'string', 'max:100'],
-            'swift_bic' => ['nullable', 'string', 'max:50'],
-            'notes' => ['nullable', 'string', 'max:2000'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['required', 'string', 'max:10'],
+            'address' => ['required', 'string', 'max:2000'],
+            'gst' => ['nullable', 'string', 'max:15'],
+            'pan' => ['nullable', 'string', 'max:10'],
+        ];
+    }
+
+    private function attachBuyerValidators(
+        ValidatorContract $validation,
+        int $companyId,
+        ?int $excludeBuyerId = null,
+    ): void {
+        IndianMobileValidator::attachAfter($validation);
+        IndianMobileValidator::attachDuplicateBuyerPhone(
+            $validation,
+            $companyId,
+            $excludeBuyerId,
+        );
+
+        $validation->after(function (ValidatorContract $validator): void {
+            if (! $validator->errors()->has('gst')) {
+                $gstMessage = IndianTaxIdValidator::messageForGst(
+                    $validator->getData()['gst'] ?? null,
+                );
+                if ($gstMessage !== null) {
+                    $validator->errors()->add('gst', $gstMessage);
+                }
+            }
+
+            if (! $validator->errors()->has('pan')) {
+                $panMessage = IndianTaxIdValidator::messageForPan(
+                    $validator->getData()['pan'] ?? null,
+                );
+                if ($panMessage !== null) {
+                    $validator->errors()->add('pan', $panMessage);
+                }
+            }
+        });
+    }
+
+    /**
+     * @param  array<string, mixed>  $validated
+     * @return array<string, mixed>
+     */
+    private function prepareBuyerPayload(array $validated): array
+    {
+        $companyName = trim((string) ($validated['company_name'] ?? ''));
+        $gst = strtoupper(trim((string) ($validated['gst'] ?? '')));
+        $pan = strtoupper(trim((string) ($validated['pan'] ?? '')));
+
+        $ownerName = trim((string) ($validated['name'] ?? ''));
+        $address = trim((string) ($validated['address'] ?? ''));
+
+        return [
+            'company_name' => $companyName,
+            'name' => $ownerName,
+            'address' => $address !== '' ? $address : null,
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'gst' => $gst !== '' ? $gst : null,
+            'pan' => $pan !== '' ? $pan : null,
+            'tax_id' => $gst !== '' ? $gst : null,
+            'tax_id_label' => $gst !== '' ? 'GSTIN' : 'GSTIN',
         ];
     }
 }

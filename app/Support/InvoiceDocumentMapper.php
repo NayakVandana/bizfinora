@@ -42,12 +42,17 @@ class InvoiceDocumentMapper
             ])->filter()->implode("\n");
         }
 
+        $gst = $buyer->gst ?: $buyer->tax_id;
+
         return [
-            'name' => $buyer->name,
+            'company_name' => $buyer->company_name ?? '',
+            'name' => $buyer->name ?? '',
             'email' => $buyer->email,
             'phone' => $buyer->phone,
-            'tax_id' => $buyer->tax_id,
-            'tax_id_label' => $buyer->tax_id_label ?? 'VAT no',
+            'gst' => $buyer->gst,
+            'pan' => $buyer->pan,
+            'tax_id' => $gst,
+            'tax_id_label' => $gst ? 'GSTIN' : ($buyer->tax_id_label ?? 'GSTIN'),
             'address' => $address,
             'account_number' => $buyer->account_number,
             'swift_bic' => $buyer->swift_bic,

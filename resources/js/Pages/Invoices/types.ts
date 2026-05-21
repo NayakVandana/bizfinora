@@ -1,8 +1,12 @@
 export type BuyerOption = {
     id: number;
+    company_name?: string;
+    /** Owner / contact person */
     name: string;
     email?: string | null;
     phone?: string | null;
+    gst?: string | null;
+    pan?: string | null;
     tax_id?: string | null;
     tax_id_label?: string;
     address?: string | null;

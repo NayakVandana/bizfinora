@@ -1,27 +1,38 @@
 import type { BuyerOption } from '@/Pages/Invoices/types';
 
-export type BuyerFormState = Omit<BuyerOption, 'id'> & { id?: number };
+export type BuyerFormState = {
+    id?: number;
+    company_name: string;
+    /** Owner / contact person — stored in DB column `name` */
+    name: string;
+    email: string;
+    phone: string;
+    gst: string;
+    pan: string;
+    address: string;
+};
 
 export function emptyBuyerForm(): BuyerFormState {
     return {
+        company_name: '',
         name: '',
         email: '',
         phone: '',
-        tax_id: '',
-        tax_id_label: 'VAT no',
+        gst: '',
+        pan: '',
         address: '',
-        address_line1: '',
-        address_line2: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: '',
-        account_number: '',
-        swift_bic: '',
-        notes: '',
     };
 }
 
 export function buyerToForm(buyer: BuyerOption): BuyerFormState {
-    return { ...buyer };
+    return {
+        id: buyer.id,
+        company_name: buyer.company_name ?? '',
+        name: buyer.name ?? '',
+        email: buyer.email ?? '',
+        phone: buyer.phone ?? '',
+        gst: buyer.gst ?? buyer.tax_id ?? '',
+        pan: buyer.pan ?? '',
+        address: buyer.address ?? '',
+    };
 }

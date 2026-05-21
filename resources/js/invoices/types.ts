@@ -13,9 +13,13 @@ export type InvoiceStatus = 'draft' | 'sent' | 'paid';
 export type FieldVisibility = Record<string, boolean>;
 
 export interface PartyDetails {
+    /** Owner or contact name (buyer); seller display name */
     name: string;
+    company_name?: string | null;
     email?: string | null;
     phone?: string | null;
+    gst?: string | null;
+    pan?: string | null;
     tax_id?: string | null;
     tax_id_label?: string;
     address?: string | null;

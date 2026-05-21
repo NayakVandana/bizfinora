@@ -1,5 +1,6 @@
 import type { BuyerFormState } from './buyerForm';
-import { validateIndianMobileOptional } from '@/utils/indianPhone';
+import { validateIndianMobileRequired } from '@/utils/indianPhone';
+import { validateGstOptional, validatePanOptional } from '@/utils/indianTaxId';
 
 export type BuyerFieldErrors = Partial<
     Record<keyof BuyerFormState | '_form', string>
@@ -8,16 +9,45 @@ export type BuyerFieldErrors = Partial<
 export function validateBuyerForm(form: BuyerFormState): BuyerFieldErrors {
     const errors: BuyerFieldErrors = {};
 
-    if (!form.name.trim()) {
-        errors.name = 'Name is required.';
+    if (!form.company_name.trim()) {
+        errors.company_name = 'Company name is required.';
     }
 
-    const phoneError = validateIndianMobileOptional(form.phone ?? '');
+    if (!form.name.trim()) {
+        errors.name = 'Owner name is required.';
+    }
+
+    const phoneError = validateIndianMobileRequired(form.phone);
     if (phoneError) {
         errors.phone = phoneError;
     }
 
+    const email = form.email.trim();
+    if (!email) {
+        errors.email = 'Email is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        errors.email = 'Enter a valid email address.';
+    }
+
+    if (!form.address.trim()) {
+        errors.address = 'Address is required.';
+    }
+
+    const gstError = validateGstOptional(form.gst);
+    if (gstError) {
+        errors.gst = gstError;
+    }
+
+    const panError = validatePanOptional(form.pan);
+    if (panError) {
+        errors.pan = panError;
+    }
+
     return errors;
+}
+
+export function isBuyerFormComplete(form: BuyerFormState): boolean {
+    return Object.keys(validateBuyerForm(form)).length === 0;
 }
 
 export function mapBuyerApiErrors(data: unknown): BuyerFieldErrors {
@@ -28,14 +58,13 @@ export function mapBuyerApiErrors(data: unknown): BuyerFieldErrors {
     const out: BuyerFieldErrors = {};
     const record = data as Record<string, unknown>;
     const keys: (keyof BuyerFormState)[] = [
+        'company_name',
         'name',
         'email',
         'phone',
-        'tax_id',
+        'gst',
+        'pan',
         'address',
-        'city',
-        'country',
-        'notes',
     ];
 
     for (const key of keys) {

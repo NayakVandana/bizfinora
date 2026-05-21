@@ -12,26 +12,18 @@ type Props = {
 };
 
 function buyerToDocumentParty(buyer: BuyerOption): InvoiceDraft['document']['buyer'] {
-    const address =
-        buyer.address ||
-        [
-            buyer.address_line1,
-            buyer.address_line2,
-            [buyer.city, buyer.state, buyer.postal_code]
-                .filter(Boolean)
-                .join(', '),
-            buyer.country,
-        ]
-            .filter(Boolean)
-            .join('\n');
+    const gst = buyer.gst ?? buyer.tax_id ?? '';
 
     return {
-        name: buyer.name,
+        company_name: buyer.company_name ?? '',
+        name: buyer.name ?? '',
         email: buyer.email,
         phone: buyer.phone,
-        tax_id: buyer.tax_id,
-        tax_id_label: buyer.tax_id_label ?? 'VAT no',
-        address,
+        gst,
+        pan: buyer.pan,
+        tax_id: gst,
+        tax_id_label: gst ? 'GSTIN' : 'GSTIN',
+        address: buyer.address,
         address_line1: buyer.address_line1,
         address_line2: buyer.address_line2,
         city: buyer.city,
@@ -52,10 +44,6 @@ export default function BuyerSection({
 }: Props) {
     const buyer = draft.document.buyer;
     const visibility = draft.field_visibility ?? {};
-
-    const bankLine = [buyer.account_number, buyer.swift_bic]
-        .filter(Boolean)
-        .join(' · ');
 
     return (
         <Accordion title="Buyer" defaultOpen>
@@ -78,7 +66,7 @@ export default function BuyerSection({
                 <option value="">Select saved buyer…</option>
                 {buyers.map((b) => (
                     <option key={b.id} value={b.id}>
-                        {b.name}
+                        {b.company_name || b.name}
                     </option>
                 ))}
             </select>
@@ -90,11 +78,18 @@ export default function BuyerSection({
             ) : (
                 <div className="divide-y divide-gray-100 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80">
                     <PartyFieldRow
-                        label="Name"
-                        value={buyer.name}
+                        label="Company"
+                        value={buyer.company_name ?? buyer.name}
                         visibility={visibility}
                         onVisibilityChange={onVisibilityChange}
                         showToggle={false}
+                    />
+                    <PartyFieldRow
+                        label="Owner"
+                        value={buyer.name}
+                        visibilityField="buyer_owner_name"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
                     />
                     <PartyFieldRow
                         label="Address"
@@ -104,16 +99,9 @@ export default function BuyerSection({
                         onVisibilityChange={onVisibilityChange}
                     />
                     <PartyFieldRow
-                        label="Tax label"
-                        value={buyer.tax_id_label}
-                        visibility={visibility}
-                        onVisibilityChange={onVisibilityChange}
-                        showToggle={false}
-                    />
-                    <PartyFieldRow
-                        label="Tax ID"
-                        value={buyer.tax_id}
-                        visibilityField="buyer_tax_id"
+                        label="Mobile"
+                        value={buyer.phone}
+                        visibilityField="buyer_phone"
                         visibility={visibility}
                         onVisibilityChange={onVisibilityChange}
                     />
@@ -125,23 +113,16 @@ export default function BuyerSection({
                         onVisibilityChange={onVisibilityChange}
                     />
                     <PartyFieldRow
-                        label="Phone"
-                        value={buyer.phone}
-                        visibilityField="buyer_phone"
+                        label="GST"
+                        value={buyer.gst ?? buyer.tax_id}
+                        visibilityField="buyer_gst"
                         visibility={visibility}
                         onVisibilityChange={onVisibilityChange}
                     />
                     <PartyFieldRow
-                        label="Bank"
-                        value={bankLine || null}
-                        visibilityField="buyer_bank"
-                        visibility={visibility}
-                        onVisibilityChange={onVisibilityChange}
-                    />
-                    <PartyFieldRow
-                        label="Notes"
-                        value={buyer.notes}
-                        visibilityField="buyer_notes"
+                        label="PAN"
+                        value={buyer.pan}
+                        visibilityField="buyer_pan"
                         visibility={visibility}
                         onVisibilityChange={onVisibilityChange}
                     />
