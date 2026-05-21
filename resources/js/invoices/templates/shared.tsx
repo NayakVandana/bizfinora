@@ -1,5 +1,10 @@
 import { StyleSheet, Text, View } from '@react-pdf/renderer';
-import type { PartyDetails } from '../types';
+import {
+    partyDetailLines,
+    showPartyLogo,
+    type PartyVisibilityRole,
+} from '../partyPdfLines';
+import type { FieldVisibility, PartyDetails } from '../types';
 
 export const baseStyles = StyleSheet.create({
     page: {
@@ -33,32 +38,15 @@ export const baseStyles = StyleSheet.create({
 export function PartyBlock({
     title,
     party,
+    visibility,
+    role = 'seller',
 }: {
     title: string;
     party: PartyDetails;
+    visibility?: FieldVisibility;
+    role?: PartyVisibilityRole;
 }) {
-    const addressBlock = party.address
-        ? party.address.split('\n')
-        : [
-              party.address_line1,
-              party.address_line2,
-              [party.city, party.state, party.postal_code]
-                  .filter(Boolean)
-                  .join(', '),
-              party.country,
-          ].filter(Boolean);
-
-    const lines = [
-        ...addressBlock,
-        party.email,
-        party.phone,
-        party.tax_id
-            ? `${party.tax_id_label ?? 'Tax ID'}: ${party.tax_id}`
-            : null,
-        party.account_number ? `Account: ${party.account_number}` : null,
-        party.swift_bic ? `SWIFT: ${party.swift_bic}` : null,
-        party.notes,
-    ].filter(Boolean);
+    const lines = partyDetailLines(party, visibility, role);
 
     return (
         <View style={{ width: '48%' }}>

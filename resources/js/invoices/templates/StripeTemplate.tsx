@@ -1,5 +1,6 @@
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 import { invoiceDateDisplay } from '../formatInvoiceDate';
+import { showPartyLogo } from '../partyPdfLines';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { PartyBlock } from './shared';
@@ -82,7 +83,8 @@ export function StripeTemplate({
                 <View style={styles.content}>
                     <View style={styles.headerRow}>
                         <View style={{ maxWidth: '55%' }}>
-                            {doc.logo_data_url ? (
+                            {doc.logo_data_url &&
+                            showPartyLogo(draft.field_visibility, 'seller') ? (
                                 <Image
                                     src={doc.logo_data_url}
                                     style={{
@@ -118,8 +120,18 @@ export function StripeTemplate({
                     </View>
 
                     <View style={styles.parties}>
-                        <PartyBlock title="From" party={doc.seller} />
-                        <PartyBlock title="Bill to" party={doc.buyer} />
+                        <PartyBlock
+                            title="From"
+                            party={doc.seller}
+                            visibility={draft.field_visibility}
+                            role="seller"
+                        />
+                        <PartyBlock
+                            title="Bill to"
+                            party={doc.buyer}
+                            visibility={draft.field_visibility}
+                            role="buyer"
+                        />
                     </View>
 
                     <View style={styles.tableHead}>

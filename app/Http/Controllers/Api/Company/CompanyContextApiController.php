@@ -74,6 +74,7 @@ class CompanyContextApiController extends Controller
     {
         try {
             $validation = Validator::make($request->all(), [
+                'name' => ['required', 'string', 'max:255'],
                 'address' => ['nullable', 'string', 'max:2000'],
                 'tax_id' => ['nullable', 'string', 'max:100'],
                 'tax_id_label' => ['nullable', 'string', 'max:50'],
@@ -98,11 +99,13 @@ class CompanyContextApiController extends Controller
                 return $this->sendJsonResponse(false, 'Only company owners can update the seller profile.', null, 200);
             }
 
-            $company->update($validation->validated());
+            $data = $validation->validated();
+            $data['slug'] = Company::uniqueSlugFromName($data['name']);
+            $company->update($data);
 
             return $this->sendJsonResponse(
                 true,
-                'Seller profile updated successfully.',
+                'Company profile updated successfully.',
                 CompanyPresentation::format($company->fresh(), CompanyMembership::ROLE_OWNER, true),
                 200,
             );

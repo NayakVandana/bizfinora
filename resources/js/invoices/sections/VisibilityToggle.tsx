@@ -3,6 +3,8 @@ type Props = {
     field: string;
     visibility: Record<string, boolean>;
     onChange: (field: string, visible: boolean) => void;
+    /** Shorter label for dense layouts (e.g. seller table rows). */
+    compact?: boolean;
 };
 
 export default function VisibilityToggle({
@@ -10,8 +12,26 @@ export default function VisibilityToggle({
     field,
     visibility,
     onChange,
+    compact = false,
 }: Props) {
     const checked = visibility[field] !== false;
+
+    if (compact) {
+        return (
+            <label
+                className="flex cursor-pointer items-center gap-1 text-[11px] text-gray-500"
+                title={`Show ${label} on PDF`}
+            >
+                <input
+                    type="checkbox"
+                    className="h-3.5 w-3.5 rounded border-gray-300 text-indigo-600"
+                    checked={checked}
+                    onChange={(e) => onChange(field, e.target.checked)}
+                />
+                <span>PDF</span>
+            </label>
+        );
+    }
 
     return (
         <label className="flex items-center gap-2 text-xs text-gray-600">

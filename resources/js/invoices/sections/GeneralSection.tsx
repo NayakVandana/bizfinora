@@ -6,10 +6,9 @@ import type { InvoiceDraft } from '../types';
 type Props = {
     draft: InvoiceDraft;
     onChange: (patch: Partial<InvoiceDraft>) => void;
-    onLogoFile: (file: File | null) => void;
 };
 
-export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
+export default function GeneralSection({ draft, onChange }: Props) {
     return (
         <Accordion title="General" defaultOpen>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -109,16 +108,6 @@ export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
                     rows={2}
                     value={draft.header_notes ?? ''}
                     onChange={(e) => onChange({ header_notes: e.target.value })}
-                />
-            </div>
-
-            <div>
-                <InputLabel value="Company logo" />
-                <input
-                    type="file"
-                    accept="image/*"
-                    className="mt-1 block w-full text-sm"
-                    onChange={(e) => onLogoFile(e.target.files?.[0] ?? null)}
                 />
             </div>
         </Accordion>

@@ -33,7 +33,14 @@ function useNavEntries(): NavEntry[] {
             type: 'link',
             href: route('companies.index'),
             label: 'Companies',
-            isActive: () => Boolean(route().current('companies.index')),
+            isActive: () =>
+                Boolean(route().current()?.startsWith('companies.')),
+        },
+        {
+            type: 'link',
+            href: route('companies.profile'),
+            label: 'Company profile',
+            isActive: () => route().current() === 'companies.profile',
         },
         {
             type: 'link',

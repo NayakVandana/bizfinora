@@ -1,5 +1,6 @@
 import { Document, Image, Page, Text, View } from '@react-pdf/renderer';
 import { invoiceDateDisplay } from '../formatInvoiceDate';
+import { showPartyLogo } from '../partyPdfLines';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { baseStyles, PartyBlock } from './shared';
@@ -21,7 +22,8 @@ export function ClassicTemplate({
             <Page size="A4" style={baseStyles.page}>
                 <View style={baseStyles.row}>
                     <View>
-                        {doc.logo_data_url ? (
+                        {doc.logo_data_url &&
+                        showPartyLogo(draft.field_visibility, 'seller') ? (
                             <Image
                                 src={doc.logo_data_url}
                                 style={{ width: 120, height: 48, objectFit: 'contain', marginBottom: 8 }}
@@ -45,8 +47,18 @@ export function ClassicTemplate({
                 </View>
 
                 <View style={[baseStyles.row, baseStyles.section, { marginTop: 20 }]}>
-                    <PartyBlock title="From (Seller)" party={doc.seller} />
-                    <PartyBlock title="Bill to (Buyer)" party={doc.buyer} />
+                    <PartyBlock
+                        title="From (Seller)"
+                        party={doc.seller}
+                        visibility={draft.field_visibility}
+                        role="seller"
+                    />
+                    <PartyBlock
+                        title="Bill to (Buyer)"
+                        party={doc.buyer}
+                        visibility={draft.field_visibility}
+                        role="buyer"
+                    />
                 </View>
 
                 <View style={baseStyles.tableHeader}>

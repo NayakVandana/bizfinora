@@ -9,6 +9,7 @@ import {
 import { buildFormatConfig } from '../invoiceFormatConfig';
 import type { TableColumnKey } from '../invoiceFormatConfig';
 import { formatInvoiceDate, invoiceDateDisplay } from '../formatInvoiceDate';
+import { isPartyFieldVisible, showPartyLogo } from '../partyPdfLines';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceLineItem, InvoiceTotals } from '../types';
 import { PartyBlock } from './shared';
@@ -288,10 +289,22 @@ export function UnifiedInvoicePdf({
             </View>
         ) : null;
 
+    const visibility = draft.field_visibility;
+
     const parties = (
         <View style={s.parties}>
-            <PartyBlock title={cfg.sellerLabel} party={doc.seller} />
-            <PartyBlock title={cfg.buyerLabel} party={doc.buyer} />
+            <PartyBlock
+                title={cfg.sellerLabel}
+                party={doc.seller}
+                visibility={visibility}
+                role="seller"
+            />
+            <PartyBlock
+                title={cfg.buyerLabel}
+                party={doc.buyer}
+                visibility={visibility}
+                role="buyer"
+            />
         </View>
     );
 
@@ -343,20 +356,37 @@ export function UnifiedInvoicePdf({
                             </Text>
                         </View>
                         {headerNote}
-                        <View style={s.taxIdRow}>
-                            <View style={{ width: '48%' }}>
-                                <Text style={s.muted}>Supplier tax ID</Text>
-                                <Text style={{ fontWeight: 700 }}>
-                                    {doc.seller.tax_id || '—'}
-                                </Text>
+                        {isPartyFieldVisible(visibility, 'seller', 'tax_id') ||
+                        isPartyFieldVisible(visibility, 'buyer', 'tax_id') ? (
+                            <View style={s.taxIdRow}>
+                                {isPartyFieldVisible(
+                                    visibility,
+                                    'seller',
+                                    'tax_id',
+                                ) ? (
+                                    <View style={{ width: '48%' }}>
+                                        <Text style={s.muted}>
+                                            Supplier tax ID
+                                        </Text>
+                                        <Text style={{ fontWeight: 700 }}>
+                                            {doc.seller.tax_id || '—'}
+                                        </Text>
+                                    </View>
+                                ) : null}
+                                {isPartyFieldVisible(
+                                    visibility,
+                                    'buyer',
+                                    'tax_id',
+                                ) ? (
+                                    <View style={{ width: '48%' }}>
+                                        <Text style={s.muted}>Buyer tax ID</Text>
+                                        <Text style={{ fontWeight: 700 }}>
+                                            {doc.buyer.tax_id || '—'}
+                                        </Text>
+                                    </View>
+                                ) : null}
                             </View>
-                            <View style={{ width: '48%' }}>
-                                <Text style={s.muted}>Buyer tax ID</Text>
-                                <Text style={{ fontWeight: 700 }}>
-                                    {doc.buyer.tax_id || '—'}
-                                </Text>
-                            </View>
-                        </View>
+                        ) : null}
                         <Text style={[s.muted, { marginBottom: 8 }]}>
                             {invoiceDateDisplay(
                                 draft.invoice_date,
@@ -382,7 +412,8 @@ export function UnifiedInvoicePdf({
                     {banner}
                     <View style={s.headerRow}>
                         <View>
-                            {doc.logo_data_url ? (
+                            {doc.logo_data_url &&
+                            showPartyLogo(draft.field_visibility, 'seller') ? (
                                 <Image
                                     src={doc.logo_data_url}
                                     style={{
@@ -422,12 +453,16 @@ export function UnifiedInvoicePdf({
                             <Text style={s.tradeMetaLabel}>Currency</Text>
                             <Text style={s.tradeMetaValue}>INR (Rs.)</Text>
                         </View>
-                        <View style={s.tradeMetaCell}>
-                            <Text style={s.tradeMetaLabel}>Country of origin</Text>
-                            <Text style={s.tradeMetaValue}>
-                                {doc.seller.country || '—'}
-                            </Text>
-                        </View>
+                        {isPartyFieldVisible(visibility, 'seller', 'address') ? (
+                            <View style={s.tradeMetaCell}>
+                                <Text style={s.tradeMetaLabel}>
+                                    Country of origin
+                                </Text>
+                                <Text style={s.tradeMetaValue}>
+                                    {doc.seller.country || '—'}
+                                </Text>
+                            </View>
+                        ) : null}
                         <View style={s.tradeMetaCell}>
                             <Text style={s.tradeMetaLabel}>Terms of delivery</Text>
                             <Text style={s.tradeMetaValue}>
@@ -527,7 +562,8 @@ export function UnifiedInvoicePdf({
                     {banner}
                     <View style={s.headerRow}>
                         <View>
-                            {doc.logo_data_url ? (
+                            {doc.logo_data_url &&
+                            showPartyLogo(draft.field_visibility, 'seller') ? (
                                 <Image
                                     src={doc.logo_data_url}
                                     style={{
@@ -589,7 +625,8 @@ export function UnifiedInvoicePdf({
                     {banner}
                     <View style={s.headerRow}>
                         <View style={{ maxWidth: '55%' }}>
-                            {doc.logo_data_url ? (
+                            {doc.logo_data_url &&
+                            showPartyLogo(draft.field_visibility, 'seller') ? (
                                 <Image
                                     src={doc.logo_data_url}
                                     style={{

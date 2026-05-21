@@ -53,7 +53,7 @@ export default function InvoicePreview({
 
     const viewer = (
         <PDFViewer
-            key={`${draft.template}-${draft.invoice_number}`}
+            key={`${draft.template}-${draft.invoice_number}-${JSON.stringify(draft.field_visibility ?? {})}`}
             width={variant === 'fit' ? PREVIEW_WIDTH : '100%'}
             height={variant === 'fit' ? PREVIEW_HEIGHT : '100%'}
             showToolbar={false}

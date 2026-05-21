@@ -103,10 +103,19 @@ export default function CompaniesIndex() {
                                         </p>
                                     </div>
 
+                                    <div className="flex flex-wrap items-center gap-2">
                                     {company.is_current ? (
+                                        <>
+                                        <a
+                                            href={route('companies.profile')}
+                                            className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                                        >
+                                            Edit profile
+                                        </a>
                                         <span className="rounded-full bg-indigo-100 px-3 py-1 text-xs font-medium text-indigo-800">
                                             Active
                                         </span>
+                                        </>
                                     ) : (
                                         <button
                                             type="button"
@@ -118,6 +127,7 @@ export default function CompaniesIndex() {
                                             Switch to this company
                                         </button>
                                     )}
+                                    </div>
                                 </li>
                             ))}
                         </ul>

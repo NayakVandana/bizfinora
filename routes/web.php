@@ -24,6 +24,8 @@ Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard
 
 Route::get('/companies', fn () => Inertia::render('Companies/Index'))->name('companies.index');
 
+Route::get('/companies/profile', fn () => Inertia::render('Companies/Profile'))->name('companies.profile');
+
 Route::get('/profile', fn () => Inertia::render('Profile/Edit', [
     'mustVerifyEmail' => false,
     'status' => null,

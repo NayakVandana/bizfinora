@@ -10,6 +10,8 @@ import TaxSettingsSection from './sections/TaxSettingsSection';
 import type { CompanyTaxSettings } from './taxPresets';
 import PaymentNotesSection from './sections/PaymentNotesSection';
 import SellerSection from './sections/SellerSection';
+import { buyerToDocumentParty } from './sections/BuyerSection';
+import { emptyParty } from './defaultDraft';
 import type { InvoiceDraft, InvoiceLineItem } from './types';
 
 type Props = {
@@ -45,11 +47,6 @@ export default function InvoiceBuilder({
             ...draft,
             document: { ...draft.document, ...patch },
         });
-
-    const updateParty = (
-        side: 'seller' | 'buyer',
-        patch: Partial<InvoiceDraft['document']['seller']>,
-    ) => updateDoc({ [side]: { ...draft.document[side], ...patch } });
 
     const updateVisibility = (field: string, visible: boolean) =>
         update({
@@ -88,56 +85,29 @@ export default function InvoiceBuilder({
     };
 
     const applyBuyer = (buyerId: string) => {
+        if (!buyerId) {
+            update({
+                buyer_id: null,
+                document: {
+                    ...draft.document,
+                    buyer: emptyParty(),
+                },
+            });
+            return;
+        }
+
         const buyer = buyers.find((b) => String(b.id) === buyerId);
         if (!buyer) {
             return;
         }
-        const address =
-            buyer.address ||
-            [
-                buyer.address_line1,
-                buyer.address_line2,
-                [buyer.city, buyer.state, buyer.postal_code].filter(Boolean).join(', '),
-                buyer.country,
-            ]
-                .filter(Boolean)
-                .join('\n');
 
         update({
             buyer_id: buyer.id,
             document: {
                 ...draft.document,
-                buyer: {
-                    name: buyer.name,
-                    email: buyer.email,
-                    phone: buyer.phone,
-                    tax_id: buyer.tax_id,
-                    tax_id_label: buyer.tax_id_label ?? 'VAT no',
-                    address,
-                    address_line1: buyer.address_line1,
-                    address_line2: buyer.address_line2,
-                    city: buyer.city,
-                    state: buyer.state,
-                    postal_code: buyer.postal_code,
-                    country: buyer.country,
-                    account_number: buyer.account_number,
-                    swift_bic: buyer.swift_bic,
-                    notes: buyer.notes,
-                },
+                buyer: buyerToDocumentParty(buyer),
             },
         });
-    };
-
-    const onLogoFile = (file: File | null) => {
-        if (!file) {
-            updateDoc({ logo_data_url: null });
-
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = () =>
-            updateDoc({ logo_data_url: reader.result as string });
-        reader.readAsDataURL(file);
     };
 
     return (
@@ -176,21 +146,15 @@ export default function InvoiceBuilder({
                     onChange={update}
                     isNewInvoice={isNewInvoice}
                 />
-                <GeneralSection
-                    draft={draft}
-                    onChange={update}
-                    onLogoFile={onLogoFile}
-                />
+                <GeneralSection draft={draft} onChange={update} />
                 <SellerSection
                     draft={draft}
-                    onPartyChange={(p) => updateParty('seller', p)}
                     onVisibilityChange={updateVisibility}
                 />
                 <BuyerSection
                     draft={draft}
                     buyers={buyers}
                     onBuyerSelect={applyBuyer}
-                    onPartyChange={(p) => updateParty('buyer', p)}
                     onVisibilityChange={updateVisibility}
                 />
                 <TaxSettingsSection

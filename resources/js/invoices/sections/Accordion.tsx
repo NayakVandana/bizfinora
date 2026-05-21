@@ -23,7 +23,11 @@ export default function Accordion({
                 {title}
                 <span className="text-sm text-gray-500">{open ? '−' : '+'}</span>
             </button>
-            {open ? <div className="space-y-3 border-t border-gray-100 px-4 py-3">{children}</div> : null}
+            {open ? (
+                <div className="space-y-2 border-t border-gray-100 px-3 py-2.5">
+                    {children}
+                </div>
+            ) : null}
         </div>
     );
 }

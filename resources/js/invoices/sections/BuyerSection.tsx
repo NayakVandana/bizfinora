@@ -1,29 +1,75 @@
-import TextInput from '@/Components/TextInput';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import Accordion from './Accordion';
-import VisibilityToggle from './VisibilityToggle';
+import PartyFieldRow from './PartyFieldRow';
 import type { InvoiceDraft } from '../types';
+import { Link } from '@inertiajs/react';
 
 type Props = {
     draft: InvoiceDraft;
     buyers: BuyerOption[];
     onBuyerSelect: (buyerId: string) => void;
-    onPartyChange: (patch: Partial<InvoiceDraft['document']['buyer']>) => void;
     onVisibilityChange: (field: string, visible: boolean) => void;
 };
+
+function buyerToDocumentParty(buyer: BuyerOption): InvoiceDraft['document']['buyer'] {
+    const address =
+        buyer.address ||
+        [
+            buyer.address_line1,
+            buyer.address_line2,
+            [buyer.city, buyer.state, buyer.postal_code]
+                .filter(Boolean)
+                .join(', '),
+            buyer.country,
+        ]
+            .filter(Boolean)
+            .join('\n');
+
+    return {
+        name: buyer.name,
+        email: buyer.email,
+        phone: buyer.phone,
+        tax_id: buyer.tax_id,
+        tax_id_label: buyer.tax_id_label ?? 'VAT no',
+        address,
+        address_line1: buyer.address_line1,
+        address_line2: buyer.address_line2,
+        city: buyer.city,
+        state: buyer.state,
+        postal_code: buyer.postal_code,
+        country: buyer.country,
+        account_number: buyer.account_number,
+        swift_bic: buyer.swift_bic,
+        notes: buyer.notes,
+    };
+}
 
 export default function BuyerSection({
     draft,
     buyers,
     onBuyerSelect,
-    onPartyChange,
     onVisibilityChange,
 }: Props) {
     const buyer = draft.document.buyer;
     const visibility = draft.field_visibility ?? {};
 
+    const bankLine = [buyer.account_number, buyer.swift_bic]
+        .filter(Boolean)
+        .join(' · ');
+
     return (
-        <Accordion title="Buyer">
+        <Accordion title="Buyer" defaultOpen>
+            <p className="text-xs leading-snug text-gray-600">
+                Select a saved buyer from{' '}
+                <Link
+                    href={route('buyers.index')}
+                    className="font-medium text-indigo-600 hover:text-indigo-800"
+                >
+                    Buyers
+                </Link>
+                . Toggle PDF visibility per field.
+            </p>
+
             <select
                 className="block w-full rounded-md border-gray-300 text-sm shadow-sm"
                 value={draft.buyer_id ?? ''}
@@ -37,76 +83,72 @@ export default function BuyerSection({
                 ))}
             </select>
 
-            <div className="grid gap-2 sm:grid-cols-2">
-                <TextInput
-                    placeholder="Buyer name"
-                    value={buyer.name}
-                    onChange={(e) => onPartyChange({ name: e.target.value })}
-                />
-                <TextInput
-                    placeholder="Tax ID label"
-                    value={buyer.tax_id_label ?? 'VAT no'}
-                    onChange={(e) =>
-                        onPartyChange({ tax_id_label: e.target.value })
-                    }
-                />
-                <TextInput
-                    placeholder="Tax ID"
-                    value={buyer.tax_id ?? ''}
-                    onChange={(e) => onPartyChange({ tax_id: e.target.value })}
-                />
-                <TextInput
-                    className="sm:col-span-2"
-                    placeholder="Address"
-                    value={buyer.address ?? buyer.address_line1 ?? ''}
-                    onChange={(e) => onPartyChange({ address: e.target.value })}
-                />
-                <TextInput
-                    placeholder="Email"
-                    value={buyer.email ?? ''}
-                    onChange={(e) => onPartyChange({ email: e.target.value })}
-                />
-                <TextInput
-                    placeholder="Phone"
-                    value={buyer.phone ?? ''}
-                    onChange={(e) => onPartyChange({ phone: e.target.value })}
-                />
-                <TextInput
-                    placeholder="Bank account"
-                    value={buyer.account_number ?? ''}
-                    onChange={(e) =>
-                        onPartyChange({ account_number: e.target.value })
-                    }
-                />
-                <TextInput
-                    placeholder="SWIFT / BIC"
-                    value={buyer.swift_bic ?? ''}
-                    onChange={(e) =>
-                        onPartyChange({ swift_bic: e.target.value })
-                    }
-                />
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-                <VisibilityToggle
-                    label="tax ID"
-                    field="buyer_tax_id"
-                    visibility={visibility}
-                    onChange={onVisibilityChange}
-                />
-                <VisibilityToggle
-                    label="email"
-                    field="buyer_email"
-                    visibility={visibility}
-                    onChange={onVisibilityChange}
-                />
-                <VisibilityToggle
-                    label="phone"
-                    field="buyer_phone"
-                    visibility={visibility}
-                    onChange={onVisibilityChange}
-                />
-            </div>
+            {!draft.buyer_id ? (
+                <p className="rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-500">
+                    Choose a buyer to preview details and PDF fields.
+                </p>
+            ) : (
+                <div className="divide-y divide-gray-100 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80">
+                    <PartyFieldRow
+                        label="Name"
+                        value={buyer.name}
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                        showToggle={false}
+                    />
+                    <PartyFieldRow
+                        label="Address"
+                        value={buyer.address ?? buyer.address_line1}
+                        visibilityField="buyer_address"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                    />
+                    <PartyFieldRow
+                        label="Tax label"
+                        value={buyer.tax_id_label}
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                        showToggle={false}
+                    />
+                    <PartyFieldRow
+                        label="Tax ID"
+                        value={buyer.tax_id}
+                        visibilityField="buyer_tax_id"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                    />
+                    <PartyFieldRow
+                        label="Email"
+                        value={buyer.email}
+                        visibilityField="buyer_email"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                    />
+                    <PartyFieldRow
+                        label="Phone"
+                        value={buyer.phone}
+                        visibilityField="buyer_phone"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                    />
+                    <PartyFieldRow
+                        label="Bank"
+                        value={bankLine || null}
+                        visibilityField="buyer_bank"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                    />
+                    <PartyFieldRow
+                        label="Notes"
+                        value={buyer.notes}
+                        visibilityField="buyer_notes"
+                        visibility={visibility}
+                        onVisibilityChange={onVisibilityChange}
+                    />
+                </div>
+            )}
         </Accordion>
     );
 }
+
+export { buyerToDocumentParty };
