@@ -33,6 +33,38 @@ class BuyerApiController extends Controller
         }
     }
 
+    public function postBuyerShow(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => ['required', 'integer'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+            $buyer = Buyer::query()
+                ->where('company_id', $company->id)
+                ->find($request->input('id'));
+
+            if ($buyer === null) {
+                return $this->sendJsonResponse(false, 'Buyer not found.', null, 200);
+            }
+
+            return $this->sendJsonResponse(
+                true,
+                'Buyer fetched successfully.',
+                InvoicePresentation::formatBuyer($buyer),
+                200,
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
     public function postBuyerStore(Request $request)
     {
         try {

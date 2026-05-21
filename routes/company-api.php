@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(
     Route::post('/invoice-templates/invoice-template-set-default', [InvoiceTemplateApiController::class, 'postInvoiceTemplateSetDefault']);
 
     Route::post('/buyers/buyers-list', [BuyerApiController::class, 'postBuyersList']);
+    Route::post('/buyers/buyer-show', [BuyerApiController::class, 'postBuyerShow']);
     Route::post('/buyers/buyer-store', [BuyerApiController::class, 'postBuyerStore']);
     Route::post('/buyers/buyer-update', [BuyerApiController::class, 'postBuyerUpdate']);
     Route::post('/buyers/buyer-destroy', [BuyerApiController::class, 'postBuyerDestroy']);

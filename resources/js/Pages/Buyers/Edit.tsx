@@ -24,17 +24,11 @@ export default function BuyersEdit({ buyerId }: Props) {
     const [notFound, setNotFound] = useState(false);
 
     useEffect(() => {
-        void companyApiPost<ApiEnvelope<BuyerOption[]>>(
-            '/buyers/buyers-list',
-            {},
-        ).then((res) => {
+        void companyApiPost<ApiEnvelope<BuyerOption>>('/buyers/buyer-show', {
+            id: buyerId,
+        }).then((res) => {
             if (res.success && res.data) {
-                const buyer = res.data.find((b) => b.id === buyerId);
-                if (buyer) {
-                    setForm(buyerToForm(buyer));
-                } else {
-                    setNotFound(true);
-                }
+                setForm(buyerToForm(res.data));
             } else {
                 setNotFound(true);
             }
@@ -71,12 +65,22 @@ export default function BuyersEdit({ buyerId }: Props) {
 
             <div className="py-6">
                 <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-                    <Link
-                        href={route('buyers.index')}
-                        className="text-sm text-indigo-600 hover:text-indigo-800"
-                    >
-                        ← Back to buyers
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-3 text-sm">
+                        <Link
+                            href={route('buyers.index')}
+                            className="text-indigo-600 hover:text-indigo-800"
+                        >
+                            ← Back to buyers
+                        </Link>
+                        {!loading && !notFound && form ? (
+                            <Link
+                                href={route('buyers.show', buyerId)}
+                                className="text-indigo-600 hover:text-indigo-800"
+                            >
+                                View details
+                            </Link>
+                        ) : null}
+                    </div>
 
                     {loading ? (
                         <p className="mt-6 text-center text-gray-500">
