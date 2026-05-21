@@ -66,7 +66,6 @@ const s = StyleSheet.create({
         marginBottom: 16,
     },
     amountBox: { textAlign: 'right' },
-    amountValue: { fontSize: 16, fontWeight: 700 },
     parties: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -324,7 +323,7 @@ export function UnifiedInvoicePdf({
                 boxStyle={
                     cfg.format === 'tax' ? s.totalBoxTax : s.totalBox
                 }
-                amountDueLabel={cfg.totalLabel}
+                totalLabel={cfg.totalLabel}
             />
         </View>
     );
@@ -426,12 +425,6 @@ export function UnifiedInvoicePdf({
                             ) : null}
                             <Text style={s.titleClassic}>{cfg.title}</Text>
                         </View>
-                        <View style={s.amountBox}>
-                            <Text style={s.amountValue}>
-                                {formatMoney(totals.total, draft.currency)}
-                            </Text>
-                            <Text style={s.muted}>{cfg.totalLabel}</Text>
-                        </View>
                     </View>
                     <View style={s.tradeMeta}>
                         <View style={s.tradeMetaCell}>
@@ -504,12 +497,6 @@ export function UnifiedInvoicePdf({
                                         : ''}
                                 </Text>
                             </View>
-                            <View style={s.amountBox}>
-                                <Text style={s.amountValue}>
-                                    {formatMoney(totals.total, draft.currency)}
-                                </Text>
-                                <Text style={s.muted}>{cfg.totalLabel}</Text>
-                            </View>
                         </View>
                         {headerNote}
                         {parties}
@@ -541,11 +528,6 @@ export function UnifiedInvoicePdf({
                                 draft.date_format,
                             )}
                         </Text>
-                        <View style={[s.headerRow, { marginTop: 12 }]}>
-                            <Text style={s.amountValue}>
-                                {formatMoney(totals.total, draft.currency)}
-                            </Text>
-                        </View>
                         {parties}
                         {items}
                         {footerNotes}
@@ -590,9 +572,6 @@ export function UnifiedInvoicePdf({
                             {draft.due_date ? (
                                 <Text>Due: {draft.due_date}</Text>
                             ) : null}
-                            <Text style={[s.amountValue, { marginTop: 6 }]}>
-                                {formatMoney(totals.total, draft.currency)}
-                            </Text>
                         </View>
                     </View>
                     {headerNote}
@@ -651,12 +630,6 @@ export function UnifiedInvoicePdf({
                                     ? ` · Due ${draft.due_date}`
                                     : ''}
                             </Text>
-                        </View>
-                        <View style={s.amountBox}>
-                            <Text style={s.amountValue}>
-                                {formatMoney(totals.total, draft.currency)}
-                            </Text>
-                            <Text style={s.muted}>{cfg.amountHeaderLabel}</Text>
                         </View>
                     </View>
                     {headerNote}

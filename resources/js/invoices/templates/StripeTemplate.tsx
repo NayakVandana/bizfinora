@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
     },
     title: { fontSize: 28, fontWeight: 700, color: '#0a2540', marginBottom: 4 },
     meta: { color: '#425466', fontSize: 10 },
-    amountDue: { fontWeight: 700, fontSize: 14, color: '#0a2540' },
     parties: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -110,12 +109,6 @@ export function StripeTemplate({
                                     ? ` · Due ${draft.due_date}`
                                     : ''}
                             </Text>
-                        </View>
-                        <View style={{ textAlign: 'right' }}>
-                            <Text style={styles.amountDue}>
-                                {formatMoney(totals.total, draft.currency)}
-                            </Text>
-                            <Text style={styles.meta}>Amount due</Text>
                         </View>
                     </View>
 
