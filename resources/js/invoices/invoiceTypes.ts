@@ -1,4 +1,5 @@
 import { APP_CURRENCY } from './currency';
+import { defaultInvoiceDateLabel } from './invoiceDateLabels';
 import { formatForInvoiceType } from './invoiceFormatConfig';
 import type { InvoiceDraft, InvoiceTemplate, TaxType } from './types';
 
@@ -424,6 +425,7 @@ export function applyInvoiceTypeToDraft(
         invoice_type: meta.id,
         template: layoutFromFormat(formatForInvoiceType(meta.id)),
         invoice_number_label: meta.number_label,
+        invoice_date_label: defaultInvoiceDateLabel(meta.id),
         currency: APP_CURRENCY,
     };
 

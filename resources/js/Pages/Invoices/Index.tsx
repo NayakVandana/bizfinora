@@ -12,7 +12,7 @@ type InvoiceRow = {
     id: number;
     invoice_number: string;
     status: string;
-    issue_date: string;
+    invoice_date: string;
     due_date?: string;
     currency: string;
     total: number;
@@ -124,7 +124,7 @@ export default function InvoicesIndex() {
                                                 {row.buyer_name ?? '—'}
                                             </td>
                                             <td className="px-4 py-3 text-sm">
-                                                {row.issue_date}
+                                                {row.invoice_date}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className="rounded-full bg-gray-100 px-2 py-1 text-xs capitalize">

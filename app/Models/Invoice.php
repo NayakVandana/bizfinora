@@ -15,7 +15,8 @@ class Invoice extends Model
         'buyer_id',
         'invoice_number',
         'status',
-        'issue_date',
+        'invoice_date',
+        'invoice_date_label',
         'due_date',
         'currency',
         'language',
@@ -49,7 +50,7 @@ class Invoice extends Model
     protected function casts(): array
     {
         return [
-            'issue_date' => 'date',
+            'invoice_date' => 'date',
             'due_date' => 'date',
             'date_of_service' => 'date',
             'discount_amount' => 'decimal:2',

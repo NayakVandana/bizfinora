@@ -24,6 +24,7 @@ class InvoiceTemplatePresetBuilder
 
         return [
             'invoice_number_label' => $meta['number_label'] ?? 'Invoice #',
+            'invoice_date_label' => $meta['date_label'] ?? 'Invoice date',
             'invoice_type' => $typeId,
             'template' => InvoiceTypes::layoutFor($typeId),
             'tax_type' => $taxType,

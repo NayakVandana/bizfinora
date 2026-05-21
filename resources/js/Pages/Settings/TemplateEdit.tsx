@@ -222,6 +222,28 @@ export default function TemplateEdit({ templateId }: Props) {
                                 </div>
 
                                 <div>
+                                    <InputLabel value="Invoice date label" />
+                                    <TextInput
+                                        className="mt-1 block w-full"
+                                        value={
+                                            draft?.invoice_date_label ??
+                                            'Invoice date'
+                                        }
+                                        onChange={(e) =>
+                                            updateDraft({
+                                                invoice_date_label:
+                                                    e.target.value,
+                                            })
+                                        }
+                                        placeholder="Invoice date"
+                                    />
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        Label shown on the PDF next to the
+                                        invoice date.
+                                    </p>
+                                </div>
+
+                                <div>
                                     <InputLabel value="Header notes" />
                                     <textarea
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"

@@ -57,8 +57,9 @@ export interface InvoiceDraft {
     invoice_number: string;
     invoice_number_label?: string;
     status: InvoiceStatus;
-    issue_date: string;
-    due_date: string;
+    invoice_date: string;
+    invoice_date_label?: string;
+    due_date?: string;
     date_of_service?: string;
     currency: string;
     language: string;

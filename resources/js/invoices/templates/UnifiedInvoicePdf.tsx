@@ -8,6 +8,7 @@ import {
 } from '@react-pdf/renderer';
 import { buildFormatConfig } from '../invoiceFormatConfig';
 import type { TableColumnKey } from '../invoiceFormatConfig';
+import { formatInvoiceDate, invoiceDateDisplay } from '../formatInvoiceDate';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceLineItem, InvoiceTotals } from '../types';
 import { PartyBlock } from './shared';
@@ -357,7 +358,11 @@ export function UnifiedInvoicePdf({
                             </View>
                         </View>
                         <Text style={[s.muted, { marginBottom: 8 }]}>
-                            Issue: {draft.issue_date}
+                            {invoiceDateDisplay(
+                                draft.invoice_date,
+                                draft.invoice_date_label,
+                                draft.date_format,
+                            )}
                             {draft.due_date ? ` · Due: ${draft.due_date}` : ''}
                         </Text>
                         {parties}
@@ -407,7 +412,10 @@ export function UnifiedInvoicePdf({
                         <View style={s.tradeMetaCell}>
                             <Text style={s.tradeMetaLabel}>Date</Text>
                             <Text style={s.tradeMetaValue}>
-                                {draft.issue_date}
+                                {formatInvoiceDate(
+                                    draft.invoice_date,
+                                    draft.date_format,
+                                )}
                             </Text>
                         </View>
                         <View style={s.tradeMetaCell}>
@@ -450,7 +458,12 @@ export function UnifiedInvoicePdf({
                                     {cfg.numberLabel} {draft.invoice_number}
                                 </Text>
                                 <Text style={s.muted}>
-                                    Period: {draft.date_of_service || draft.issue_date}
+                                    Period:{' '}
+                                    {formatInvoiceDate(
+                                        draft.date_of_service ||
+                                            draft.invoice_date,
+                                        draft.date_format,
+                                    )}
                                     {draft.due_date
                                         ? ` — Due ${draft.due_date}`
                                         : ''}
@@ -488,7 +501,10 @@ export function UnifiedInvoicePdf({
                         <Text style={s.title}>{cfg.title}</Text>
                         <Text style={s.muted}>
                             {cfg.numberLabel} {draft.invoice_number} ·{' '}
-                            {draft.issue_date}
+                            {formatInvoiceDate(
+                                draft.invoice_date,
+                                draft.date_format,
+                            )}
                         </Text>
                         <View style={[s.headerRow, { marginTop: 12 }]}>
                             <Text style={s.amountValue}>
@@ -528,7 +544,13 @@ export function UnifiedInvoicePdf({
                             </Text>
                         </View>
                         <View style={s.amountBox}>
-                            <Text>Issue: {draft.issue_date}</Text>
+                            <Text>
+                                {invoiceDateDisplay(
+                                    draft.invoice_date,
+                                    draft.invoice_date_label,
+                                    draft.date_format,
+                                )}
+                            </Text>
                             {draft.due_date ? (
                                 <Text>Due: {draft.due_date}</Text>
                             ) : null}
@@ -583,7 +605,11 @@ export function UnifiedInvoicePdf({
                                 {cfg.numberLabel} {draft.invoice_number}
                             </Text>
                             <Text style={s.muted}>
-                                Issued {draft.issue_date}
+                                {invoiceDateDisplay(
+                                    draft.invoice_date,
+                                    draft.invoice_date_label,
+                                    draft.date_format,
+                                )}
                                 {draft.due_date
                                     ? ` · Due ${draft.due_date}`
                                     : ''}

@@ -39,7 +39,7 @@ class InvoiceApiController extends Controller
             $query = Invoice::query()
                 ->where('company_id', $company->id)
                 ->with('buyer:id,name,email')
-                ->orderByDesc('issue_date')
+                ->orderByDesc('invoice_date')
                 ->orderByDesc('id');
 
             if ($request->filled('status')) {
@@ -50,7 +50,7 @@ class InvoiceApiController extends Controller
                 'id',
                 'invoice_number',
                 'status',
-                'issue_date',
+                'invoice_date',
                 'due_date',
                 'currency',
                 'total',
@@ -64,7 +64,7 @@ class InvoiceApiController extends Controller
                     'id' => $invoice->id,
                     'invoice_number' => $invoice->invoice_number,
                     'status' => $invoice->status,
-                    'issue_date' => $invoice->issue_date?->format('Y-m-d'),
+                    'invoice_date' => $invoice->invoice_date?->format('Y-m-d'),
                     'due_date' => $invoice->due_date?->format('Y-m-d'),
                     'currency' => $invoice->currency,
                     'total' => (float) $invoice->total,
@@ -249,7 +249,8 @@ class InvoiceApiController extends Controller
                 'buyer_id' => ['nullable', 'integer'],
                 'invoice_number' => ['required', 'string', 'max:50'],
                 'status' => ['required', 'string', Rule::in(['draft', 'sent', 'paid'])],
-                'issue_date' => ['required', 'date'],
+                'invoice_date' => ['required', 'date'],
+                'invoice_date_label' => ['nullable', 'string', 'max:50'],
                 'due_date' => ['nullable', 'date'],
                 'currency' => ['nullable', 'string', Rule::in(['INR'])],
                 'language' => ['nullable', 'string', 'max:5'],
@@ -329,7 +330,8 @@ class InvoiceApiController extends Controller
                     'invoice_number' => $data['invoice_number'],
                     'invoice_number_label' => $data['invoice_number_label'] ?? 'Invoice #',
                     'status' => $data['status'],
-                    'issue_date' => $data['issue_date'],
+                    'invoice_date' => $data['invoice_date'],
+                    'invoice_date_label' => $data['invoice_date_label'] ?? 'Invoice date',
                     'due_date' => $data['due_date'] ?? null,
                     'date_of_service' => $data['date_of_service'] ?? null,
                     'currency' => 'INR',

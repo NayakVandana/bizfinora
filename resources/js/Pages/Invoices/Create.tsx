@@ -1,7 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoiceBuilder from '@/invoices/InvoiceBuilder';
-import { buildDefaultDraft } from '@/invoices/defaultDraft';
+import {
+    buildDefaultDraft,
+    ensureDefaultInvoiceDates,
+} from '@/invoices/defaultDraft';
 import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
 import type { TemplatePreset } from '@/invoices/templatePresets';
 import { serializeInvoiceDraft } from '@/invoices/serializeDraft';
@@ -56,7 +59,7 @@ export default function InvoicesCreate() {
                         metaRes.data.custom_template_preset,
                     );
                 }
-                setDraft(nextDraft);
+                setDraft(ensureDefaultInvoiceDates(nextDraft));
             }
             if (buyersRes.success && buyersRes.data) {
                 setBuyers(buyersRes.data);

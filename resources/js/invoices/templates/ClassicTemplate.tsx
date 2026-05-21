@@ -1,4 +1,5 @@
 import { Document, Image, Page, Text, View } from '@react-pdf/renderer';
+import { invoiceDateDisplay } from '../formatInvoiceDate';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { baseStyles, PartyBlock } from './shared';
@@ -30,7 +31,13 @@ export function ClassicTemplate({
                         <Text style={baseStyles.muted}>#{draft.invoice_number}</Text>
                     </View>
                     <View style={{ textAlign: 'right' }}>
-                        <Text>Issue: {draft.issue_date}</Text>
+                        <Text>
+                            {invoiceDateDisplay(
+                                draft.invoice_date,
+                                draft.invoice_date_label,
+                                draft.date_format,
+                            )}
+                        </Text>
                         {draft.due_date ? (
                             <Text>Due: {draft.due_date}</Text>
                         ) : null}

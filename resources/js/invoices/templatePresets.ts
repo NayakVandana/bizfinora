@@ -18,6 +18,7 @@ export const INVOICE_TEMPLATES: {
 
 export type TemplatePreset = {
     invoice_number_label?: string;
+    invoice_date_label?: string;
     invoice_type?: string;
     template?: InvoiceTemplate;
     tax_type?: TaxType;
@@ -38,6 +39,7 @@ export type TemplatePreset = {
 export function draftToTemplatePreset(draft: InvoiceDraft): TemplatePreset {
     return {
         invoice_number_label: draft.invoice_number_label,
+        invoice_date_label: draft.invoice_date_label,
         invoice_type: draft.invoice_type,
         template: draft.template,
         tax_type: draft.tax_type,
@@ -76,6 +78,10 @@ export function applyTemplatePresetToDraft(
             preset.invoice_number_label ??
             typePatch.invoice_number_label ??
             draft.invoice_number_label,
+        invoice_date_label:
+            preset.invoice_date_label ??
+            typePatch.invoice_date_label ??
+            draft.invoice_date_label,
         template:
             preset.template ??
             (typePatch.template as InvoiceTemplate | undefined) ??

@@ -1,3 +1,4 @@
+import { ensureDefaultInvoiceDates } from './defaultDraft';
 import { applyInvoiceTypeToDraft } from './invoiceTypes';
 import { applyTemplatePresetToDraft, type TemplatePreset } from './templatePresets';
 import type { CustomTemplateRow, SystemTemplateRow } from './customTemplatesApi';
@@ -27,22 +28,40 @@ export function applyTemplateSelection(
     key: TemplateSelectKey,
     system: SystemTemplateRow[],
     custom: CustomTemplateRow[],
+    keepDates = true,
 ): InvoiceDraft {
     const { kind, id } = parseTemplateSelectKey(key);
+    const priorInvoiceDate = draft.invoice_date;
+    const priorDue = draft.due_date;
+    const priorService = draft.date_of_service;
+
+    let next: InvoiceDraft;
 
     if (kind === 'custom') {
         const row = custom.find((t) => String(t.id) === id);
         if (row) {
-            return applyTemplatePresetToDraft(draft, row.preset ?? {});
+            next = applyTemplatePresetToDraft(draft, row.preset ?? {});
+        } else {
+            next = draft;
         }
-        return draft;
+    } else {
+        const typeId = system.find((t) => t.id === id)?.id ?? id;
+        next = {
+            ...draft,
+            ...applyInvoiceTypeToDraft(draft, typeId),
+        };
     }
 
-    const typeId = system.find((t) => t.id === id)?.id ?? id;
-    return {
-        ...draft,
-        ...applyInvoiceTypeToDraft(draft, typeId),
-    };
+    if (keepDates) {
+        next = {
+            ...next,
+            invoice_date: priorInvoiceDate,
+            due_date: priorDue,
+            date_of_service: priorService,
+        };
+    }
+
+    return ensureDefaultInvoiceDates(next);
 }
 
 export function defaultTemplateLabel(

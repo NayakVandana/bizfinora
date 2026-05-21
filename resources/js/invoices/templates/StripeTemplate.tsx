@@ -1,4 +1,5 @@
 import { Document, Image, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
+import { invoiceDateDisplay } from '../formatInvoiceDate';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceTotals } from '../types';
 import { PartyBlock } from './shared';
@@ -98,7 +99,11 @@ export function StripeTemplate({
                                 {draft.invoice_number}
                             </Text>
                             <Text style={styles.meta}>
-                                Issued {draft.issue_date}
+                                {invoiceDateDisplay(
+                                    draft.invoice_date,
+                                    draft.invoice_date_label,
+                                    draft.date_format,
+                                )}
                                 {draft.due_date
                                     ? ` · Due ${draft.due_date}`
                                     : ''}

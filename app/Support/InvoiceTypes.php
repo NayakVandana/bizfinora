@@ -52,6 +52,7 @@ class InvoiceTypes
                 'layout' => $type['layout'] ?? 'stripe',
                 'title' => $type['title'] ?? 'INVOICE',
                 'number_label' => $type['number_label'] ?? 'Invoice #',
+                'date_label' => $type['date_label'] ?? 'Invoice date',
                 'accent' => $type['accent'] ?? null,
                 'header_note' => $type['header_note'] ?? null,
                 'tax_type' => $type['tax_type'] ?? null,

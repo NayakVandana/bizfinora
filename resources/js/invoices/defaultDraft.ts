@@ -1,7 +1,32 @@
 import { APP_CURRENCY, normalizeCurrency } from './currency';
+import { defaultInvoiceDateLabel } from './invoiceDateLabels';
 import { applyInvoiceTypeToDraft } from './invoiceTypes';
 import type { CompanyTaxSettings } from './taxPresets';
 import type { InvoiceDraft, InvoiceTemplate, PartyDetails } from './types';
+
+/** YYYY-MM-DD in local timezone (for HTML date inputs). */
+export function localDateString(date: Date = new Date()): string {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+export function addDaysLocal(base: Date, days: number): string {
+    const next = new Date(base);
+    next.setDate(next.getDate() + days);
+    return localDateString(next);
+}
+
+/** Only invoice date defaults to today; other dates stay empty until the user sets them. */
+export function ensureDefaultInvoiceDates(draft: InvoiceDraft): InvoiceDraft {
+    const today = localDateString();
+
+    return {
+        ...draft,
+        invoice_date: draft.invoice_date?.trim() || today,
+    };
+}
 
 export function emptyParty(): PartyDetails {
     return {
@@ -44,20 +69,19 @@ export function buildDefaultDraft(
     template: InvoiceTemplate = 'stripe',
     invoiceType: string = 'standard',
 ): InvoiceDraft {
-    const today = new Date().toISOString().slice(0, 10);
-    const due = new Date();
-    due.setDate(due.getDate() + 14);
+    const today = localDateString();
 
     const base: InvoiceDraft = {
         invoice_number: invoiceNumber,
         invoice_number_label: 'Invoice #',
         status: 'draft',
-        issue_date: today,
-        due_date: due.toISOString().slice(0, 10),
-        date_of_service: today,
+        invoice_date: today,
+        invoice_date_label: defaultInvoiceDateLabel(invoiceType),
+        due_date: '',
+        date_of_service: '',
         currency: APP_CURRENCY,
         language: 'en',
-        date_format: 'YYYY-MM-DD',
+        date_format: 'DD/MM/YYYY',
         template,
         invoice_type: invoiceType,
         tax_type: taxSettings?.default_tax_type ?? 'vat',
@@ -114,14 +138,19 @@ export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDra
         invoice_number: String(data.invoice_number ?? ''),
         invoice_number_label: String(data.invoice_number_label ?? 'Invoice #'),
         status: data.status as InvoiceDraft['status'],
-        issue_date: String(data.issue_date ?? ''),
+        invoice_date: String(
+            data.invoice_date ?? data.issue_date ?? '',
+        ),
+        invoice_date_label: String(
+            data.invoice_date_label ?? 'Invoice date',
+        ),
         due_date: String(data.due_date ?? ''),
         date_of_service: String(data.date_of_service ?? ''),
         currency: normalizeCurrency(
             data.currency as string | undefined,
         ),
         language: String(data.language ?? 'en'),
-        date_format: String(data.date_format ?? 'YYYY-MM-DD'),
+        date_format: String(data.date_format ?? 'DD/MM/YYYY'),
         template: data.template as InvoiceDraft['template'],
         invoice_type: String(data.invoice_type ?? 'standard'),
         tax_type: data.tax_type as InvoiceDraft['tax_type'],

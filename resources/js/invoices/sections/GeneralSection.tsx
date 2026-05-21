@@ -51,45 +51,54 @@ export default function GeneralSection({ draft, onChange, onLogoFile }: Props) {
                     </select>
                 </div>
                 <div>
-                    <InputLabel value="Issue date" />
+                    <InputLabel value="Invoice date label" />
                     <TextInput
-                        type="date"
                         className="mt-1 block w-full"
-                        value={draft.issue_date}
-                        onChange={(e) => onChange({ issue_date: e.target.value })}
+                        value={draft.invoice_date_label ?? 'Invoice date'}
+                        onChange={(e) =>
+                            onChange({
+                                invoice_date_label: e.target.value,
+                            })
+                        }
+                        placeholder="Invoice date"
                     />
                 </div>
                 <div>
-                    <InputLabel value="Due date" />
+                    <InputLabel value="Invoice date" />
                     <TextInput
                         type="date"
                         className="mt-1 block w-full"
-                        value={draft.due_date}
-                        onChange={(e) => onChange({ due_date: e.target.value })}
+                        value={draft.invoice_date}
+                        onChange={(e) =>
+                            onChange({ invoice_date: e.target.value })
+                        }
                     />
                 </div>
                 <div>
-                    <InputLabel value="Date of service" />
+                    <InputLabel value="Due date (optional)" />
+                    <TextInput
+                        type="date"
+                        className="mt-1 block w-full"
+                        value={draft.due_date ?? ''}
+                        onChange={(e) =>
+                            onChange({
+                                due_date: e.target.value || '',
+                            })
+                        }
+                    />
+                </div>
+                <div>
+                    <InputLabel value="Date of service (optional)" />
                     <TextInput
                         type="date"
                         className="mt-1 block w-full"
                         value={draft.date_of_service ?? ''}
                         onChange={(e) =>
-                            onChange({ date_of_service: e.target.value })
+                            onChange({
+                                date_of_service: e.target.value || '',
+                            })
                         }
                     />
-                </div>
-                <div>
-                    <InputLabel value="Date format" />
-                    <select
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                        value={draft.date_format ?? 'YYYY-MM-DD'}
-                        onChange={(e) => onChange({ date_format: e.target.value })}
-                    >
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                    </select>
                 </div>
             </div>
 

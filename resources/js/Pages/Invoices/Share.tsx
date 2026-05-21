@@ -29,7 +29,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
                         tax_rate,
                         currency,
                         language,
-                        issue_date,
+                        invoice_date,
                         due_date,
                         status,
                         buyer_id,
@@ -38,7 +38,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
                     setDraft({
                         invoice_number,
                         status,
-                        issue_date,
+                        invoice_date,
                         due_date: due_date ?? '',
                         currency,
                         language,
