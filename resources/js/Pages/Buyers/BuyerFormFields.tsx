@@ -63,17 +63,6 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
                 />
                 <InputError message={errors.email} className="mt-1" />
             </div>
-            <div className="sm:col-span-2">
-                <InputLabel value="Address *" />
-                <textarea
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                    rows={3}
-                    value={form.address}
-                    onChange={(e) => onChange({ address: e.target.value })}
-                    placeholder="Street, area, city, PIN"
-                />
-                <InputError message={errors.address} className="mt-1" />
-            </div>
             <div>
                 <InputLabel value="GST" />
                 <TextInput
@@ -99,6 +88,87 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
                     placeholder="e.g. ABCDE1234F (optional)"
                 />
                 <InputError message={errors.pan} className="mt-1" />
+            </div>
+            <div className="sm:col-span-2">
+                <InputLabel value="Address *" />
+                <textarea
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    rows={3}
+                    value={form.address}
+                    onChange={(e) => onChange({ address: e.target.value })}
+                    placeholder="Full address for invoices"
+                />
+                <InputError message={errors.address} className="mt-1" />
+            </div>
+            <div className="sm:col-span-2">
+                <p className="text-xs font-medium text-gray-500">
+                    Structured address (optional)
+                </p>
+            </div>
+            <div className="sm:col-span-2">
+                <InputLabel value="Address line 1" />
+                <TextInput
+                    className="mt-1 block w-full"
+                    value={form.address_line1}
+                    onChange={(e) =>
+                        onChange({ address_line1: e.target.value })
+                    }
+                    placeholder="Building, street"
+                />
+                <InputError message={errors.address_line1} className="mt-1" />
+            </div>
+            <div className="sm:col-span-2">
+                <InputLabel value="Address line 2" />
+                <TextInput
+                    className="mt-1 block w-full"
+                    value={form.address_line2}
+                    onChange={(e) =>
+                        onChange({ address_line2: e.target.value })
+                    }
+                    placeholder="Area, landmark"
+                />
+                <InputError message={errors.address_line2} className="mt-1" />
+            </div>
+            <div>
+                <InputLabel value="City" />
+                <TextInput
+                    className="mt-1 block w-full"
+                    value={form.city}
+                    onChange={(e) => onChange({ city: e.target.value })}
+                />
+                <InputError message={errors.city} className="mt-1" />
+            </div>
+            <div>
+                <InputLabel value="State" />
+                <TextInput
+                    className="mt-1 block w-full"
+                    value={form.state}
+                    onChange={(e) => onChange({ state: e.target.value })}
+                />
+                <InputError message={errors.state} className="mt-1" />
+            </div>
+            <div>
+                <InputLabel value="Postal code" />
+                <TextInput
+                    className="mt-1 block w-full"
+                    value={form.postal_code}
+                    onChange={(e) =>
+                        onChange({ postal_code: e.target.value })
+                    }
+                    placeholder="PIN / ZIP"
+                />
+                <InputError message={errors.postal_code} className="mt-1" />
+            </div>
+            <div className="sm:col-span-2">
+                <InputLabel value="Notes" />
+                <textarea
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    rows={2}
+                    value={form.notes}
+                    onChange={(e) => onChange({ notes: e.target.value })}
+                    placeholder="Internal notes (optional)"
+                />
+                <InputError message={errors.notes} className="mt-1" />
             </div>
         </div>
     );

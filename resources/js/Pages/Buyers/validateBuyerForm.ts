@@ -65,6 +65,12 @@ export function mapBuyerApiErrors(data: unknown): BuyerFieldErrors {
         'gst',
         'pan',
         'address',
+        'address_line1',
+        'address_line2',
+        'city',
+        'state',
+        'postal_code',
+        'notes',
     ];
 
     for (const key of keys) {

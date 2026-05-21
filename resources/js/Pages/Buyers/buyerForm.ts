@@ -10,6 +10,12 @@ export type BuyerFormState = {
     gst: string;
     pan: string;
     address: string;
+    address_line1: string;
+    address_line2: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    notes: string;
 };
 
 export function emptyBuyerForm(): BuyerFormState {
@@ -21,6 +27,12 @@ export function emptyBuyerForm(): BuyerFormState {
         gst: '',
         pan: '',
         address: '',
+        address_line1: '',
+        address_line2: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        notes: '',
     };
 }
 
@@ -34,5 +46,11 @@ export function buyerToForm(buyer: BuyerOption): BuyerFormState {
         gst: buyer.gst ?? buyer.tax_id ?? '',
         pan: buyer.pan ?? '',
         address: buyer.address ?? '',
+        address_line1: buyer.address_line1 ?? '',
+        address_line2: buyer.address_line2 ?? '',
+        city: buyer.city ?? '',
+        state: buyer.state ?? '',
+        postal_code: buyer.postal_code ?? '',
+        notes: buyer.notes ?? '',
     };
 }

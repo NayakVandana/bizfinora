@@ -22,12 +22,24 @@ export async function submitBuyerForm(
     }
 
     const phone = normalizeIndianMobile(form.phone);
+    const optional = (value: string) => {
+        const trimmed = value.trim();
+
+        return trimmed !== '' ? trimmed : null;
+    };
+
     const payload = {
         company_name: form.company_name.trim(),
         name: form.name.trim(),
         email: form.email.trim(),
         phone: phone ?? '',
         address: form.address.trim(),
+        address_line1: optional(form.address_line1),
+        address_line2: optional(form.address_line2),
+        city: optional(form.city),
+        state: optional(form.state),
+        postal_code: optional(form.postal_code),
+        notes: optional(form.notes),
         gst: normalizeGst(form.gst) || null,
         pan: normalizePan(form.pan) || null,
         id: form.id,

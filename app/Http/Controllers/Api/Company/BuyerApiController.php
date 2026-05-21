@@ -173,6 +173,12 @@ class BuyerApiController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:10'],
             'address' => ['required', 'string', 'max:2000'],
+            'address_line1' => ['nullable', 'string', 'max:255'],
+            'address_line2' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:120'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
+            'notes' => ['nullable', 'string', 'max:5000'],
             'gst' => ['nullable', 'string', 'max:15'],
             'pan' => ['nullable', 'string', 'max:10'],
         ];
@@ -228,6 +234,12 @@ class BuyerApiController extends Controller
             'company_name' => $companyName,
             'name' => $ownerName,
             'address' => $address !== '' ? $address : null,
+            'address_line1' => $this->optionalString($validated['address_line1'] ?? null),
+            'address_line2' => $this->optionalString($validated['address_line2'] ?? null),
+            'city' => $this->optionalString($validated['city'] ?? null, 120),
+            'state' => $this->optionalString($validated['state'] ?? null, 120),
+            'postal_code' => $this->optionalString($validated['postal_code'] ?? null, 20),
+            'notes' => $this->optionalString($validated['notes'] ?? null, 5000),
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'gst' => $gst !== '' ? $gst : null,
@@ -235,5 +247,16 @@ class BuyerApiController extends Controller
             'tax_id' => $gst !== '' ? $gst : null,
             'tax_id_label' => $gst !== '' ? 'GSTIN' : 'GSTIN',
         ];
+    }
+
+    private function optionalString(mixed $value, int $maxLength = 255): ?string
+    {
+        $trimmed = trim((string) ($value ?? ''));
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        return mb_substr($trimmed, 0, $maxLength);
     }
 }
