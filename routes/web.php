@@ -33,7 +33,13 @@ Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.in
 
 Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplateDefault'))->name('settings.templates');
 
+Route::get('/settings/templates/library', fn () => Inertia::render('Settings/TemplatesIndex'))->name('settings.templates.library');
+
 Route::get('/settings/templates/preview', fn () => Inertia::render('Settings/TemplatePreview'))->name('settings.templates.preview');
+
+Route::get('/settings/templates/{id}/edit', fn (int $id) => Inertia::render('Settings/TemplateEdit', ['templateId' => $id]))
+    ->whereNumber('id')
+    ->name('settings.templates.edit');
 
 Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
 

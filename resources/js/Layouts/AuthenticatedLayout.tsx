@@ -51,6 +51,14 @@ function useNavEntries(): NavEntry[] {
         { type: 'heading', label: 'Templates' },
         {
             type: 'link',
+            href: route('settings.templates.library'),
+            label: 'Template library',
+            isActive: () =>
+                route().current() === 'settings.templates.library' ||
+                route().current() === 'settings.templates.edit',
+        },
+        {
+            type: 'link',
             href: route('settings.templates'),
             label: 'Default template',
             isActive: () => route().current() === 'settings.templates',

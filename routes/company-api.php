@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Company\BuyerApiController;
 use App\Http\Controllers\Api\Company\CompanyContextApiController;
 use App\Http\Controllers\Api\Company\InvoiceApiController;
+use App\Http\Controllers\Api\Company\InvoiceTemplateApiController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(function () {
@@ -11,6 +12,14 @@ Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(
     Route::post('/company/company-profile-update', [CompanyContextApiController::class, 'postCompanyProfileUpdate']);
     Route::post('/company/company-tax-settings-update', [CompanyContextApiController::class, 'postCompanyTaxSettingsUpdate']);
     Route::post('/company/company-template-settings-update', [CompanyContextApiController::class, 'postCompanyTemplateSettingsUpdate']);
+
+    Route::post('/invoice-templates/invoice-templates-list', [InvoiceTemplateApiController::class, 'postInvoiceTemplatesList']);
+    Route::post('/invoice-templates/invoice-template-show', [InvoiceTemplateApiController::class, 'postInvoiceTemplateShow']);
+    Route::post('/invoice-templates/invoice-template-store', [InvoiceTemplateApiController::class, 'postInvoiceTemplateStore']);
+    Route::post('/invoice-templates/invoice-template-update', [InvoiceTemplateApiController::class, 'postInvoiceTemplateUpdate']);
+    Route::post('/invoice-templates/invoice-template-clone', [InvoiceTemplateApiController::class, 'postInvoiceTemplateClone']);
+    Route::post('/invoice-templates/invoice-template-destroy', [InvoiceTemplateApiController::class, 'postInvoiceTemplateDestroy']);
+    Route::post('/invoice-templates/invoice-template-set-default', [InvoiceTemplateApiController::class, 'postInvoiceTemplateSetDefault']);
 
     Route::post('/buyers/buyers-list', [BuyerApiController::class, 'postBuyersList']);
     Route::post('/buyers/buyer-store', [BuyerApiController::class, 'postBuyerStore']);

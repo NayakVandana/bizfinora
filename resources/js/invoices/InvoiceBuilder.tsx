@@ -22,6 +22,7 @@ type Props = {
     saving?: boolean;
     shareUrl?: string | null;
     companyTax?: CompanyTaxSettings | null;
+    isNewInvoice?: boolean;
 };
 
 export default function InvoiceBuilder({
@@ -34,6 +35,7 @@ export default function InvoiceBuilder({
     saving = false,
     shareUrl,
     companyTax,
+    isNewInvoice = false,
 }: Props) {
     const update = (patch: Partial<InvoiceDraft>) =>
         onChange({ ...draft, ...patch });
@@ -169,7 +171,11 @@ export default function InvoiceBuilder({
                     </div>
                 ) : null}
 
-                <TemplateSection draft={draft} onChange={update} />
+                <TemplateSection
+                    draft={draft}
+                    onChange={update}
+                    isNewInvoice={isNewInvoice}
+                />
                 <GeneralSection
                     draft={draft}
                     onChange={update}

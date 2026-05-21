@@ -31,6 +31,7 @@ class Company extends Model
         'tax_per_line',
         'default_invoice_template',
         'default_invoice_type',
+        'default_custom_template_id',
     ];
 
     protected function casts(): array
@@ -56,6 +57,11 @@ class Company extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function invoiceTemplates(): HasMany
+    {
+        return $this->hasMany(InvoiceTemplate::class);
     }
 
     public static function uniqueSlugFromName(string $name): string

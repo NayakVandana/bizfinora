@@ -8,7 +8,7 @@ import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import InvoiceTypePicker from '@/invoices/InvoiceTypePicker';
 import { buildTemplatePreviewDraft } from '@/invoices/buildTemplatePreviewDraft';
 import { invoiceTypeLabel } from '@/invoices/invoiceTypes';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { useMemo, useState } from 'react';
 import { useTemplatePreviewData } from './useTemplatePreviewData';
 
@@ -84,7 +84,15 @@ export default function TemplateDefault() {
                                 <p className="text-sm text-gray-600">
                                     Choose the default invoice type for new
                                     invoices. Preview updates as you select —
-                                    save when ready.
+                                    save when ready.{' '}
+                                    <Link
+                                        href={route(
+                                            'settings.templates.library',
+                                        )}
+                                        className="text-indigo-600 hover:text-indigo-800"
+                                    >
+                                        Browse & clone templates
+                                    </Link>
                                 </p>
 
                                 {message ? (

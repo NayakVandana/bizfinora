@@ -113,6 +113,18 @@ class InvoiceApiController extends Controller
             /** @var Company $company */
             $company = $request->attributes->get('company');
 
+            $customPreset = null;
+            $defaultTemplateLabel = InvoiceTypes::get($company->default_invoice_type ?? 'standard')['label'] ?? 'Standard Invoice';
+            if ($company->default_custom_template_id) {
+                $custom = $company->invoiceTemplates()
+                    ->where('id', $company->default_custom_template_id)
+                    ->first();
+                if ($custom) {
+                    $customPreset = $custom->preset;
+                    $defaultTemplateLabel = $custom->name;
+                }
+            }
+
             return $this->sendJsonResponse(true, 'Invoice meta fetched successfully.', [
                 'seller' => InvoicePresentation::sellerFromCompany($company),
                 'next_invoice_number' => Invoice::nextInvoiceNumber($company->id),
@@ -134,6 +146,12 @@ class InvoiceApiController extends Controller
                     'tax_per_line' => (bool) ($company->tax_per_line ?? false),
                 ],
                 'default_template' => $company->default_invoice_template ?? 'stripe',
+                'default_custom_template_id' => $company->default_custom_template_id,
+                'custom_template_preset' => $customPreset,
+                'default_template_label' => $defaultTemplateLabel,
+                'default_template_selection' => $company->default_custom_template_id
+                    ? 'custom:'.$company->default_custom_template_id
+                    : 'system:'.($company->default_invoice_type ?? 'standard'),
             ], 200);
         } catch (Exception $e) {
             return $this->sendError($e);

@@ -154,6 +154,7 @@ class CompanyContextApiController extends Controller
             $validation = Validator::make($request->all(), [
                 'default_invoice_type' => ['required', 'string', Rule::in(InvoiceTypes::ids())],
                 'default_invoice_template' => ['nullable', 'string', Rule::in(['stripe', 'classic'])],
+                'default_custom_template_id' => ['nullable', 'integer'],
             ]);
 
             if ($validation->fails()) {
@@ -173,6 +174,18 @@ class CompanyContextApiController extends Controller
             $typeId = $data['default_invoice_type'];
             $data['default_invoice_template'] = $data['default_invoice_template']
                 ?? InvoiceTypes::layoutFor($typeId);
+
+            if (array_key_exists('default_custom_template_id', $data)) {
+                $customId = $data['default_custom_template_id'];
+                if ($customId) {
+                    $exists = $company->invoiceTemplates()->where('id', $customId)->exists();
+                    if (! $exists) {
+                        return $this->sendJsonResponse(false, 'Custom template not found.', null, 200);
+                    }
+                }
+            } else {
+                unset($data['default_custom_template_id']);
+            }
 
             $company->update($data);
 

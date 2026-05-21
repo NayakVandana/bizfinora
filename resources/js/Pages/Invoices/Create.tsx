@@ -2,6 +2,8 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoiceBuilder from '@/invoices/InvoiceBuilder';
 import { buildDefaultDraft } from '@/invoices/defaultDraft';
+import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
+import type { TemplatePreset } from '@/invoices/templatePresets';
 import { serializeInvoiceDraft } from '@/invoices/serializeDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import type { InvoiceDraft } from '@/invoices/types';
@@ -17,6 +19,8 @@ type Meta = {
     tax_settings?: CompanyTaxSettings;
     default_template?: 'stripe' | 'classic';
     default_invoice_type?: string;
+    default_custom_template_id?: number | null;
+    custom_template_preset?: TemplatePreset | null;
 };
 
 export default function InvoicesCreate() {
@@ -38,16 +42,21 @@ export default function InvoicesCreate() {
                 if (metaRes.data.tax_settings) {
                     setCompanyTax(metaRes.data.tax_settings);
                 }
-                setDraft(
-                    buildDefaultDraft(
-                        seller,
-                        metaRes.data.next_invoice_number,
-                        (seller as { logo_data_url?: string }).logo_data_url,
-                        metaRes.data.tax_settings,
-                        metaRes.data.default_template ?? 'stripe',
-                        metaRes.data.default_invoice_type ?? 'standard',
-                    ),
+                let nextDraft = buildDefaultDraft(
+                    seller,
+                    metaRes.data.next_invoice_number,
+                    (seller as { logo_data_url?: string }).logo_data_url,
+                    metaRes.data.tax_settings,
+                    metaRes.data.default_template ?? 'stripe',
+                    metaRes.data.default_invoice_type ?? 'standard',
                 );
+                if (metaRes.data.custom_template_preset) {
+                    nextDraft = applyTemplatePresetToDraft(
+                        nextDraft,
+                        metaRes.data.custom_template_preset,
+                    );
+                }
+                setDraft(nextDraft);
             }
             if (buyersRes.success && buyersRes.data) {
                 setBuyers(buyersRes.data);
@@ -115,6 +124,7 @@ export default function InvoicesCreate() {
                             saving={saving}
                             shareUrl={shareUrl}
                             companyTax={companyTax}
+                            isNewInvoice
                         />
                     )}
                 </div>

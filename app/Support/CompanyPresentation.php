@@ -34,6 +34,7 @@ class CompanyPresentation
             'tax_per_line' => (bool) ($company->tax_per_line ?? false),
             'default_invoice_template' => $company->default_invoice_template ?? 'stripe',
             'default_invoice_type' => $company->default_invoice_type ?? 'standard',
+            'default_custom_template_id' => $company->default_custom_template_id,
             'created_at' => $company->created_at?->toIso8601String(),
             'updated_at' => $company->updated_at?->toIso8601String(),
         ];
