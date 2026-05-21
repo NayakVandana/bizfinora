@@ -53,6 +53,13 @@ export default function Dashboard() {
                                     className="text-indigo-600 underline hover:text-indigo-800"
                                 >
                                     manage companies
+                                </Link>{' '}
+                                or{' '}
+                                <Link
+                                    href={route('invoices.create')}
+                                    className="text-indigo-600 underline hover:text-indigo-800"
+                                >
+                                    create an invoice
                                 </Link>
                                 .
                             </p>

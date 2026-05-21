@@ -8,11 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreignId('current_company_id')
+                ->nullable()
+                ->after('email')
+                ->constrained('companies')
+                ->nullOnDelete();
         });
 
         Schema::create('company_user', function (Blueprint $table) {
@@ -24,23 +25,14 @@ return new class extends Migration
 
             $table->unique(['company_id', 'user_id']);
         });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('current_company_id')
-                ->nullable()
-                ->after('email')
-                ->constrained('companies')
-                ->nullOnDelete();
-        });
     }
 
     public function down(): void
     {
+        Schema::dropIfExists('company_user');
+
         Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('current_company_id');
         });
-
-        Schema::dropIfExists('company_user');
-        Schema::dropIfExists('companies');
     }
 };

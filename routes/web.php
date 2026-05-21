@@ -29,4 +29,17 @@ Route::get('/profile', fn () => Inertia::render('Profile/Edit', [
     'status' => null,
 ]))->name('profile.edit');
 
+Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.index');
+
+Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
+
+Route::get('/invoices', fn () => Inertia::render('Invoices/Index'))->name('invoices.index');
+Route::get('/invoices/create', fn () => Inertia::render('Invoices/Create'))->name('invoices.create');
+Route::get('/invoices/{id}/edit', fn (int $id) => Inertia::render('Invoices/Edit', ['invoiceId' => $id]))
+    ->whereNumber('id')
+    ->name('invoices.edit');
+
+Route::get('/i/{token}', fn (string $token) => Inertia::render('Invoices/Share', ['shareToken' => $token]))
+    ->name('invoices.share');
+
 require __DIR__.'/auth.php';

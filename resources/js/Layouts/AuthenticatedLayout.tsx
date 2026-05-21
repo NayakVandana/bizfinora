@@ -61,6 +61,28 @@ export default function Authenticated({
                                 >
                                     Companies
                                 </NavLink>
+                                <NavLink
+                                    href={route('buyers.index')}
+                                    active={route().current('buyers.index')}
+                                >
+                                    Buyers
+                                </NavLink>
+                                <NavLink
+                                    href={route('invoices.index')}
+                                    active={Boolean(
+                                        route()
+                                            .current()
+                                            ?.startsWith('invoices.'),
+                                    )}
+                                >
+                                    Invoices
+                                </NavLink>
+                                <NavLink
+                                    href={route('settings.tax')}
+                                    active={route().current('settings.tax')}
+                                >
+                                    Tax
+                                </NavLink>
                             </div>
                         </div>
 
@@ -171,6 +193,28 @@ export default function Authenticated({
                             active={route().current('companies.index')}
                         >
                             Companies
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('buyers.index')}
+                            active={route().current('buyers.index')}
+                        >
+                            Buyers
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('invoices.index')}
+                            active={Boolean(
+                                route()
+                                    .current()
+                                    ?.startsWith('invoices.'),
+                            )}
+                        >
+                            Invoices
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('settings.tax')}
+                            active={route().current('settings.tax')}
+                        >
+                            Tax
                         </ResponsiveNavLink>
                     </div>
 
