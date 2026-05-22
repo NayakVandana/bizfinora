@@ -25,8 +25,8 @@
     --input-bg: oklch(1 0 0);
     --focus-ring-shadow: 0 0 0 3px oklch(0.55 0.1 264 / 0.16);
     --ring: oklch(0.55 0.1 264);
-    --sidebar: oklch(1 0 0);
-    --sidebar-foreground: oklch(0.35 0 0);
+    --sidebar: oklch(0.99 0.005 264);
+    --sidebar-foreground: oklch(0.32 0.02 264);
     --sidebar-primary: oklch(0.45 0.14 264);
     --sidebar-primary-foreground: oklch(0.98 0 0);
     --sidebar-accent: oklch(0.96 0.02 264);

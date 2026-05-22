@@ -35,7 +35,7 @@ export default function TemplatePreviewPage() {
             <Head title="Template preview" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+                <div className="w-full px-4 sm:px-6 lg:px-8">
                     {loading ? (
                         <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (

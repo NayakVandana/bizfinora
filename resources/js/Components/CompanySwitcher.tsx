@@ -30,7 +30,7 @@ function NewCompanyButton({ className = '' }: { className?: string }) {
     );
 }
 
-export default function CompanySwitcher() {
+export default function CompanySwitcher({ className = '' }: { className?: string }) {
     const { currentCompany, companies, refresh } = useAuthUser();
 
     if (companies.length === 0) {
@@ -55,10 +55,10 @@ export default function CompanySwitcher() {
     return (
         <Dropdown>
             <Dropdown.Trigger>
-                <span className="inline-flex rounded-md">
+                <span className={`inline-flex rounded-md ${className}`}>
                     <button
                         type="button"
-                        className="inline-flex max-w-[14rem] items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-muted focus:outline-none"
+                        className="inline-flex max-w-[14rem] items-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium leading-4 text-foreground transition hover:bg-muted focus:outline-none"
                     >
                         <span className="truncate">
                             {currentCompany?.name ?? 'Select company'}

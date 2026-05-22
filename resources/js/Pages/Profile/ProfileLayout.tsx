@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { pageContainer, pageShell } from '@/lib/pageLayout';
 import { Head } from '@inertiajs/react';
 import { PropsWithChildren } from 'react';
 
@@ -22,10 +23,10 @@ export default function ProfileLayout({
         >
             <Head title={headTitle ?? title} />
 
-            <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-3xl px-3 sm:px-6 lg:px-8">
-                    <div className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm p-5 sm:p-8">
-                        <div className="max-w-xl">{children}</div>
+            <div className={pageShell}>
+                <div className={pageContainer}>
+                    <div className="overflow-hidden rounded-xl border border-border bg-card p-5 text-card-foreground shadow-sm sm:p-8">
+                        {children}
                     </div>
                 </div>
             </div>

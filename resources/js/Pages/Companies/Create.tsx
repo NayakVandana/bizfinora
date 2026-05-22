@@ -98,7 +98,7 @@ export default function CompaniesCreate() {
             <Head title="New company" />
 
             <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-2xl px-3 sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     <Link
                         href={route('companies.index')}
                         className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"

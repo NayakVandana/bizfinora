@@ -142,7 +142,7 @@ export default function TemplateEdit({ templateId }: Props) {
             <Head title="Edit template" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
+                <div className="w-full px-4 sm:px-6 lg:px-8">
                     <Link
                         href={route('settings.templates.library')}
                         className="font-medium text-sidebar-primary hover:opacity-80 text-sm"

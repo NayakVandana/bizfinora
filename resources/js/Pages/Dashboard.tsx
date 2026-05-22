@@ -2,6 +2,7 @@ import ListingIndex from '@/Components/ListingIndex';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { pageContainer, pageShell } from '@/lib/pageLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
@@ -140,8 +141,8 @@ export default function Dashboard() {
         >
             <Head title="Dashboard" />
 
-            <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-7xl space-y-6 px-3 sm:px-6 lg:px-8">
+            <div className={pageShell}>
+                <div className={`${pageContainer} space-y-6`}>
                     <div className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm p-4 sm:p-6">
                         <p className="text-foreground text-lg">
                             Welcome, <strong>{user?.name}</strong>

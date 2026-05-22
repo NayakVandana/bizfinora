@@ -70,7 +70,7 @@ export default function InvoicesIndex() {
             <Head title="Invoices" />
 
             <div className="py-8">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm">
                         <div className="flex flex-col gap-2 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                             <p className="text-muted-foreground text-sm">

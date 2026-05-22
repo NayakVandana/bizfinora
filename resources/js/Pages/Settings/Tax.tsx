@@ -81,7 +81,7 @@ export default function TaxSettings() {
             <Head title="Tax settings" />
 
             <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-2xl px-3 sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     {loading ? (
                         <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (

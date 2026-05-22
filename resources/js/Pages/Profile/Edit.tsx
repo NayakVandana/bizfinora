@@ -14,7 +14,7 @@ export default function ProfileEdit() {
             <Head title="Edit user profile" />
 
             <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-2xl px-3 sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     <Link
                         href={route('profile.information')}
                         className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"

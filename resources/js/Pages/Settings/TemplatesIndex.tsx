@@ -350,7 +350,7 @@ export default function TemplatesIndex() {
             <Head title="Templates" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                <div className="w-full px-4 sm:px-6 lg:px-8">
                     <p className="text-muted-foreground mb-4 text-sm">
                         Browse general and custom templates. Preview any
                         template, clone to customize, save, and reuse on new

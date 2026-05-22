@@ -2,86 +2,102 @@ import {
     isProfileRouteActive,
     profileMenuLinks,
 } from '@/Pages/Profile/profileMenu';
+import type { SidebarIconName } from '@/Layouts/sidebarIcons';
 
 export type NavLinkItem = {
-    type: 'link';
     href: string;
     label: string;
+    icon: SidebarIconName;
     isActive: () => boolean;
 };
 
-export type NavHeading = {
-    type: 'heading';
-    label: string;
+export type NavSection = {
+    title?: string;
+    links: NavLinkItem[];
 };
 
-export type NavEntry = NavLinkItem | NavHeading;
+const profileIconByRoute: Record<string, SidebarIconName> = {
+    'profile.information': 'user',
+    'profile.password': 'key',
+    'profile.appearance': 'palette',
+};
 
-export function sidebarNavEntries(): NavEntry[] {
-    const userProfileLinks: NavLinkItem[] = profileMenuLinks.map((item) => ({
-        type: 'link',
+export function sidebarNavSections(): NavSection[] {
+    const profileLinks: NavLinkItem[] = profileMenuLinks.map((item) => ({
         href: route(item.routeName),
         label: item.label,
+        icon: profileIconByRoute[item.routeName] ?? 'user',
         isActive: () => isProfileRouteActive(item.routeName),
     }));
 
     return [
         {
-            type: 'link',
-            href: route('dashboard'),
-            label: 'Dashboard',
-            isActive: () => Boolean(route().current('dashboard')),
+            links: [
+                {
+                    href: route('dashboard'),
+                    label: 'Dashboard',
+                    icon: 'dashboard',
+                    isActive: () => Boolean(route().current('dashboard')),
+                },
+                {
+                    href: route('buyers.index'),
+                    label: 'Buyers',
+                    icon: 'buyers',
+                    isActive: () =>
+                        Boolean(route().current()?.startsWith('buyers.')),
+                },
+                {
+                    href: route('invoices.index'),
+                    label: 'Invoices',
+                    icon: 'invoices',
+                    isActive: () =>
+                        Boolean(route().current()?.startsWith('invoices.')),
+                },
+            ],
         },
         {
-            type: 'link',
-            href: route('buyers.index'),
-            label: 'Buyers',
-            isActive: () =>
-                Boolean(route().current()?.startsWith('buyers.')),
+            title: 'Templates',
+            links: [
+                {
+                    href: route('settings.templates.library'),
+                    label: 'Library',
+                    icon: 'library',
+                    isActive: () =>
+                        route().current() === 'settings.templates.library' ||
+                        route().current() === 'settings.templates.edit',
+                },
+                {
+                    href: route('settings.templates'),
+                    label: 'Default',
+                    icon: 'template',
+                    isActive: () => route().current() === 'settings.templates',
+                },
+                {
+                    href: route('settings.templates.preview'),
+                    label: 'Preview',
+                    icon: 'preview',
+                    isActive: () =>
+                        route().current() === 'settings.templates.preview',
+                },
+                {
+                    href: route('settings.tax'),
+                    label: 'Tax',
+                    icon: 'tax',
+                    isActive: () => Boolean(route().current('settings.tax')),
+                },
+            ],
         },
         {
-            type: 'link',
-            href: route('invoices.index'),
-            label: 'Invoices',
-            isActive: () =>
-                Boolean(route().current()?.startsWith('invoices.')),
-        },
-        { type: 'heading', label: 'Templates' },
-        {
-            type: 'link',
-            href: route('settings.templates.library'),
-            label: 'Template library',
-            isActive: () =>
-                route().current() === 'settings.templates.library' ||
-                route().current() === 'settings.templates.edit',
-        },
-        {
-            type: 'link',
-            href: route('settings.templates'),
-            label: 'Default template',
-            isActive: () => route().current() === 'settings.templates',
-        },
-        {
-            type: 'link',
-            href: route('settings.templates.preview'),
-            label: 'Preview',
-            isActive: () =>
-                route().current() === 'settings.templates.preview',
-        },
-        {
-            type: 'link',
-            href: route('settings.tax'),
-            label: 'Tax',
-            isActive: () => Boolean(route().current('settings.tax')),
-        },
-        { type: 'heading', label: 'User' },
-        ...userProfileLinks,
-        { type: 'heading', label: 'Company' },
-        {
-            type: 'link',
-            href: route('companies.index'),
-            label: 'Company profile',
-            isActive: () => route().current() === 'companies.index',
+            title: 'Profile',
+            links: [
+                ...profileLinks,
+                {
+                    href: route('companies.index'),
+                    label: 'Company',
+                    icon: 'building',
+                    isActive: () => route().current() === 'companies.index',
+                },
+            ],
         },
     ];
 }

@@ -66,7 +66,7 @@ export default function CompaniesIndex() {
             <Head title="Company profile" />
 
             <div className="py-6 sm:py-8">
-                <div className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     <p className="text-muted-foreground mb-6 max-w-2xl text-sm">
                         Seller details for your active workspace. Switch
                         company or add a new one from the{' '}

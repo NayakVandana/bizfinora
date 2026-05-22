@@ -64,7 +64,7 @@ export default function BuyersEdit({ buyerId }: Props) {
             <Head title="Edit buyer" />
 
             <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-3xl px-3 sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     <div className="flex flex-wrap items-center gap-3 text-sm">
                         <Link
                             href={route('buyers.index')}

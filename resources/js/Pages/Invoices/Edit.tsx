@@ -89,7 +89,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
             <Head title="Edit invoice" />
 
             <div className="py-6">
-                <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8">
+                <div className="w-full px-3 sm:px-6 lg:px-8">
                     {!draft ? (
                         <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (

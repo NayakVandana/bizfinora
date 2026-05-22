@@ -1,49 +1,13 @@
+import AppSidebar from '@/Components/AppSidebar';
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import CompanySwitcher from '@/Components/CompanySwitcher';
 import Dropdown from '@/Components/Dropdown';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { Link, router } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { profileMenuLinks } from '@/Pages/Profile/profileMenu';
+import { useSidebarCollapsed } from '@/hooks/useSidebarCollapsed';
 import { requireAuthPage } from '@/utils/requireAuth';
-import { type NavEntry, sidebarNavEntries } from '@/Layouts/sidebarNav';
-
-function SidebarNav({
-    entries,
-    onNavigate,
-}: {
-    entries: NavEntry[];
-    onNavigate?: () => void;
-}) {
-    return (
-        <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4">
-            {entries.map((entry, index) => {
-                if (entry.type === 'heading') {
-                    return (
-                        <p
-                            key={`${entry.type}-${entry.label}-${index}`}
-                            className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground first:mt-0"
-                        >
-                            {entry.label}
-                        </p>
-                    );
-                }
-
-                return (
-                    <ResponsiveNavLink
-                        key={`${entry.href}-${entry.label}`}
-                        href={entry.href}
-                        active={entry.isActive()}
-                        onClick={onNavigate}
-                    >
-                        {entry.label}
-                    </ResponsiveNavLink>
-                );
-            })}
-        </nav>
-    );
-}
 
 function UserMenu({ onLogout }: { onLogout: () => void }) {
     const { user } = useAuthUser();
@@ -54,7 +18,7 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
                 <span className="inline-flex rounded-md">
                     <button
                         type="button"
-                        className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-muted focus:outline-none"
+                        className="inline-flex items-center rounded-md border border-border bg-background px-3 py-2 text-sm font-medium leading-4 text-foreground transition hover:bg-muted focus:outline-none"
                     >
                         {user?.name}
                         <svg
@@ -88,7 +52,7 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
                 <button
                     type="button"
                     onClick={onLogout}
-                    className="block w-full px-4 py-2 text-start text-sm leading-5 text-popover-foreground transition duration-150 ease-in-out hover:bg-muted focus:bg-muted focus:outline-none"
+                    className="block w-full px-4 py-2 text-start text-sm leading-5 text-popover-foreground transition hover:bg-muted focus:bg-muted focus:outline-none"
                 >
                     Log out
                 </button>
@@ -102,9 +66,8 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { user, loading, logout } = useAuthUser();
-    const navEntries = sidebarNavEntries();
-
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
+    const { collapsed, toggle: toggleSidebar } = useSidebarCollapsed();
 
     useEffect(() => {
         if (!loading) {
@@ -119,90 +82,29 @@ export default function Authenticated({
 
     if (loading || !user) {
         return (
-            <div className="min-h-screen bg-background text-foreground flex items-center justify-center text-muted-foreground">
+            <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
                 Loading…
             </div>
         );
     }
 
+    const closeMobile = () => setMobileNavOpen(false);
+
     return (
-        <div className="min-h-screen bg-background text-foreground lg:flex">
-            <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
-                <div className="flex h-16 items-center border-b border-sidebar-border px-4">
-                    <Link href={route('dashboard')}>
-                        <ApplicationLogo className="block h-8 w-auto fill-current text-sidebar-foreground" />
-                    </Link>
-                </div>
-                <SidebarNav entries={navEntries} />
+        <div className="flex min-h-svh w-full bg-background text-foreground">
+            <aside
+                className={`hidden shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-[width] duration-200 ease-out lg:flex ${
+                    collapsed ? 'w-[3.25rem]' : 'w-44'
+                }`}
+            >
+                <AppSidebar
+                    collapsed={collapsed}
+                    onToggleCollapsed={toggleSidebar}
+                />
             </aside>
 
-            {mobileNavOpen ? (
-                <div
-                    className="fixed inset-0 z-40 lg:hidden"
-                    role="presentation"
-                    onClick={() => setMobileNavOpen(false)}
-                >
-                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
-                    <aside
-                        className="relative flex h-full w-56 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-xl"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-                            <Link
-                                href={route('dashboard')}
-                                onClick={() => setMobileNavOpen(false)}
-                            >
-                                <ApplicationLogo className="block h-8 w-auto fill-current text-sidebar-foreground" />
-                            </Link>
-                            <button
-                                type="button"
-                                onClick={() => setMobileNavOpen(false)}
-                                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                aria-label="Close menu"
-                            >
-                                <svg
-                                    className="h-5 w-5"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                        <SidebarNav
-                            entries={navEntries}
-                            onNavigate={() => setMobileNavOpen(false)}
-                        />
-                        <div className="border-t border-sidebar-border px-4 py-3">
-                            <CompanySwitcher />
-                        </div>
-                        <div className="mt-auto border-t border-sidebar-border px-4 py-4">
-                            <p className="text-sm font-medium text-foreground">
-                                {user.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                                {user.email}
-                            </p>
-                            <button
-                                type="button"
-                                onClick={() => void handleLogout()}
-                                className="mt-3 block w-full px-4 py-2 text-start text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
-                            >
-                                Log out
-                            </button>
-                        </div>
-                    </aside>
-                </div>
-            ) : null}
-
-            <div className="flex min-w-0 flex-1 flex-col">
-                <header className="flex min-h-16 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-card px-3 py-2 sm:px-6 sm:py-0 lg:px-8">
+            <div className="flex min-h-svh min-w-0 flex-1 flex-col">
+                <header className="flex min-h-14 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-background px-4 py-2 sm:px-6 lg:px-8">
                     <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
                         <button
                             type="button"
@@ -211,7 +113,7 @@ export default function Authenticated({
                             aria-label="Open menu"
                         >
                             <svg
-                                className="h-6 w-6"
+                                className="h-5 w-5"
                                 stroke="currentColor"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -225,15 +127,12 @@ export default function Authenticated({
                             </svg>
                         </button>
                         {header ? (
-                            <div className="text-foreground min-w-0 flex-1">
+                            <div className="min-w-0 flex-1 text-foreground">
                                 {header}
                             </div>
                         ) : (
-                            <Link
-                                href={route('dashboard')}
-                                className="lg:hidden"
-                            >
-                                <ApplicationLogo className="block h-8 w-auto fill-current text-foreground" />
+                            <Link href={route('dashboard')} className="lg:hidden">
+                                <ApplicationLogo className="block h-7 w-auto fill-current text-foreground" />
                             </Link>
                         )}
                     </div>
@@ -243,8 +142,49 @@ export default function Authenticated({
                     </div>
                 </header>
 
-                <main className="flex-1">{children}</main>
+                <main className="min-h-0 flex-1 overflow-auto">{children}</main>
             </div>
+
+            {mobileNavOpen ? (
+                <div
+                    className="fixed inset-0 z-50 lg:hidden"
+                    role="presentation"
+                    onClick={closeMobile}
+                >
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+                    <aside
+                        className="relative flex h-full w-[min(18rem,85vw)] flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            type="button"
+                            onClick={closeMobile}
+                            className="absolute end-3 top-3 z-10 rounded-md p-1.5 text-muted-foreground hover:bg-sidebar-accent"
+                            aria-label="Close menu"
+                        >
+                            <svg
+                                className="h-5 w-5"
+                                stroke="currentColor"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                        <AppSidebar
+                            collapsed={false}
+                            onToggleCollapsed={toggleSidebar}
+                            onNavigate={closeMobile}
+                            onLogoClick={closeMobile}
+                        />
+                    </aside>
+                </div>
+            ) : null}
         </div>
     );
 }

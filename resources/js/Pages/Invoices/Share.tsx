@@ -62,7 +62,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
             <Head title="Shared invoice" />
 
             <header className="border-b border-border bg-card px-4 py-4 shadow-sm">
-                <div className="mx-auto flex max-w-6xl items-center justify-between">
+                <div className="flex w-full items-center justify-between">
                     <div>
                         <p className="text-muted-foreground text-sm">Shared invoice</p>
                         <h1 className="text-foreground text-lg font-semibold">
@@ -81,7 +81,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
                 </div>
             </header>
 
-            <main className="mx-auto max-w-6xl p-4">
+            <main className="w-full p-4">
                 {error ? (
                     <p className="text-red-600">{error}</p>
                 ) : !draft ? (
