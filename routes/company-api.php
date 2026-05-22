@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\Company\BuyerApiController;
 use App\Http\Controllers\Api\Company\CompanyContextApiController;
+use App\Http\Controllers\Api\Company\DashboardApiController;
 use App\Http\Controllers\Api\Company\InvoiceApiController;
 use App\Http\Controllers\Api\Company\InvoiceTemplateApiController;
 use Illuminate\Support\Facades\Route;
@@ -12,6 +13,8 @@ Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(
     Route::post('/company/company-profile-update', [CompanyContextApiController::class, 'postCompanyProfileUpdate']);
     Route::post('/company/company-tax-settings-update', [CompanyContextApiController::class, 'postCompanyTaxSettingsUpdate']);
     Route::post('/company/company-template-settings-update', [CompanyContextApiController::class, 'postCompanyTemplateSettingsUpdate']);
+
+    Route::post('/dashboard/dashboard-summary', [DashboardApiController::class, 'postDashboardSummary']);
 
     Route::post('/invoice-templates/invoice-templates-list', [InvoiceTemplateApiController::class, 'postInvoiceTemplatesList']);
     Route::post('/invoice-templates/invoice-template-show', [InvoiceTemplateApiController::class, 'postInvoiceTemplateShow']);
