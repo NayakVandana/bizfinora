@@ -23,7 +23,7 @@ function SidebarNav({
                     return (
                         <p
                             key={`${entry.type}-${entry.label}-${index}`}
-                            className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 first:mt-0"
+                            className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground first:mt-0"
                         >
                             {entry.label}
                         </p>
@@ -54,7 +54,7 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
                 <span className="inline-flex rounded-md">
                     <button
                         type="button"
-                        className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
+                        className="inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-muted focus:outline-none"
                     >
                         {user?.name}
                         <svg
@@ -73,7 +73,7 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
                 </span>
             </Dropdown.Trigger>
             <Dropdown.Content>
-                <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Account
                 </p>
                 {profileMenuLinks.map((item) => (
@@ -84,11 +84,11 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
                         {item.label}
                     </Dropdown.Link>
                 ))}
-                <div className="my-1 border-t border-gray-100" />
+                <div className="my-1 border-t border-border" />
                 <button
                     type="button"
                     onClick={onLogout}
-                    className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    className="block w-full px-4 py-2 text-start text-sm leading-5 text-popover-foreground transition duration-150 ease-in-out hover:bg-muted focus:bg-muted focus:outline-none"
                 >
                     Log out
                 </button>
@@ -119,47 +119,45 @@ export default function Authenticated({
 
     if (loading || !user) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-100 text-gray-500">
+            <div className="min-h-screen bg-background text-foreground flex items-center justify-center text-muted-foreground">
                 Loading…
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 lg:flex">
-            {/* Desktop sidebar */}
-            <aside className="hidden w-56 shrink-0 flex-col border-r border-gray-200 bg-white lg:flex">
-                <div className="flex h-16 items-center border-b border-gray-100 px-4">
+        <div className="min-h-screen bg-background text-foreground lg:flex">
+            <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground lg:flex">
+                <div className="flex h-16 items-center border-b border-sidebar-border px-4">
                     <Link href={route('dashboard')}>
-                        <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
+                        <ApplicationLogo className="block h-8 w-auto fill-current text-sidebar-foreground" />
                     </Link>
                 </div>
                 <SidebarNav entries={navEntries} />
             </aside>
 
-            {/* Mobile sidebar overlay */}
             {mobileNavOpen ? (
                 <div
                     className="fixed inset-0 z-40 lg:hidden"
                     role="presentation"
                     onClick={() => setMobileNavOpen(false)}
                 >
-                    <div className="absolute inset-0 bg-gray-600/50" />
+                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" />
                     <aside
-                        className="relative flex h-full w-56 flex-col bg-white shadow-xl"
+                        className="relative flex h-full w-56 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex h-16 items-center justify-between border-b border-gray-100 px-4">
+                        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
                             <Link
                                 href={route('dashboard')}
                                 onClick={() => setMobileNavOpen(false)}
                             >
-                                <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
+                                <ApplicationLogo className="block h-8 w-auto fill-current text-sidebar-foreground" />
                             </Link>
                             <button
                                 type="button"
                                 onClick={() => setMobileNavOpen(false)}
-                                className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                                className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground"
                                 aria-label="Close menu"
                             >
                                 <svg
@@ -181,18 +179,20 @@ export default function Authenticated({
                             entries={navEntries}
                             onNavigate={() => setMobileNavOpen(false)}
                         />
-                        <div className="border-t border-gray-200 px-4 py-3">
+                        <div className="border-t border-sidebar-border px-4 py-3">
                             <CompanySwitcher />
                         </div>
-                        <div className="mt-auto border-t border-gray-200 px-4 py-4">
-                            <p className="text-sm font-medium text-gray-800">
+                        <div className="mt-auto border-t border-sidebar-border px-4 py-4">
+                            <p className="text-sm font-medium text-foreground">
                                 {user.name}
                             </p>
-                            <p className="text-xs text-gray-500">{user.email}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {user.email}
+                            </p>
                             <button
                                 type="button"
                                 onClick={() => void handleLogout()}
-                                className="mt-3 block w-full px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                                className="mt-3 block w-full px-4 py-2 text-start text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
                             >
                                 Log out
                             </button>
@@ -202,12 +202,12 @@ export default function Authenticated({
             ) : null}
 
             <div className="flex min-w-0 flex-1 flex-col">
-                <header className="flex min-h-16 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 py-2 sm:px-6 sm:py-0 lg:px-8">
+                <header className="flex min-h-16 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border bg-card px-3 py-2 sm:px-6 sm:py-0 lg:px-8">
                     <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
                         <button
                             type="button"
                             onClick={() => setMobileNavOpen(true)}
-                            className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 lg:hidden"
+                            className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground lg:hidden"
                             aria-label="Open menu"
                         >
                             <svg
@@ -225,13 +225,15 @@ export default function Authenticated({
                             </svg>
                         </button>
                         {header ? (
-                            <div className="min-w-0 flex-1">{header}</div>
+                            <div className="text-foreground min-w-0 flex-1">
+                                {header}
+                            </div>
                         ) : (
                             <Link
                                 href={route('dashboard')}
                                 className="lg:hidden"
                             >
-                                <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
+                                <ApplicationLogo className="block h-8 w-auto fill-current text-foreground" />
                             </Link>
                         )}
                     </div>

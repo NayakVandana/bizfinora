@@ -15,7 +15,7 @@ export default function ProfileLayout({
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold leading-tight">
                     {title}
                 </h2>
             }
@@ -24,7 +24,7 @@ export default function ProfileLayout({
 
             <div className="py-6 sm:py-8">
                 <div className="mx-auto max-w-3xl px-3 sm:px-6 lg:px-8">
-                    <div className="overflow-hidden rounded-xl bg-white p-5 shadow-sm sm:p-8">
+                    <div className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm p-5 sm:p-8">
                         <div className="max-w-xl">{children}</div>
                     </div>
                 </div>

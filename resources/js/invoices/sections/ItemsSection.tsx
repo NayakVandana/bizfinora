@@ -25,10 +25,10 @@ export default function ItemsSection({
     return (
         <Accordion title="Invoice items" defaultOpen>
             <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Line items</span>
+                <span className="text-muted-foreground text-sm">Line items</span>
                 <button
                     type="button"
-                    className="text-sm text-indigo-600"
+                    className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
                     onClick={onAddItem}
                 >
                     + Add line
@@ -38,7 +38,7 @@ export default function ItemsSection({
             {draft.document.items.map((item, index) => (
                 <div
                     key={index}
-                    className="grid gap-2 rounded border border-gray-100 p-3 sm:grid-cols-12 sm:p-2"
+                    className="grid gap-2 rounded border border-border bg-muted p-3 sm:grid-cols-12 sm:p-2"
                 >
                     <TextInput
                         className="w-full sm:col-span-4"

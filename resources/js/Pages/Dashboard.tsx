@@ -6,6 +6,7 @@ import { listingIndexThClass } from '@/utils/listingIndex';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { formatMoney } from '@/invoices/formatMoney';
+import { statusBadgeClass } from '@/utils/statusBadgeClass';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -68,17 +69,6 @@ const quickLinks = [
     },
 ] as const;
 
-function statusBadgeClass(status: string): string {
-    switch (status) {
-        case 'paid':
-            return 'bg-green-100 text-green-800';
-        case 'sent':
-            return 'bg-blue-100 text-blue-800';
-        default:
-            return 'bg-gray-100 text-gray-700';
-    }
-}
-
 function StatCard({
     label,
     value,
@@ -89,13 +79,13 @@ function StatCard({
     sub?: string;
 }) {
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">
+        <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-0 text-xs">
                 {label}
             </p>
-            <p className="mt-1 text-2xl font-semibold text-gray-900">{value}</p>
+            <p className="text-foreground mt-1 text-2xl font-semibold">{value}</p>
             {sub ? (
-                <p className="mt-1 text-sm text-gray-600">{sub}</p>
+                <p className="text-muted-foreground mt-1 text-sm">{sub}</p>
             ) : null}
         </div>
     );
@@ -143,7 +133,7 @@ export default function Dashboard() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold leading-tight">
                     Dashboard
                 </h2>
             }
@@ -152,12 +142,12 @@ export default function Dashboard() {
 
             <div className="py-6 sm:py-8">
                 <div className="mx-auto max-w-7xl space-y-6 px-3 sm:px-6 lg:px-8">
-                    <div className="rounded-lg bg-white p-4 shadow-sm sm:p-6">
-                        <p className="text-lg text-gray-900">
+                    <div className="overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm p-4 sm:p-6">
+                        <p className="text-foreground text-lg">
                             Welcome, <strong>{user?.name}</strong>
                         </p>
                         {currentCompany ? (
-                            <p className="mt-1 text-sm text-gray-600">
+                            <p className="text-muted-foreground mt-1 text-sm">
                                 Active company:{' '}
                                 <strong>{currentCompany.name}</strong>
                                 {companies.length > 1 ? (
@@ -168,12 +158,12 @@ export default function Dashboard() {
                                 ) : null}
                             </p>
                         ) : (
-                            <p className="mt-2 text-sm text-amber-800">
+                            <p className="mt-2 text-sm text-amber-800 dark:text-amber-300">
                                 Select or create a company to use invoices and
                                 buyers.{' '}
                                 <Link
                                     href={route('companies.create')}
-                                    className="font-medium underline"
+                                    className="font-medium underline dark:text-amber-200"
                                 >
                                     New company
                                 </Link>
@@ -182,11 +172,11 @@ export default function Dashboard() {
                     </div>
 
                     {!currentCompany ? null : loading ? (
-                        <p className="text-center text-sm text-gray-500">
+                        <p className="text-muted-foreground text-center text-sm">
                             Loading summary…
                         </p>
                     ) : error ? (
-                        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/50 dark:text-red-300">
                             {error}
                         </p>
                     ) : summary ? (
@@ -215,7 +205,7 @@ export default function Dashboard() {
                             </div>
 
                             <div>
-                                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                                     Quick actions
                                 </h3>
                                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -223,12 +213,12 @@ export default function Dashboard() {
                                         <Link
                                             key={item.href}
                                             href={route(item.href)}
-                                            className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
+                                            className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm transition hover:border-accent hover:shadow-md"
                                         >
-                                            <p className="font-semibold text-gray-900">
+                                            <p className="text-foreground font-semibold">
                                                 {item.title}
                                             </p>
-                                            <p className="mt-1 text-sm text-gray-600">
+                                            <p className="text-muted-foreground mt-1 text-sm">
                                                 {item.description}
                                             </p>
                                         </Link>
@@ -248,32 +238,32 @@ export default function Dashboard() {
                                 </div>
                             </div>
 
-                            <div className="overflow-hidden rounded-lg bg-white shadow-sm">
-                                <div className="flex flex-col gap-2 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                                    <h3 className="font-semibold text-gray-900">
+                            <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+                                <div className="flex flex-col gap-2 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                                    <h3 className="text-foreground font-semibold">
                                         Recent invoices
                                     </h3>
                                     <Link
                                         href={route('invoices.index')}
-                                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                                        className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
                                     >
                                         View all
                                     </Link>
                                 </div>
 
                                 {summary.recent_invoices.length === 0 ? (
-                                    <p className="p-6 text-center text-sm text-gray-500">
+                                    <p className="text-muted-foreground p-6 text-center text-sm">
                                         No invoices yet.{' '}
                                         <Link
                                             href={route('invoices.create')}
-                                            className="font-medium text-indigo-600 hover:text-indigo-800"
+                                            className="font-medium text-sidebar-primary hover:opacity-80"
                                         >
                                             Create your first invoice
                                         </Link>
                                     </p>
                                 ) : (
                                     <>
-                                        <ul className="divide-y divide-gray-100 md:hidden">
+                                        <ul className="divide-y divide-gray-100 md:hidden dark:divide-gray-800">
                                             {summary.recent_invoices.map(
                                                 (row, index) => (
                                                     <li
@@ -291,13 +281,13 @@ export default function Dashboard() {
                                                                 'invoices.edit',
                                                                 row.id,
                                                             )}
-                                                            className="font-medium text-indigo-600"
+                                                            className="font-medium text-sidebar-primary hover:opacity-80 font-medium"
                                                         >
                                                             {
                                                                 row.invoice_number
                                                             }
                                                         </Link>
-                                                        <p className="mt-1 text-sm text-gray-600">
+                                                        <p className="text-muted-foreground mt-1 text-sm">
                                                             {row.buyer_name ??
                                                                 'No buyer'}{' '}
                                                             · {row.invoice_date}
@@ -308,7 +298,7 @@ export default function Dashboard() {
                                                             >
                                                                 {row.status}
                                                             </span>
-                                                            <span className="text-sm font-medium text-gray-900">
+                                                            <span className="text-foreground text-sm font-medium">
                                                                 {formatMoney(
                                                                     row.total,
                                                                 )}
@@ -320,8 +310,8 @@ export default function Dashboard() {
                                         </ul>
 
                                         <div className="hidden md:block">
-                                            <table className="min-w-full divide-y divide-gray-200 text-sm">
-                                                <thead className="bg-gray-50">
+                                            <table className="w-full min-w-full divide-y divide-border text-sm">
+                                                <thead className="bg-muted">
                                                     <tr>
                                                         <th
                                                             className={
@@ -330,27 +320,27 @@ export default function Dashboard() {
                                                         >
                                                             #
                                                         </th>
-                                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                             Number
                                                         </th>
-                                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                             Buyer
                                                         </th>
-                                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                             Date
                                                         </th>
-                                                        <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                             Status
                                                         </th>
-                                                        <th className="px-4 py-3 text-right font-medium text-gray-600">
+                                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-right">
                                                             Total
                                                         </th>
-                                                        <th className="px-4 py-3 text-right font-medium text-gray-600">
+                                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-right">
                                                             Action
                                                         </th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-gray-100">
+                                                <tbody className="divide-y divide-border">
                                                     {summary.recent_invoices.map(
                                                         (row, index) => (
                                                             <tr key={row.id}>
@@ -359,41 +349,43 @@ export default function Dashboard() {
                                                                         index
                                                                     }
                                                                 />
-                                                                <td className="px-4 py-3 font-medium">
+                                                                <td className="px-4 py-3 font-medium text-foreground">
                                                                     {
                                                                         row.invoice_number
                                                                     }
                                                                 </td>
-                                                                <td className="px-4 py-3 text-gray-600">
+                                                                <td className="px-4 py-3 text-muted-foreground">
                                                                     {row.buyer_name ??
                                                                         '—'}
                                                                 </td>
-                                                                <td className="px-4 py-3 text-gray-600">
+                                                                <td className="px-4 py-3 text-muted-foreground">
                                                                     {
                                                                         row.invoice_date
                                                                     }
                                                                 </td>
-                                                                <td className="px-4 py-3">
+                                                                <td className="px-4 py-3 text-muted-foreground">
                                                                     <span
-                                                                        className={`rounded-full px-2 py-0.5 text-xs capitalize ${statusBadgeClass(row.status)}`}
+                                                                        className={statusBadgeClass(
+                                                                            row.status,
+                                                                        )}
                                                                     >
                                                                         {
                                                                             row.status
                                                                         }
                                                                     </span>
                                                                 </td>
-                                                                <td className="px-4 py-3 text-right">
+                                                                <td className="px-4 py-3 text-muted-foreground text-right">
                                                                     {formatMoney(
                                                                         row.total,
                                                                     )}
                                                                 </td>
-                                                                <td className="px-4 py-3 text-right">
+                                                                <td className="px-4 py-3 text-muted-foreground text-right">
                                                                     <Link
                                                                         href={route(
                                                                             'invoices.edit',
                                                                             row.id,
                                                                         )}
-                                                                        className="text-indigo-600 hover:text-indigo-800"
+                                                                        className="font-medium text-sidebar-primary hover:opacity-80"
                                                                     >
                                                                         Edit
                                                                     </Link>

@@ -73,128 +73,146 @@ export default function TaxSettings() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Tax settings
                 </h2>
             }
         >
             <Head title="Tax settings" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+            <div className="py-6 sm:py-8">
+                <div className="mx-auto max-w-2xl px-3 sm:px-6 lg:px-8">
                     {loading ? (
-                        <p className="text-gray-500">Loading…</p>
+                        <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (
-                        <div className="space-y-6 rounded-lg bg-white p-6 shadow-sm">
-                            <p className="text-sm text-gray-600">
-                                Defaults apply to new invoices for the active
-                                company. You can still override tax on each
-                                invoice.
-                            </p>
-
-                            {message ? (
-                                <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-                                    {message}
-                                </div>
-                            ) : null}
-
-                            <div className="flex flex-wrap gap-2">
-                                {TAX_PRESETS.map((preset) => (
-                                    <button
-                                        key={preset.id}
-                                        type="button"
-                                        className={
-                                            form.default_tax_type === preset.id
-                                                ? 'rounded-full bg-indigo-600 px-3 py-1 text-xs font-medium text-white'
-                                                : 'rounded-full border border-gray-300 px-3 py-1 text-xs text-gray-700'
-                                        }
-                                        onClick={() => applyPreset(preset.id)}
-                                    >
-                                        {preset.label}
-                                    </button>
-                                ))}
+                        <div className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm">
+                            <div className="border-b border-border px-5 py-4 sm:px-6">
+                                <p className="text-muted-foreground text-sm">
+                                    Defaults apply to new invoices for the active
+                                    company. You can still override tax on each
+                                    invoice.
+                                </p>
                             </div>
 
-                            <div className="grid gap-4">
-                                <div>
-                                    <InputLabel value="Tax label" />
-                                    <TextInput
-                                        className="mt-1 block w-full"
-                                        value={form.default_tax_label}
-                                        disabled={form.default_tax_type === 'none'}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                default_tax_label:
-                                                    e.target.value,
-                                            })
-                                        }
-                                    />
-                                </div>
-                                <div>
-                                    <InputLabel value="Default tax rate %" />
-                                    <TextInput
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        step="0.01"
-                                        className="mt-1 block w-full"
-                                        value={form.default_tax_rate}
-                                        disabled={form.default_tax_type === 'none'}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                default_tax_rate: Number(
-                                                    e.target.value,
-                                                ),
-                                            })
-                                        }
-                                    />
-                                </div>
-                                <div>
-                                    <InputLabel value="Calculation mode" />
-                                    <select
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                        value={form.tax_calculation_mode}
-                                        disabled={form.default_tax_type === 'none'}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                tax_calculation_mode: e.target
-                                                    .value as TaxCalculationMode,
-                                            })
-                                        }
-                                    >
-                                        <option value="exclusive">
-                                            Tax exclusive
-                                        </option>
-                                        <option value="inclusive">
-                                            Tax inclusive
-                                        </option>
-                                    </select>
-                                </div>
-                                <label className="flex items-center gap-2 text-sm">
-                                    <input
-                                        type="checkbox"
-                                        checked={form.tax_per_line}
-                                        disabled={form.default_tax_type === 'none'}
-                                        onChange={(e) =>
-                                            setForm({
-                                                ...form,
-                                                tax_per_line: e.target.checked,
-                                            })
-                                        }
-                                    />
-                                    Enable per-line tax rates by default
-                                </label>
-                            </div>
+                            <div className="space-y-6 px-5 py-6 sm:px-6">
+                                {message ? (
+                                    <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300">
+                                        {message}
+                                    </div>
+                                ) : null}
 
-                            <PrimaryButton
-                                disabled={saving}
-                                onClick={() => void save()}
-                            >
-                                {saving ? 'Saving…' : 'Save tax settings'}
-                            </PrimaryButton>
+                                <div className="flex flex-wrap gap-2">
+                                    {TAX_PRESETS.map((preset) => (
+                                        <button
+                                            key={preset.id}
+                                            type="button"
+                                            className={
+                                                form.default_tax_type ===
+                                                preset.id
+                                                    ? 'rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground'
+                                                    : 'rounded-full border border-border px-3 py-1 text-xs text-foreground transition hover:bg-muted'
+                                            }
+                                            onClick={() =>
+                                                applyPreset(preset.id)
+                                            }
+                                        >
+                                            {preset.label}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <div className="grid gap-4">
+                                    <div>
+                                        <InputLabel value="Tax label" />
+                                        <TextInput
+                                            className="mt-1 block w-full"
+                                            value={form.default_tax_label}
+                                            disabled={
+                                                form.default_tax_type === 'none'
+                                            }
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    default_tax_label:
+                                                        e.target.value,
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputLabel value="Default tax rate %" />
+                                        <TextInput
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            className="mt-1 block w-full"
+                                            value={form.default_tax_rate}
+                                            disabled={
+                                                form.default_tax_type === 'none'
+                                            }
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    default_tax_rate: Number(
+                                                        e.target.value,
+                                                    ),
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                    <div>
+                                        <InputLabel value="Calculation mode" />
+                                        <select
+                                            className="app-field"
+                                            value={form.tax_calculation_mode}
+                                            disabled={
+                                                form.default_tax_type === 'none'
+                                            }
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    tax_calculation_mode: e
+                                                        .target
+                                                        .value as TaxCalculationMode,
+                                                })
+                                            }
+                                        >
+                                            <option value="exclusive">
+                                                Tax exclusive
+                                            </option>
+                                            <option value="inclusive">
+                                                Tax inclusive
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <label className="flex items-center gap-2 text-sm text-foreground">
+                                        <input
+                                            type="checkbox"
+                                            className="rounded border-input text-sidebar-primary focus:ring-ring"
+                                            checked={form.tax_per_line}
+                                            disabled={
+                                                form.default_tax_type === 'none'
+                                            }
+                                            onChange={(e) =>
+                                                setForm({
+                                                    ...form,
+                                                    tax_per_line:
+                                                        e.target.checked,
+                                                })
+                                            }
+                                        />
+                                        Enable per-line tax rates by default
+                                    </label>
+                                </div>
+
+                                <PrimaryButton
+                                    disabled={saving}
+                                    onClick={() => void save()}
+                                >
+                                    {saving ? 'Saving…' : 'Save tax settings'}
+                                </PrimaryButton>
+                            </div>
                         </div>
                     )}
                 </div>

@@ -25,30 +25,30 @@ export default function TemplatePicker({
                         onClick={() => onChange(option.id)}
                         className={
                             selected
-                                ? 'rounded-lg border-2 border-indigo-600 bg-indigo-50 p-4 text-left ring-2 ring-indigo-200'
-                                : 'rounded-lg border border-gray-200 bg-white p-4 text-left hover:border-gray-300 hover:bg-gray-50'
+                                ? 'rounded-lg border-2 border-ring bg-accent p-3 text-left text-accent-foreground ring-1 ring-ring'
+                                : 'rounded-lg border border-border bg-card p-3 text-left transition hover:border-accent hover:bg-muted'
                         }
                     >
                         <span
                             className={
                                 selected
-                                    ? 'text-sm font-semibold text-indigo-900'
-                                    : 'text-sm font-semibold text-gray-900'
+                                    ? 'text-sm font-semibold text-accent-foreground'
+                                    : 'text-foreground text-sm font-semibold'
                             }
                         >
                             {option.label}
                         </span>
-                        <span className="mt-1 block text-xs text-gray-500">
+                        <span className="text-muted-foreground mt-1 block text-xs">
                             {option.id === 'stripe'
                                 ? 'Clean layout with bold totals and spacing.'
                                 : 'Traditional invoice with structured blocks.'}
                         </span>
                         {selected ? (
-                            <span className="mt-2 inline-block text-xs font-medium text-indigo-700">
+                            <span className="font-medium text-sidebar-primary hover:opacity-80 mt-2 inline-block text-xs">
                                 {mode === 'select' ? 'Selected' : 'Previewing'}
                             </span>
                         ) : mode === 'preview' ? (
-                            <span className="mt-2 inline-block text-xs text-gray-400">
+                            <span className="text-muted-foreground mt-2 inline-block text-xs">
                                 Click to preview
                             </span>
                         ) : null}

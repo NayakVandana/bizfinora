@@ -96,12 +96,12 @@ export default function TemplateSection({
             <div>
                 <InputLabel value="Template" />
                 {loading ? (
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="text-muted-foreground mt-2 text-sm">
                         Loading templates…
                     </p>
                 ) : (
                     <select
-                        className="mt-1 block w-full rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        className="app-field"
                         value={selectedKey}
                         onChange={(e) => handleSelect(e.target.value)}
                     >
@@ -150,7 +150,7 @@ export default function TemplateSection({
                         <strong>{companyDefaultName}</strong>
                     </p>
                 ) : (
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="text-muted-foreground mt-2 text-sm">
                         Selected:{' '}
                         <strong>
                             {invoiceTypeLabel(
@@ -164,18 +164,15 @@ export default function TemplateSection({
                     </p>
                 )}
 
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="text-muted-foreground mt-2 text-xs">
                     <Link
                         href={route('settings.templates.library')}
-                        className="text-indigo-600 hover:text-indigo-800"
+                        className="font-medium text-sidebar-primary hover:opacity-80"
                     >
                         Manage templates
                     </Link>
                     {' · '}
-                    <Link
-                        href={route('settings.templates')}
-                        className="text-indigo-600 hover:text-indigo-800"
-                    >
+                    <Link href={route('settings.templates')} className="font-medium text-sidebar-primary hover:opacity-80">
                         Change company default
                     </Link>
                 </p>

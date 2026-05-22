@@ -30,47 +30,60 @@ export default function BuyersCreate() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     New buyer
                 </h2>
             }
         >
             <Head title="New buyer" />
 
-            <div className="py-6">
-                <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <div className="py-6 sm:py-8">
+                <div className="mx-auto max-w-3xl px-3 sm:px-6 lg:px-8">
                     <Link
                         href={route('buyers.index')}
-                        className="text-sm text-indigo-600 hover:text-indigo-800"
+                        className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"
                     >
                         ← Back to buyers
                     </Link>
 
-                    <div className="mt-4 rounded-lg bg-white p-6 shadow-sm">
-                        <BuyerFormFields
-                            form={form}
-                            errors={errors}
-                            onChange={(patch) => {
-                                setForm((prev) => ({ ...prev, ...patch }));
-                                const key = Object.keys(patch)[0] as keyof typeof patch;
-                                if (key && errors[key]) {
-                                    setErrors((prev) => {
-                                        const next = { ...prev };
-                                        delete next[key];
-                                        return next;
-                                    });
-                                }
-                            }}
-                        />
-                        <InputError message={errors._form} className="mt-4" />
-                        <div className="mt-6">
-                            <PrimaryButton
-                                type="button"
-                                disabled={saving}
-                                onClick={() => void save()}
-                            >
-                                {saving ? 'Saving…' : 'Create'}
-                            </PrimaryButton>
+                    <div className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm mt-6">
+                        <div className="border-b border-border px-5 py-4 sm:px-6">
+                            <h3 className="text-foreground font-semibold">
+                                Buyer details
+                            </h3>
+                            <p className="text-muted-foreground mt-1 text-sm">
+                                Used as the buyer on your invoices.
+                            </p>
+                        </div>
+
+                        <div className="space-y-5 px-5 py-6 sm:px-6">
+                            <BuyerFormFields
+                                form={form}
+                                errors={errors}
+                                onChange={(patch) => {
+                                    setForm((prev) => ({ ...prev, ...patch }));
+                                    const key = Object.keys(
+                                        patch,
+                                    )[0] as keyof typeof patch;
+                                    if (key && errors[key]) {
+                                        setErrors((prev) => {
+                                            const next = { ...prev };
+                                            delete next[key];
+                                            return next;
+                                        });
+                                    }
+                                }}
+                            />
+                            <InputError message={errors._form} />
+                            <div className="border-t border-border pt-5">
+                                <PrimaryButton
+                                    type="button"
+                                    disabled={saving}
+                                    onClick={() => void save()}
+                                >
+                                    {saving ? 'Saving…' : 'Create'}
+                                </PrimaryButton>
+                            </div>
                         </div>
                     </div>
                 </div>

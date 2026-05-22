@@ -5,6 +5,7 @@ import { listingIndexThClass } from '@/utils/listingIndex';
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { formatMoney } from '@/invoices/formatMoney';
+import { statusBadgeClass } from '@/utils/statusBadgeClass';
 import type { InvoiceDraft } from '@/invoices/types';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { Head, Link } from '@inertiajs/react';
@@ -61,7 +62,7 @@ export default function InvoicesIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold leading-tight">
                     Invoices
                 </h2>
             }
@@ -70,9 +71,9 @@ export default function InvoicesIndex() {
 
             <div className="py-8">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden rounded-lg bg-white shadow">
-                        <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                            <p className="text-sm text-gray-600">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+                        <div className="flex flex-col gap-2 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <p className="text-muted-foreground text-sm">
                                 Create, edit, and download invoices (INR)
                             </p>
                             <Link href={route('invoices.create')}>
@@ -80,13 +81,13 @@ export default function InvoicesIndex() {
                             </Link>
                         </div>
                         {loading ? (
-                            <p className="p-6 text-gray-500">Loading…</p>
+                            <p className="text-muted-foreground p-6">Loading…</p>
                         ) : rows.length === 0 ? (
-                            <p className="p-6 text-gray-500">
+                            <p className="text-muted-foreground p-6">
                                 No invoices yet.{' '}
                                 <Link
                                     href={route('invoices.create')}
-                                    className="text-indigo-600 underline"
+                                    className="font-medium text-sidebar-primary hover:opacity-80 underline"
                                 >
                                     Create your first invoice
                                 </Link>
@@ -94,7 +95,7 @@ export default function InvoicesIndex() {
                             </p>
                         ) : (
                             <>
-                                <ul className="divide-y divide-gray-100 md:hidden">
+                                <ul className="divide-y divide-border md:hidden">
                                     {rows.map((row, index) => (
                                         <li
                                             key={row.id}
@@ -111,19 +112,23 @@ export default function InvoicesIndex() {
                                                     'invoices.edit',
                                                     row.id,
                                                 )}
-                                                className="font-medium text-indigo-600"
+                                                className="font-medium text-sidebar-primary hover:opacity-80 font-medium"
                                             >
                                                 {row.invoice_number}
                                             </Link>
-                                            <p className="mt-1 text-sm text-gray-600">
+                                            <p className="text-muted-foreground mt-1 text-sm">
                                                 {row.buyer_name ?? '—'} ·{' '}
                                                 {row.invoice_date}
                                             </p>
                                             <div className="mt-2 flex items-center justify-between">
-                                                <span className="rounded-full bg-gray-100 px-2 py-1 text-xs capitalize">
+                                                <span
+                                                    className={statusBadgeClass(
+                                                        row.status,
+                                                    )}
+                                                >
                                                     {row.status}
                                                 </span>
-                                                <span className="text-sm font-medium">
+                                                <span className="text-foreground text-sm font-medium">
                                                     {formatMoney(row.total)}
                                                 </span>
                                             </div>
@@ -133,7 +138,7 @@ export default function InvoicesIndex() {
                                                         'invoices.edit',
                                                         row.id,
                                                     )}
-                                                    className="text-indigo-600"
+                                                    className="font-medium text-sidebar-primary hover:opacity-80"
                                                 >
                                                     Edit
                                                 </Link>
@@ -148,7 +153,7 @@ export default function InvoicesIndex() {
                                                             row.id,
                                                         )
                                                     }
-                                                    className="text-indigo-600 disabled:opacity-50"
+                                                    className="font-medium text-sidebar-primary hover:opacity-80 disabled:opacity-50"
                                                 >
                                                     {downloadingId === row.id
                                                         ? 'PDF…'
@@ -158,66 +163,70 @@ export default function InvoicesIndex() {
                                         </li>
                                     ))}
                                 </ul>
-                                <table className="hidden min-w-full divide-y divide-gray-200 md:table">
-                                <thead className="bg-gray-50">
+                                <table className="w-full min-w-full divide-y divide-border text-sm hidden md:table">
+                                <thead className="bg-muted">
                                     <tr>
                                         <th
                                             className={listingIndexThClass}
                                         >
                                             #
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
                                             Number
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
                                             Buyer
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
                                             Date
                                         </th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
                                             Status
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-right text-xs uppercase">
                                             Total
                                         </th>
-                                        <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-right text-xs uppercase">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-200">
+                                <tbody className="divide-y divide-border">
                                     {rows.map((row, index) => (
                                         <tr key={row.id}>
                                             <ListingIndex index={index} />
-                                            <td className="px-4 py-3 font-medium">
+                                            <td className="px-4 py-3 font-medium text-foreground">
                                                 {row.invoice_number}
                                             </td>
-                                            <td className="px-4 py-3 text-sm text-gray-600">
+                                            <td className="px-4 py-3 text-muted-foreground text-sm">
                                                 {row.buyer_name ?? '—'}
                                             </td>
-                                            <td className="px-4 py-3 text-sm">
+                                            <td className="px-4 py-3 text-muted-foreground text-sm">
                                                 {row.invoice_date}
                                             </td>
-                                            <td className="px-4 py-3">
-                                                <span className="rounded-full bg-gray-100 px-2 py-1 text-xs capitalize">
+                                            <td className="px-4 py-3 text-muted-foreground">
+                                                <span
+                                                    className={statusBadgeClass(
+                                                        row.status,
+                                                    )}
+                                                >
                                                     {row.status}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-right text-sm">
+                                            <td className="px-4 py-3 text-muted-foreground text-right text-sm">
                                                 {formatMoney(row.total)}
                                             </td>
-                                            <td className="px-4 py-3 text-right text-sm">
+                                            <td className="px-4 py-3 text-muted-foreground text-right text-sm">
                                                 <Link
                                                     href={route(
                                                         'invoices.edit',
                                                         row.id,
                                                     )}
-                                                    className="text-indigo-600 hover:text-indigo-800"
+                                                    className="font-medium text-sidebar-primary hover:opacity-80"
                                                 >
                                                     Edit
                                                 </Link>
-                                                <span className="mx-2 text-gray-300">
+                                                <span className="mx-2 text-border">
                                                     |
                                                 </span>
                                                 <button
@@ -231,7 +240,7 @@ export default function InvoicesIndex() {
                                                             row.id,
                                                         )
                                                     }
-                                                    className="text-indigo-600 hover:text-indigo-800 disabled:opacity-50"
+                                                    className="font-medium text-sidebar-primary hover:opacity-80 disabled:opacity-50"
                                                 >
                                                     {downloadingId === row.id
                                                         ? 'PDF…'

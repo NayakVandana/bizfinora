@@ -35,7 +35,7 @@ export default function InvoiceTypePicker({
         <div className="max-h-[min(28rem,50vh)] space-y-4 overflow-y-auto pr-1">
             {groups.map((group) => (
                 <div key={group.category}>
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
                         {group.category_label}
                     </p>
                     <div className="grid gap-2">
@@ -49,28 +49,28 @@ export default function InvoiceTypePicker({
                                     onClick={() => onChange(option.id)}
                                     className={
                                         selected
-                                            ? 'rounded-lg border-2 border-indigo-600 bg-indigo-50 p-3 text-left ring-1 ring-indigo-200'
-                                            : 'rounded-lg border border-gray-200 bg-white p-3 text-left hover:border-gray-300 hover:bg-gray-50'
+                                            ? 'rounded-lg border-2 border-ring bg-accent p-3 text-left text-accent-foreground ring-1 ring-ring'
+                                            : 'rounded-lg border border-border bg-card p-3 text-left transition hover:border-accent hover:bg-muted'
                                     }
                                 >
                                     <span
                                         className={
                                             selected
-                                                ? 'text-sm font-semibold text-indigo-900'
-                                                : 'text-sm font-semibold text-gray-900'
+                                                ? 'text-sm font-semibold text-accent-foreground'
+                                                : 'text-foreground text-sm font-semibold'
                                         }
                                     >
                                         {option.label}
                                     </span>
-                                    <span className="mt-0.5 block text-xs text-gray-500 line-clamp-2">
+                                    <span className="text-muted-foreground mt-0.5 block text-xs line-clamp-2">
                                         {option.description}
                                     </span>
-                                    <span className="mt-1 block text-[10px] font-medium uppercase tracking-wide text-gray-400">
+                                    <span className="text-muted-foreground mt-1 block text-[10px] font-medium uppercase tracking-wide">
                                         {FORMAT_LABELS[formatForInvoiceType(option.id)] ??
                                             option.layout}
                                     </span>
                                     {selected ? (
-                                        <span className="mt-1 inline-block text-xs font-medium text-indigo-700">
+                                        <span className="font-medium text-sidebar-primary hover:opacity-80 mt-1 inline-block text-xs">
                                             {mode === 'select'
                                                 ? 'Selected'
                                                 : 'Previewing'}

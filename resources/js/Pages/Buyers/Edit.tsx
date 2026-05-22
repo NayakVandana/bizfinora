@@ -56,26 +56,26 @@ export default function BuyersEdit({ buyerId }: Props) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Edit buyer
                 </h2>
             }
         >
             <Head title="Edit buyer" />
 
-            <div className="py-6">
-                <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <div className="py-6 sm:py-8">
+                <div className="mx-auto max-w-3xl px-3 sm:px-6 lg:px-8">
                     <div className="flex flex-wrap items-center gap-3 text-sm">
                         <Link
                             href={route('buyers.index')}
-                            className="text-indigo-600 hover:text-indigo-800"
+                            className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1"
                         >
                             ← Back to buyers
                         </Link>
                         {!loading && !notFound && form ? (
                             <Link
                                 href={route('buyers.show', buyerId)}
-                                className="text-indigo-600 hover:text-indigo-800"
+                                className="font-medium text-sidebar-primary hover:opacity-80"
                             >
                                 View details
                             </Link>
@@ -83,41 +83,51 @@ export default function BuyersEdit({ buyerId }: Props) {
                     </div>
 
                     {loading ? (
-                        <p className="mt-6 text-center text-gray-500">
+                        <p className="text-muted-foreground mt-6 text-center text-sm">
                             Loading…
                         </p>
                     ) : notFound || !form ? (
-                        <p className="mt-6 text-center text-gray-600">
+                        <p className="text-muted-foreground mt-6 text-center text-sm">
                             Buyer not found.
                         </p>
                     ) : (
-                        <div className="mt-4 rounded-lg bg-white p-6 shadow-sm">
-                            <BuyerFormFields
-                                form={form}
-                                errors={errors}
-                                onChange={(patch) => {
-                                    setForm((prev) =>
-                                        prev ? { ...prev, ...patch } : prev,
-                                    );
-                                    const key = Object.keys(patch)[0] as keyof typeof patch;
-                                    if (key && errors[key]) {
-                                        setErrors((prev) => {
-                                            const next = { ...prev };
-                                            delete next[key];
-                                            return next;
-                                        });
-                                    }
-                                }}
-                            />
-                            <InputError message={errors._form} className="mt-4" />
-                            <div className="mt-6">
-                                <PrimaryButton
-                                    type="button"
-                                    disabled={saving}
-                                    onClick={() => void save()}
-                                >
-                                    {saving ? 'Saving…' : 'Update'}
-                                </PrimaryButton>
+                        <div className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm mt-6">
+                            <div className="border-b border-border px-5 py-4 sm:px-6">
+                                <h3 className="text-foreground font-semibold">
+                                    Buyer details
+                                </h3>
+                            </div>
+
+                            <div className="space-y-5 px-5 py-6 sm:px-6">
+                                <BuyerFormFields
+                                    form={form}
+                                    errors={errors}
+                                    onChange={(patch) => {
+                                        setForm((prev) =>
+                                            prev ? { ...prev, ...patch } : prev,
+                                        );
+                                        const key = Object.keys(
+                                            patch,
+                                        )[0] as keyof typeof patch;
+                                        if (key && errors[key]) {
+                                            setErrors((prev) => {
+                                                const next = { ...prev };
+                                                delete next[key];
+                                                return next;
+                                            });
+                                        }
+                                    }}
+                                />
+                                <InputError message={errors._form} />
+                                <div className="border-t border-border pt-5">
+                                    <PrimaryButton
+                                        type="button"
+                                        disabled={saving}
+                                        onClick={() => void save()}
+                                    >
+                                        {saving ? 'Saving…' : 'Update'}
+                                    </PrimaryButton>
+                                </div>
                             </div>
                         </div>
                     )}

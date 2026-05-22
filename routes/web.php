@@ -60,6 +60,7 @@ Route::redirect('/profile', '/profile/information');
 Route::get('/profile/information', fn () => Inertia::render('Profile/Information'))->name('profile.information');
 Route::get('/profile/information/edit', fn () => Inertia::render('Profile/Edit'))->name('profile.information.edit');
 Route::get('/profile/password', fn () => Inertia::render('Profile/Password'))->name('profile.password');
+Route::get('/profile/appearance', fn () => Inertia::render('Profile/Appearance'))->name('profile.appearance');
 
 Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.index');
 Route::get('/buyers/create', fn () => Inertia::render('Buyers/Create'))->name('buyers.create');

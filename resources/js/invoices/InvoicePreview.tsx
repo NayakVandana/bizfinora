@@ -49,7 +49,7 @@ export default function InvoicePreview({ draft }: Props) {
     );
 
     return (
-        <div className="flex max-h-[min(70vh,calc(100vh-10rem))] justify-center overflow-auto rounded-lg border border-gray-200 bg-slate-100 p-2 shadow-inner sm:p-4 lg:max-h-[calc(100vh-8rem)]">
+        <div className="flex max-h-[min(70vh,calc(100vh-10rem))] justify-center overflow-auto rounded-lg border border-border bg-muted p-2 shadow-inner sm:p-4 lg:max-h-[calc(100vh-8rem)]">
             <div
                 className="mx-auto shrink-0 overflow-hidden rounded-md bg-white shadow-md"
                 style={{

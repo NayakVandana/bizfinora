@@ -33,4 +33,11 @@ class ProfileTest extends TestCase
 
         $response->assertOk();
     }
+
+    public function test_profile_appearance_page_is_displayed(): void
+    {
+        $response = $this->get('/profile/appearance');
+
+        $response->assertOk();
+    }
 }

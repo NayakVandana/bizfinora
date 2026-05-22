@@ -6,7 +6,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <GuestLayout>
             <Head title="Forgot Password" />
 
-            <div className="mb-4 text-sm text-gray-600">
+            <div className="text-muted-foreground mb-4 text-sm">
                 Password reset will be available via API soon. For now, contact
                 your administrator or use a seeded test account.
             </div>
@@ -19,7 +19,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
             <Link
                 href={route('login')}
-                className="text-sm text-gray-600 underline hover:text-gray-900"
+                className="font-medium text-sidebar-primary hover:opacity-80 text-sm underline"
             >
                 Back to login
             </Link>

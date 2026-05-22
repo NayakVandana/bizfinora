@@ -68,7 +68,7 @@ export default function TemplateDefault() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Default template
                 </h2>
             }
@@ -78,7 +78,7 @@ export default function TemplateDefault() {
             <div className="py-6">
                 <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
                     {loading ? (
-                        <p className="text-gray-500">Loading…</p>
+                        <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (
                         <InvoiceEditorLayout
                             editTabLabel="Default template"
@@ -124,14 +124,14 @@ export default function TemplateDefault() {
                                 previewDraft ? (
                                     <InvoicePreview draft={previewDraft} />
                                 ) : (
-                                    <div className="flex h-[min(50vh,400px)] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                    <div className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground flex h-[min(50vh,400px)] items-center justify-center">
                                         Preview unavailable
                                     </div>
                                 )
                             }
                             form={
                                 <div className="space-y-6">
-                                <p className="text-sm text-gray-600">
+                                <p className="text-muted-foreground text-sm">
                                     Choose the default invoice type for new
                                     invoices. Preview updates as you select —
                                     save when ready.{' '}
@@ -139,14 +139,14 @@ export default function TemplateDefault() {
                                         href={route(
                                             'settings.templates.library',
                                         )}
-                                        className="text-indigo-600 hover:text-indigo-800"
+                                        className="font-medium text-sidebar-primary hover:opacity-80"
                                     >
                                         Browse & clone templates
                                     </Link>
                                 </p>
 
                                 {message ? (
-                                    <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                                    <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300">
                                         {message}
                                     </div>
                                 ) : null}
@@ -162,12 +162,12 @@ export default function TemplateDefault() {
                                     </div>
                                 </div>
 
-                                <p className="text-sm text-gray-700">
+                                <p className="text-muted-foreground text-sm">
                                     Selected:{' '}
-                                    <strong>
+                                    <strong className="text-foreground">
                                         {invoiceTypeLabel(invoiceType)}
                                     </strong>
-                                    <span className="text-gray-500">
+                                    <span className="text-muted-foreground">
                                         {' '}
                                         ({layout === 'classic'
                                             ? 'Classic'

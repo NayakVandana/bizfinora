@@ -50,7 +50,7 @@ export default function CompanyProfileFormFields({
             <div>
                 <InputLabel value="Address *" />
                 <textarea
-                    className="mt-1.5 block w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="app-field"
                     rows={3}
                     value={form.address}
                     onChange={(e) => {
@@ -97,7 +97,7 @@ export default function CompanyProfileFormFields({
                 <div>
                     <InputLabel value="GST" />
                     <TextInput
-                        className="mt-1.5 block w-full uppercase"
+                        className="mt-1.5 block w-full"
                         value={form.gst}
                         maxLength={15}
                         placeholder="15-character GSTIN (optional)"
@@ -111,7 +111,7 @@ export default function CompanyProfileFormFields({
                 <div>
                     <InputLabel value="PAN" />
                     <TextInput
-                        className="mt-1.5 block w-full uppercase"
+                        className="mt-1.5 block w-full"
                         value={form.pan}
                         maxLength={10}
                         placeholder="e.g. ABCDE1234F (optional)"
@@ -187,7 +187,7 @@ export default function CompanyProfileFormFields({
             <div>
                 <InputLabel value="Company notes" />
                 <textarea
-                    className="mt-1.5 block w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                    className="app-field"
                     rows={2}
                     value={form.seller_notes}
                     onChange={(e) =>
@@ -201,7 +201,7 @@ export default function CompanyProfileFormFields({
                 <input
                     type="file"
                     accept="image/*"
-                    className="mt-1.5 block w-full text-sm text-slate-600"
+                    className="mt-1.5 block w-full text-sm text-muted-foreground file:me-3 file:rounded-md file:border-0 file:bg-muted file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-foreground"
                     onChange={(e) =>
                         onLogoFile(e.target.files?.[0] ?? null)
                     }

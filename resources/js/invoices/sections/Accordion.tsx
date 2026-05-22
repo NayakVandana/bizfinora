@@ -14,19 +14,19 @@ export default function Accordion({
     const [open, setOpen] = useState(defaultOpen);
 
     return (
-        <div className="rounded-lg border border-gray-200">
+        <div className="rounded-lg border border-border bg-card text-card-foreground">
             <button
                 type="button"
-                className="flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-gray-900 hover:bg-gray-50"
+                className="flex w-full items-center justify-between px-4 py-3 text-left font-semibold text-foreground transition hover:bg-muted"
                 onClick={() => setOpen((v) => !v)}
             >
                 {title}
-                <span className="text-sm text-gray-500">{open ? '−' : '+'}</span>
+                <span className="text-sm text-muted-foreground">
+                    {open ? '−' : '+'}
+                </span>
             </button>
             {open ? (
-                <div className="space-y-2 border-t border-gray-100 px-3 py-2.5">
-                    {children}
-                </div>
+                <div className="space-y-2 border-t border-border px-3 py-2.5">{children}</div>
             ) : null}
         </div>
     );

@@ -66,7 +66,7 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
             <div>
                 <InputLabel value="GST" />
                 <TextInput
-                    className="mt-1 block w-full uppercase"
+                    className="mt-1 block w-full"
                     value={form.gst}
                     maxLength={15}
                     onChange={(e) =>
@@ -79,7 +79,7 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
             <div>
                 <InputLabel value="PAN" />
                 <TextInput
-                    className="mt-1 block w-full uppercase"
+                    className="mt-1 block w-full"
                     value={form.pan}
                     maxLength={10}
                     onChange={(e) =>
@@ -92,7 +92,7 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
             <div className="sm:col-span-2">
                 <InputLabel value="Address *" />
                 <textarea
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    className="app-field"
                     rows={3}
                     value={form.address}
                     onChange={(e) => onChange({ address: e.target.value })}
@@ -101,7 +101,7 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
                 <InputError message={errors.address} className="mt-1" />
             </div>
             <div className="sm:col-span-2">
-                <p className="text-xs font-medium text-gray-500">
+                <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-0">
                     Structured address (optional)
                 </p>
             </div>
@@ -155,14 +155,14 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
                     onChange={(e) =>
                         onChange({ postal_code: e.target.value })
                     }
-                    placeholder="PIN / ZIP"
+                    placeholder="Pin or ZIP"
                 />
                 <InputError message={errors.postal_code} className="mt-1" />
             </div>
             <div className="sm:col-span-2">
                 <InputLabel value="Notes" />
                 <textarea
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    className="app-field"
                     rows={2}
                     value={form.notes}
                     onChange={(e) => onChange({ notes: e.target.value })}

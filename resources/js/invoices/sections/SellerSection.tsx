@@ -21,18 +21,18 @@ export default function SellerSection({
 
     return (
         <Accordion title="Seller (your company)" defaultOpen>
-            <p className="text-xs leading-snug text-gray-600">
+            <p className="text-muted-foreground text-xs leading-snug">
                 From{' '}
                 <Link
                     href={route('companies.edit')}
-                    className="font-medium text-indigo-600 hover:text-indigo-800"
+                    className="font-medium text-sidebar-primary hover:opacity-80"
                 >
                     company profile
                 </Link>
                 . Toggle PDF visibility per field.
             </p>
 
-            <div className="divide-y divide-gray-100 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80">
+            <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-muted">
                 <PartyFieldRow
                     label="Name"
                     value={seller.name}
@@ -102,7 +102,7 @@ export default function SellerSection({
                             className="inline-block h-8 max-w-[120px] object-contain align-middle"
                         />
                     ) : (
-                        <span className="text-sm text-gray-400">—</span>
+                        <span className="text-sm text-muted-foreground">—</span>
                     )}
                 </PartyFieldRow>
             </div>

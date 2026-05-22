@@ -24,8 +24,8 @@ export default function PartyFieldRow({
         <span
             className={
                 value?.trim()
-                    ? 'text-sm text-gray-900'
-                    : 'text-sm text-gray-400'
+                    ? 'text-sm text-foreground'
+                    : 'text-sm text-muted-foreground'
             }
         >
             {value?.trim() || '—'}
@@ -41,13 +41,15 @@ export default function PartyFieldRow({
             compact
         />
     ) : (
-        <span className="text-[10px] text-gray-400">Always</span>
+        <span className="text-[10px] text-muted-foreground">Always</span>
     );
 
     return (
-        <div className="border-b border-gray-100 px-3 py-2.5 last:border-b-0 sm:grid sm:grid-cols-[6rem_minmax(0,1fr)_auto] sm:items-center sm:gap-x-2 sm:py-2">
+        <div className="border-b border-border px-3 py-2.5 last:border-b-0 sm:grid sm:grid-cols-[6rem_minmax(0,1fr)_auto] sm:items-center sm:gap-x-2 sm:py-2">
             <div className="mb-1.5 flex items-center justify-between gap-2 sm:mb-0 sm:block">
-                <span className="text-xs font-medium text-gray-500">{label}</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                    {label}
+                </span>
                 <div className="sm:hidden">{toggle}</div>
             </div>
             <div className="min-w-0 break-words text-sm">{display}</div>

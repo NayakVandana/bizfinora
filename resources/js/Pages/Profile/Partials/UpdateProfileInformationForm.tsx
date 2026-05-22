@@ -100,7 +100,7 @@ export default function UpdateProfileInformation({
 
     return (
         <section className={className}>
-            <p className="text-sm text-gray-600">
+            <p className="text-muted-foreground text-sm">
                 Update your name, email, and address. Used for your login
                 account (not the company seller on invoices).
             </p>
@@ -141,7 +141,7 @@ export default function UpdateProfileInformation({
                     <InputLabel htmlFor="address" value="Address" />
                     <textarea
                         id="address"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        className="app-field !mt-1"
                         rows={3}
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
@@ -188,7 +188,7 @@ export default function UpdateProfileInformation({
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>
-                        <p className="mt-2 text-sm text-gray-800">
+                        <p className="text-muted-foreground mt-2 text-sm">
                             Your email address is unverified.
                         </p>
                     </div>
@@ -211,7 +211,7 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">Saved.</p>
+                        <p className="text-muted-foreground text-sm">Saved.</p>
                     </Transition>
                 </div>
             </form>

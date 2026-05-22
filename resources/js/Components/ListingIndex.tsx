@@ -23,7 +23,7 @@ export default function ListingIndex({
 
     if (variant === 'inline') {
         return (
-            <span className="tabular-nums text-gray-500">{n}.</span>
+            <span className="tabular-nums text-muted-foreground">{n}.</span>
         );
     }
 

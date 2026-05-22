@@ -46,16 +46,16 @@ export default function BuyersIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">Buyers</h2>
+                <h2 className="text-foreground text-xl font-semibold">Buyers</h2>
             }
         >
             <Head title="Buyers" />
 
             <div className="py-6">
                 <div className="mx-auto max-w-5xl px-3 sm:px-6 lg:px-8">
-                    <div className="overflow-hidden rounded-lg bg-white shadow-sm">
-                        <div className="flex flex-col gap-3 border-b border-gray-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                            <p className="text-sm text-gray-600">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm">
+                        <div className="flex flex-col gap-2 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <p className="text-muted-foreground text-sm">
                                 Saved buyers for invoices
                             </p>
                             <Link href={route('buyers.create')}>
@@ -66,15 +66,15 @@ export default function BuyersIndex() {
                         </div>
 
                         {loading ? (
-                            <p className="p-6 text-center text-gray-500">
+                            <p className="text-muted-foreground p-6 text-center">
                                 Loading…
                             </p>
                         ) : buyers.length === 0 ? (
-                            <p className="p-6 text-center text-gray-500">
+                            <p className="text-muted-foreground p-6 text-center">
                                 No buyers yet.{' '}
                                 <Link
                                     href={route('buyers.create')}
-                                    className="font-medium text-indigo-600 hover:text-indigo-800"
+                                    className="font-medium text-sidebar-primary hover:opacity-80"
                                 >
                                     Create one
                                 </Link>
@@ -82,7 +82,7 @@ export default function BuyersIndex() {
                         ) : (
                             <>
                                 {/* Mobile cards */}
-                                <ul className="divide-y divide-gray-100 md:hidden">
+                                <ul className="divide-y divide-gray-100 md:hidden dark:divide-gray-800">
                                     {buyers.map((b, index) => (
                                         <li
                                             key={b.id}
@@ -99,15 +99,15 @@ export default function BuyersIndex() {
                                                     'buyers.show',
                                                     b.id,
                                                 )}
-                                                className="font-medium text-gray-900 hover:text-indigo-700"
+                                                className="font-medium text-sidebar-primary hover:opacity-80 font-medium"
                                             >
                                                 {buyerLabel(b)}
                                             </Link>
-                                            <dl className="mt-2 space-y-1 text-sm text-gray-600">
+                                            <dl className="text-muted-foreground mt-2 space-y-1 text-sm">
                                                 {b.name &&
                                                 b.company_name?.trim() ? (
                                                     <div>
-                                                        <span className="text-gray-500">
+                                                        <span className="text-muted-foreground">
                                                             Owner:{' '}
                                                         </span>
                                                         {b.name}
@@ -131,7 +131,7 @@ export default function BuyersIndex() {
                                                         'buyers.show',
                                                         b.id,
                                                     )}
-                                                    className="font-medium text-indigo-600 hover:text-indigo-800"
+                                                    className="font-medium text-sidebar-primary hover:opacity-80"
                                                 >
                                                     View
                                                 </Link>
@@ -140,13 +140,13 @@ export default function BuyersIndex() {
                                                         'buyers.edit',
                                                         b.id,
                                                     )}
-                                                    className="text-indigo-600 hover:text-indigo-800"
+                                                    className="font-medium text-sidebar-primary hover:opacity-80"
                                                 >
                                                     Edit
                                                 </Link>
                                                 <button
                                                     type="button"
-                                                    className="text-red-600 hover:text-red-800"
+                                                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                                                     onClick={() =>
                                                         void destroy(b.id)
                                                     }
@@ -160,8 +160,8 @@ export default function BuyersIndex() {
 
                                 {/* Desktop table */}
                                 <div className="hidden md:block">
-                                    <table className="min-w-full divide-y divide-gray-200 text-sm">
-                                        <thead className="bg-gray-50">
+                                    <table className="w-full min-w-full divide-y divide-border text-sm">
+                                        <thead className="bg-muted">
                                             <tr>
                                                 <th
                                                     className={
@@ -170,27 +170,27 @@ export default function BuyersIndex() {
                                                 >
                                                     #
                                                 </th>
-                                                <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                     Company
                                                 </th>
-                                                <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                     Owner
                                                 </th>
-                                                <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                     Mobile
                                                 </th>
-                                                <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                     Email
                                                 </th>
-                                                <th className="px-4 py-3 text-left font-medium text-gray-600">
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                     GST
                                                 </th>
-                                                <th className="px-4 py-3 text-right font-medium text-gray-600">
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-right">
                                                     Actions
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-100">
+                                        <tbody className="divide-y divide-border">
                                             {buyers.map((b, index) => (
                                                 <tr key={b.id}>
                                                     <ListingIndex
@@ -202,30 +202,30 @@ export default function BuyersIndex() {
                                                                 'buyers.show',
                                                                 b.id,
                                                             )}
-                                                            className="font-medium text-indigo-600 hover:text-indigo-800"
+                                                            className="font-medium text-sidebar-primary hover:opacity-80"
                                                         >
                                                             {buyerLabel(b)}
                                                         </Link>
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-600">
+                                                    <td className="px-4 py-3 text-muted-foreground">
                                                         {b.name ?? '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-600">
+                                                    <td className="px-4 py-3 text-muted-foreground">
                                                         {b.phone ?? '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-600">
+                                                    <td className="px-4 py-3 text-muted-foreground">
                                                         {b.email ?? '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-600">
+                                                    <td className="px-4 py-3 text-muted-foreground">
                                                         {b.gst ?? '—'}
                                                     </td>
-                                                    <td className="space-x-2 px-4 py-3 text-right whitespace-nowrap">
+                                                    <td className="px-4 py-3 text-muted-foreground space-x-2 text-right whitespace-nowrap">
                                                         <Link
                                                             href={route(
                                                                 'buyers.show',
                                                                 b.id,
                                                             )}
-                                                            className="text-indigo-600 hover:text-indigo-800"
+                                                            className="font-medium text-sidebar-primary hover:opacity-80"
                                                         >
                                                             View
                                                         </Link>
@@ -234,7 +234,7 @@ export default function BuyersIndex() {
                                                                 'buyers.edit',
                                                                 b.id,
                                                             )}
-                                                            className="text-indigo-600 hover:text-indigo-800"
+                                                            className="font-medium text-sidebar-primary hover:opacity-80"
                                                         >
                                                             Edit
                                                         </Link>

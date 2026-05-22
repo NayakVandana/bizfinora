@@ -12,12 +12,14 @@ function DetailRow({
     const text = value?.trim() || '—';
 
     return (
-        <div className="border-b border-gray-100 py-3 last:border-b-0 sm:grid sm:grid-cols-3 sm:gap-4">
-            <dt className="text-sm font-medium text-gray-500">{label}</dt>
+        <div className="border-b border-border py-3 last:border-b-0 sm:grid sm:grid-cols-3 sm:gap-4">
+            <dt className="text-sm font-medium text-muted-foreground">
+                {label}
+            </dt>
             <dd
-                className={`mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0 ${
+                className={`mt-1 text-sm text-foreground sm:col-span-2 sm:mt-0 ${
                     multiline ? 'whitespace-pre-wrap' : ''
-                }`}
+                } ${!value?.trim() ? 'text-muted-foreground' : ''}`}
             >
                 {text}
             </dd>
@@ -39,7 +41,7 @@ export default function BuyerDetail({ buyer }: { buyer: BuyerOption }) {
         hasValue(buyer.postal_code);
 
     return (
-        <dl className="divide-y divide-gray-100">
+        <dl>
             <DetailRow label="Company name" value={company} />
             <DetailRow label="Owner / contact" value={buyer.name} />
             <DetailRow label="Mobile" value={buyer.phone} />

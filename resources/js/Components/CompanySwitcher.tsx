@@ -22,7 +22,7 @@ function NewCompanyButton({ className = '' }: { className?: string }) {
     return (
         <Link
             href={route('companies.create')}
-            className={`inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 ${className}`}
+            className={`inline-flex justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90 disabled:opacity-50 w-full gap-2 ${className}`}
         >
             <PlusIcon />
             New company
@@ -58,7 +58,7 @@ export default function CompanySwitcher() {
                 <span className="inline-flex rounded-md">
                     <button
                         type="button"
-                        className="inline-flex max-w-[14rem] items-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none"
+                        className="inline-flex max-w-[14rem] items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-medium leading-4 text-foreground transition duration-150 ease-in-out hover:bg-muted focus:outline-none"
                     >
                         <span className="truncate">
                             {currentCompany?.name ?? 'Select company'}
@@ -82,7 +82,7 @@ export default function CompanySwitcher() {
             <Dropdown.Content
                 align="left"
                 width="auto"
-                contentClasses="overflow-hidden rounded-md bg-white py-1"
+                contentClasses="overflow-hidden rounded-md bg-popover py-1 text-popover-foreground"
             >
                 <ul className="max-h-64 overflow-y-auto" role="listbox">
                     {companies.map((company) => {
@@ -95,16 +95,16 @@ export default function CompanySwitcher() {
                                     role="option"
                                     aria-selected={isActive}
                                     onClick={() => void switchCompany(company)}
-                                    className={`flex w-full items-start gap-2 px-3 py-2.5 text-start text-sm transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none ${
+                                    className={`flex w-full items-start gap-2 px-3 py-2.5 text-start text-sm transition hover:bg-muted focus:bg-muted focus:outline-none ${
                                         isActive
-                                            ? 'bg-indigo-50 text-indigo-800'
-                                            : 'text-slate-700'
+                                            ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                                            : 'text-popover-foreground'
                                     }`}
                                 >
                                     <span
                                         className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
                                             isActive
-                                                ? 'bg-indigo-500'
+                                                ? 'bg-sidebar-primary'
                                                 : 'bg-transparent'
                                         }`}
                                         aria-hidden
@@ -120,7 +120,7 @@ export default function CompanySwitcher() {
                                             {company.name}
                                         </span>
                                         {isActive ? (
-                                            <span className="mt-0.5 block text-xs font-medium text-indigo-600">
+                                            <span className="mt-0.5 block text-xs font-medium text-sidebar-primary">
                                                 Active workspace
                                             </span>
                                         ) : null}
@@ -131,7 +131,7 @@ export default function CompanySwitcher() {
                     })}
                 </ul>
 
-                <div className="border-t border-slate-100 bg-slate-50/80 p-2">
+                <div className="border-t border-border bg-muted p-2">
                     <NewCompanyButton />
                 </div>
             </Dropdown.Content>

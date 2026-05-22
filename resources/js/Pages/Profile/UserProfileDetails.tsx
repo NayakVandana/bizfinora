@@ -18,13 +18,11 @@ function ProfileMeta({
     const empty = value === '—';
 
     return (
-        <div className="rounded-lg bg-slate-50/80 px-3 py-2.5">
-            <p className="text-xs text-slate-500">{label}</p>
+        <div className="rounded-lg bg-muted px-3 py-2.5">
+            <p className="text-xs text-muted-foreground">{label}</p>
             <p
-                className={`mt-0.5 text-sm ${
-                    empty
-                        ? 'text-slate-400'
-                        : 'font-medium text-slate-900'
+                className={`${
+                    empty ? 'mt-0.5 text-sm text-muted-foreground' : 'mt-0.5 text-sm font-medium text-foreground'
                 } ${multiline ? 'break-words whitespace-pre-wrap' : ''}`}
             >
                 {value}
@@ -60,17 +58,12 @@ export default function UserProfileDetails({ user }: Props) {
                 />
             </div>
 
-            {user.email_verified_at ? (
-                <ProfileMeta
-                    label="Email verification"
-                    value="Verified"
-                />
-            ) : (
-                <ProfileMeta
-                    label="Email verification"
-                    value="Not verified"
-                />
-            )}
+            <ProfileMeta
+                label="Email verification"
+                value={
+                    user.email_verified_at ? 'Verified' : 'Not verified'
+                }
+            />
         </div>
     );
 }

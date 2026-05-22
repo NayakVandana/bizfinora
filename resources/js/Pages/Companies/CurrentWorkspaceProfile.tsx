@@ -18,13 +18,11 @@ function ProfileMeta({
     const empty = value === '—';
 
     return (
-        <div className="rounded-lg bg-slate-50/80 px-3 py-2.5">
-            <p className="text-xs text-slate-500">{label}</p>
+        <div className="rounded-lg bg-muted px-3 py-2.5">
+            <p className="text-xs text-muted-foreground">{label}</p>
             <p
-                className={`mt-0.5 text-sm ${
-                    empty
-                        ? 'text-slate-400'
-                        : 'font-medium text-slate-900'
+                className={`${
+                    empty ? 'mt-0.5 text-sm text-muted-foreground' : 'mt-0.5 text-sm font-medium text-foreground'
                 } ${multiline ? 'break-words whitespace-pre-wrap' : ''}`}
             >
                 {value}
@@ -41,8 +39,8 @@ export default function CurrentWorkspaceProfile({ profile }: Props) {
     return (
         <div className="mt-5 space-y-4">
             {profile.logo_data_url ? (
-                <div className="rounded-lg border border-slate-200 bg-white px-3 py-3">
-                    <p className="text-xs text-slate-500">Company logo</p>
+                <div className="rounded-lg bg-muted px-3 py-2.5">
+                    <p className="text-xs text-muted-foreground">Company logo</p>
                     <img
                         src={profile.logo_data_url}
                         alt={`${profile.name} logo`}

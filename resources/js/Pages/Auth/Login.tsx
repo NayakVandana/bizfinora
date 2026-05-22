@@ -122,7 +122,7 @@ export default function Login({
                                 setRemember(e.target.checked || false)
                             }
                         />
-                        <span className="ms-2 text-sm text-gray-600">
+                        <span className="text-muted-foreground ms-2 text-sm">
                             Remember me
                         </span>
                     </label>
@@ -132,7 +132,7 @@ export default function Login({
                     {canResetPassword && (
                         <Link
                             href={route('password.request')}
-                            className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            className="font-medium text-sidebar-primary hover:opacity-80 rounded-md text-sm underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                         >
                             Forgot your password?
                         </Link>
@@ -144,11 +144,11 @@ export default function Login({
                 </div>
             </form>
 
-            <p className="mt-4 text-center text-sm text-gray-600">
+            <p className="text-muted-foreground mt-4 text-center text-sm">
                 No account?{' '}
                 <Link
                     href={registerUrl(redirect ?? undefined)}
-                    className="underline hover:text-gray-900"
+                    className="font-medium text-sidebar-primary hover:opacity-80 underline"
                 >
                     Register
                 </Link>

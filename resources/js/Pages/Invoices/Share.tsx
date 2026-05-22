@@ -58,21 +58,21 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
     }, [shareToken]);
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-background text-foreground">
             <Head title="Shared invoice" />
 
-            <header className="border-b bg-white px-4 py-4 shadow-sm">
+            <header className="border-b border-border bg-card px-4 py-4 shadow-sm">
                 <div className="mx-auto flex max-w-6xl items-center justify-between">
                     <div>
-                        <p className="text-sm text-gray-500">Shared invoice</p>
-                        <h1 className="text-lg font-semibold">
+                        <p className="text-muted-foreground text-sm">Shared invoice</p>
+                        <h1 className="text-foreground text-lg font-semibold">
                             {draft?.invoice_number ?? 'Invoice'}
                         </h1>
                     </div>
                     {draft ? (
                         <button
                             type="button"
-                            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                            className="inline-flex justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90 disabled:opacity-50"
                             onClick={() => void downloadInvoicePdf(draft)}
                         >
                             Download PDF
@@ -85,7 +85,7 @@ export default function InvoicesShare({ shareToken }: { shareToken: string }) {
                 {error ? (
                     <p className="text-red-600">{error}</p>
                 ) : !draft ? (
-                    <p className="text-gray-500">Loading preview…</p>
+                    <p className="text-muted-foreground text-sm">Loading preview…</p>
                 ) : (
                     <InvoicePreview draft={draft} />
                 )}

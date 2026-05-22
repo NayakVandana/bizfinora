@@ -82,7 +82,7 @@ export default function PaymentNotesSection({
             <div>
                 <InputLabel value="Notes" />
                 <textarea
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    className="app-field"
                     rows={2}
                     value={draft.document.notes ?? ''}
                     onChange={(e) => onDocChange({ notes: e.target.value })}
@@ -91,7 +91,7 @@ export default function PaymentNotesSection({
             <div>
                 <InputLabel value="Payment terms" />
                 <textarea
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    className="app-field"
                     rows={2}
                     value={draft.document.payment_terms ?? ''}
                     onChange={(e) =>

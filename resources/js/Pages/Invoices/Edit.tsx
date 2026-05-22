@@ -81,7 +81,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Edit invoice
                 </h2>
             }
@@ -91,7 +91,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
             <div className="py-6">
                 <div className="mx-auto max-w-[1600px] px-3 sm:px-6 lg:px-8">
                     {!draft ? (
-                        <p className="text-gray-500">Loading…</p>
+                        <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (
                         <InvoiceBuilder
                             draft={draft}

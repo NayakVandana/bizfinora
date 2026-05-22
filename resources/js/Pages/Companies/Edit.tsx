@@ -104,7 +104,7 @@ export default function CompaniesEdit() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-foreground text-xl font-semibold">
                     Edit company profile
                 </h2>
             }
@@ -115,23 +115,23 @@ export default function CompaniesEdit() {
                 <div className="mx-auto max-w-2xl px-3 sm:px-6 lg:px-8">
                     <Link
                         href={route('companies.index')}
-                        className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                        className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"
                     >
                         ← Company profile
                     </Link>
 
-                    <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
-                        <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
-                            <h3 className="font-semibold text-slate-900">
+                    <div className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm mt-6">
+                        <div className="border-b border-border px-5 py-4 sm:px-6">
+                            <h3 className="text-foreground font-semibold">
                                 Seller profile
                             </h3>
-                            <p className="mt-1 text-sm text-slate-500">
+                            <p className="text-muted-foreground mt-1 text-sm">
                                 Details shown as the seller on your invoices.
                             </p>
                         </div>
 
                         {loading ? (
-                            <p className="px-5 py-8 text-sm text-slate-500 sm:px-6">
+                            <p className="text-muted-foreground px-5 py-8 text-sm sm:px-6">
                                 Loading…
                             </p>
                         ) : (
@@ -151,11 +151,11 @@ export default function CompaniesEdit() {
                                     onClearError={clearFieldError}
                                 />
 
-                                <div className="flex flex-col gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:items-center">
+                                <div className="flex flex-col gap-2 border-t border-border pt-5 sm:flex-row sm:items-center">
                                     <button
                                         type="submit"
                                         disabled={processing}
-                                        className="inline-flex justify-center rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 disabled:opacity-50"
+                                        className="inline-flex justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90 disabled:opacity-50"
                                     >
                                         {processing
                                             ? 'Saving…'
@@ -163,7 +163,7 @@ export default function CompaniesEdit() {
                                     </button>
                                     <Link
                                         href={route('companies.index')}
-                                        className="text-center text-sm font-medium text-slate-600 hover:text-slate-900 sm:text-left"
+                                        className="text-muted-foreground text-center text-sm font-medium hover:text-foreground sm:text-left"
                                     >
                                         Cancel
                                     </Link>

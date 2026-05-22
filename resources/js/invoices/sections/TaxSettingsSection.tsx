@@ -59,7 +59,7 @@ export default function TaxSettingsSection({
 
     return (
         <Accordion title="Tax settings" defaultOpen>
-            <p className="text-sm text-gray-600">
+            <p className="text-muted-foreground text-sm">
                 Customize tax label, rate, calculation mode, and per-line tax.
             </p>
 
@@ -70,8 +70,8 @@ export default function TaxSettingsSection({
                         type="button"
                         className={
                             draft.tax_type === preset.id
-                                ? 'rounded-full bg-indigo-600 px-3 py-1 text-xs font-medium text-white'
-                                : 'rounded-full border border-gray-300 px-3 py-1 text-xs text-gray-700 hover:bg-gray-50'
+                                ? 'rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground'
+                                : 'rounded-full border border-border px-3 py-1 text-xs text-foreground transition hover:bg-muted'
                         }
                         onClick={() => applyPreset(preset.id)}
                     >
@@ -84,7 +84,7 @@ export default function TaxSettingsSection({
             {companyTax ? (
                 <button
                     type="button"
-                    className="text-sm text-indigo-600"
+                    className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
                     onClick={loadCompanyDefaults}
                 >
                     Load company defaults
@@ -121,7 +121,7 @@ export default function TaxSettingsSection({
                 <div className="sm:col-span-2">
                     <InputLabel value="Calculation mode" />
                     <select
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        className="app-field"
                         value={draft.tax_calculation_mode ?? 'exclusive'}
                         disabled={draft.tax_type === 'none'}
                         onChange={(e) =>

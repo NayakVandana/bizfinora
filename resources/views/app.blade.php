@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        <script>
+            (function () {
+                var doc = document.documentElement;
+                var key = 'appearance';
+                var stored = localStorage.getItem(key);
+                var appearance =
+                    stored === 'light' || stored === 'dark' || stored === 'system'
+                        ? stored
+                        : 'system';
+                var prefersDark =
+                    appearance === 'dark' ||
+                    (appearance === 'system' &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches);
+                doc.classList.toggle('dark', prefersDark);
+                doc.style.colorScheme = prefersDark ? 'dark' : 'light';
+                doc.setAttribute('data-appearance', prefersDark ? 'dark' : 'light');
+            })();
+        </script>
+        <style>
+            html {
+                background-color: var(--background);
+            }
+        </style>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 

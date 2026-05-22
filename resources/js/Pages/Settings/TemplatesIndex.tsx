@@ -243,18 +243,14 @@ export default function TemplatesIndex() {
                     <ListingIndex index={index} variant="mobile" />
                 </div>
                 <div className="min-w-0 flex-1">
-                <p className="font-medium text-gray-900">
+                <p className="text-foreground font-medium">
                     {row.name}
-                    <span className="ml-2 rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                        General
-                    </span>
+                    <span className="ml-2 rounded bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">General</span>
                     {isDefaultSystem(row.id) ? (
-                        <span className="ml-2 rounded bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800">
-                            Default
-                        </span>
+                        <span className="ml-2 rounded bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">Default</span>
                     ) : null}
                 </p>
-                <p className="text-sm text-gray-500">{row.description}</p>
+                <p className="text-muted-foreground text-sm">{row.description}</p>
                 </div>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -294,18 +290,14 @@ export default function TemplatesIndex() {
                     <ListingIndex index={index} variant="mobile" />
                 </div>
                 <div className="min-w-0 flex-1">
-                <p className="font-medium text-gray-900">
+                <p className="text-foreground font-medium">
                     {row.name}
-                    <span className="ml-2 rounded bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
-                        Custom
-                    </span>
+                    <span className="ml-2 rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950/50 dark:text-amber-300">Custom</span>
                     {isDefaultCustom(row.id) ? (
-                        <span className="ml-2 rounded bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800">
-                            Default
-                        </span>
+                        <span className="ml-2 rounded bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">Default</span>
                     ) : null}
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-muted-foreground text-sm">
                     Based on{' '}
                     {row.base_type_label ||
                         invoiceTypeLabel(row.base_invoice_type)}
@@ -350,7 +342,7 @@ export default function TemplatesIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Template library
                 </h2>
             }
@@ -359,7 +351,7 @@ export default function TemplatesIndex() {
 
             <div className="py-6">
                 <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-                    <p className="mb-4 text-sm text-gray-600">
+                    <p className="text-muted-foreground mb-4 text-sm">
                         Browse general and custom templates. Preview any
                         template, clone to customize, save, and reuse on new
                         invoices.
@@ -377,13 +369,13 @@ export default function TemplatesIndex() {
                         </div>
                         <Link
                             href={route('settings.templates')}
-                            className="text-sm text-indigo-600 hover:text-indigo-800"
+                            className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
                         >
                             Default template settings →
                         </Link>
                     </div>
 
-                    <div className="mb-6 border-b border-gray-200">
+                    <div className="border-b border-border mb-6">
                         <nav
                             className="-mb-px flex gap-6"
                             aria-label="Template tabs"
@@ -399,16 +391,16 @@ export default function TemplatesIndex() {
                                         onClick={() => setActiveTab(tab.id)}
                                         className={
                                             selected
-                                                ? 'border-b-2 border-indigo-600 px-1 pb-3 text-sm font-medium text-indigo-600'
-                                                : 'border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                                                ? 'border-b-2 border-sidebar-primary px-1 pb-3 text-sm font-medium text-sidebar-primary'
+                                                : 'border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-muted-foreground transition hover:border-border hover:text-foreground'
                                         }
                                     >
                                         {tab.label}
                                         <span
                                             className={
                                                 selected
-                                                    ? 'ml-2 rounded-full bg-indigo-100 px-2 py-0.5 text-xs text-indigo-700'
-                                                    : 'ml-2 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600'
+                                                    ? 'ml-2 rounded-full bg-accent px-2 py-0.5 text-xs text-accent-foreground'
+                                                    : 'ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground'
                                             }
                                         >
                                             {count}
@@ -420,15 +412,17 @@ export default function TemplatesIndex() {
                     </div>
 
                     {message ? (
-                        <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300 mb-4">
                             {message}
                         </div>
                     ) : null}
 
                     {pageLoading ? (
-                        <p className="text-gray-500">Loading templates…</p>
+                        <p className="text-muted-foreground text-sm">
+                            Loading templates…
+                        </p>
                     ) : emptyInTab ? (
-                        <p className="rounded-lg border border-gray-200 bg-white px-4 py-8 text-center text-sm text-gray-500 shadow-sm">
+                        <p className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm px-4 py-8 text-center text-sm text-muted-foreground">
                             {filter
                                 ? 'No templates match your search.'
                                 : activeTab === 'custom'
@@ -440,11 +434,11 @@ export default function TemplatesIndex() {
                             {showGeneral && systemRows.length > 0 ? (
                                 <section>
                                     {activeTab === 'all' ? (
-                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                                             General templates
                                         </h3>
                                     ) : null}
-                                    <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
+                                    <ul className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm divide-y divide-border">
                                         {systemRows.map((row, index) =>
                                             renderSystemRow(row, index),
                                         )}
@@ -455,11 +449,11 @@ export default function TemplatesIndex() {
                             {showCustom && customRows.length > 0 ? (
                                 <section>
                                     {activeTab === 'all' ? (
-                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                                             Custom templates
                                         </h3>
                                     ) : null}
-                                    <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
+                                    <ul className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm divide-y divide-border">
                                         {customRows.map((row, index) =>
                                             renderCustomRow(row, index),
                                         )}
@@ -470,7 +464,7 @@ export default function TemplatesIndex() {
                             {activeTab === 'all' &&
                             systemRows.length > 0 &&
                             customRows.length === 0 ? (
-                                <p className="text-sm text-gray-500">
+                                <p className="text-muted-foreground text-sm">
                                     No custom templates yet. Use{' '}
                                     <strong>Clone & customize</strong> on a
                                     general template to create one.
@@ -487,11 +481,11 @@ export default function TemplatesIndex() {
                         <div className="p-6">
                             <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">
+                                    <h3 className="text-foreground text-lg font-semibold">
                                         {previewTitle}
                                     </h3>
                                     {previewDraft ? (
-                                        <p className="text-sm text-gray-500">
+                                        <p className="text-muted-foreground text-sm">
                                             {invoiceTypeLabel(
                                                 previewDraft.invoice_type ??
                                                     'standard',
@@ -501,7 +495,7 @@ export default function TemplatesIndex() {
                                 </div>
                                 <button
                                     type="button"
-                                    className="text-sm text-gray-500 hover:text-gray-800"
+                                    className="text-muted-foreground text-sm hover:text-foreground"
                                     onClick={() => setPreviewTarget(null)}
                                 >
                                     Close
@@ -512,13 +506,13 @@ export default function TemplatesIndex() {
                                 {previewDraft ? (
                                     <InvoicePreview draft={previewDraft} />
                                 ) : (
-                                    <div className="flex h-[480px] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                    <div className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground flex h-[480px] items-center justify-center">
                                         Preview unavailable
                                     </div>
                                 )}
                             </div>
 
-                            <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
+                            <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
                                 <SecondaryButton
                                     disabled={!previewDraft || downloading}
                                     onClick={async () => {

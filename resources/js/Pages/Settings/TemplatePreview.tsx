@@ -27,7 +27,7 @@ export default function TemplatePreviewPage() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Template preview
                 </h2>
             }
@@ -37,7 +37,7 @@ export default function TemplatePreviewPage() {
             <div className="py-6">
                 <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
                     {loading ? (
-                        <p className="text-gray-500">Loading…</p>
+                        <p className="text-muted-foreground text-sm">Loading…</p>
                     ) : (
                         <InvoiceEditorLayout
                             editTabLabel="Invoice types"
@@ -69,20 +69,20 @@ export default function TemplatePreviewPage() {
                                 previewDraft ? (
                                     <InvoicePreview draft={previewDraft} />
                                 ) : (
-                                    <div className="flex h-[min(50vh,400px)] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                    <div className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground flex h-[min(50vh,400px)] items-center justify-center">
                                         Preview unavailable
                                     </div>
                                 )
                             }
                             form={
                                 <div className="space-y-4 lg:max-w-md">
-                                <p className="text-sm text-gray-600">
+                                <p className="text-muted-foreground text-sm">
                                     Browse all invoice types — preview only,
                                     nothing is saved. Set your company default
                                     on{' '}
                                     <Link
                                         href={route('settings.templates')}
-                                        className="font-medium text-indigo-600 underline hover:text-indigo-800"
+                                        className="font-medium text-sidebar-primary hover:opacity-80 underline"
                                     >
                                         Default template
                                     </Link>
@@ -100,7 +100,7 @@ export default function TemplatePreviewPage() {
                                     </div>
                                 </div>
 
-                                <p className="text-xs text-gray-500">
+                                <p className="text-muted-foreground text-xs">
                                     Layout:{' '}
                                     {layout === 'classic'
                                         ? 'Classic'

@@ -19,12 +19,12 @@ export default function VisibilityToggle({
     if (compact) {
         return (
             <label
-                className="flex cursor-pointer items-center gap-1 text-[11px] text-gray-500"
+                className="flex cursor-pointer items-center gap-1 text-[11px] text-muted-foreground"
                 title={`Show ${label} on PDF`}
             >
                 <input
                     type="checkbox"
-                    className="h-3.5 w-3.5 rounded border-gray-300 text-indigo-600"
+                    className="h-3.5 w-3.5 rounded border-input text-sidebar-primary focus:ring-ring"
                     checked={checked}
                     onChange={(e) => onChange(field, e.target.checked)}
                 />
@@ -34,9 +34,10 @@ export default function VisibilityToggle({
     }
 
     return (
-        <label className="flex items-center gap-2 text-xs text-gray-600">
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
             <input
                 type="checkbox"
+                className="rounded border-input text-sidebar-primary focus:ring-ring"
                 checked={checked}
                 onChange={(e) => onChange(field, e.target.checked)}
             />

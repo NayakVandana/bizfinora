@@ -7,6 +7,10 @@ export const profileMenuLinks = [
         label: 'Password',
         routeName: 'profile.password' as const,
     },
+    {
+        label: 'Appearance',
+        routeName: 'profile.appearance' as const,
+    },
 ] as const;
 
 export function isProfileRouteActive(routeName: string): boolean {

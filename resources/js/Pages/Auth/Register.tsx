@@ -109,7 +109,7 @@ export default function Register({
                         required
                     />
 
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="text-muted-foreground mt-1 text-xs">
                         Your first company workspace. You can add more after
                         login.
                     </p>
@@ -182,7 +182,7 @@ export default function Register({
                 <div className="mt-4 flex items-center justify-end">
                     <Link
                         href={loginUrl(redirect ?? undefined)}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                        className="font-medium text-sidebar-primary hover:opacity-80 rounded-md text-sm underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
                         Already registered?
                     </Link>

@@ -47,19 +47,16 @@ export default function BuyerSection({
 
     return (
         <Accordion title="Buyer" defaultOpen>
-            <p className="text-xs leading-snug text-gray-600">
+            <p className="text-muted-foreground text-xs leading-snug">
                 Select a saved buyer from{' '}
-                <Link
-                    href={route('buyers.index')}
-                    className="font-medium text-indigo-600 hover:text-indigo-800"
-                >
+                <Link href={route('buyers.index')} className="font-medium text-sidebar-primary hover:opacity-80">
                     Buyers
                 </Link>
                 . Toggle PDF visibility per field.
             </p>
 
             <select
-                className="block w-full rounded-md border-gray-300 text-sm shadow-sm"
+                className="app-field"
                 value={draft.buyer_id ?? ''}
                 onChange={(e) => onBuyerSelect(e.target.value)}
             >
@@ -72,11 +69,11 @@ export default function BuyerSection({
             </select>
 
             {!draft.buyer_id ? (
-                <p className="rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-center text-sm text-gray-500">
+                <p className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground">
                     Choose a buyer to preview details and PDF fields.
                 </p>
             ) : (
-                <div className="divide-y divide-gray-100 overflow-hidden rounded-md border border-gray-200 bg-gray-50/80">
+                <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-muted">
                     <PartyFieldRow
                         label="Company"
                         value={buyer.company_name ?? buyer.name}

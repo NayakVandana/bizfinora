@@ -34,39 +34,39 @@ export default function BuyersShow({ buyerId }: Props) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="truncate text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground truncate text-xl font-semibold">
                     {loading ? 'Buyer details' : title}
                 </h2>
             }
         >
             <Head title={loading ? 'Buyer details' : title} />
 
-            <div className="py-6">
+            <div className="py-6 sm:py-8">
                 <div className="mx-auto max-w-3xl px-3 sm:px-6 lg:px-8">
                     <Link
                         href={route('buyers.index')}
-                        className="text-sm text-indigo-600 hover:text-indigo-800"
+                        className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"
                     >
                         ← Back to buyers
                     </Link>
 
                     {loading ? (
-                        <p className="mt-6 text-center text-gray-500">
+                        <p className="text-muted-foreground mt-6 text-center text-sm">
                             Loading…
                         </p>
                     ) : notFound || !buyer ? (
-                        <p className="mt-6 text-center text-gray-600">
+                        <p className="text-muted-foreground mt-6 text-center text-sm">
                             Buyer not found.
                         </p>
                     ) : (
-                        <div className="mt-4 overflow-hidden rounded-lg bg-white shadow-sm">
-                            <div className="border-b border-gray-200 px-4 py-4 sm:px-6">
-                                <h3 className="text-lg font-semibold text-gray-900">
+                        <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm mt-6">
+                            <div className="border-b border-border px-4 py-4 sm:px-6">
+                                <h3 className="text-foreground text-lg font-semibold">
                                     {title}
                                 </h3>
                                 {buyer.company_name?.trim() &&
                                 buyer.name?.trim() ? (
-                                    <p className="mt-1 text-sm text-gray-600">
+                                    <p className="text-muted-foreground mt-1 text-sm">
                                         Contact: {buyer.name}
                                     </p>
                                 ) : null}
@@ -76,7 +76,7 @@ export default function BuyersShow({ buyerId }: Props) {
                                 <BuyerDetail buyer={buyer} />
                             </div>
 
-                            <div className="flex flex-col gap-2 border-t border-gray-200 px-4 py-4 sm:flex-row sm:px-6">
+                            <div className="flex flex-col gap-2 border-t border-border px-4 py-4 sm:flex-row sm:px-6">
                                 <Link
                                     href={route('buyers.edit', buyer.id)}
                                     className="inline-flex w-full sm:w-auto"

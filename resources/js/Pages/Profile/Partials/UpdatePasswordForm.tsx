@@ -60,7 +60,7 @@ export default function UpdatePasswordForm({
 
     return (
         <section className={className}>
-            <p className="text-sm text-gray-600">
+            <p className="text-muted-foreground text-sm">
                 Use a strong password. You will stay signed in on this device
                 after saving.
             </p>
@@ -139,7 +139,7 @@ export default function UpdatePasswordForm({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">Saved.</p>
+                        <p className="text-muted-foreground text-sm">Saved.</p>
                     </Transition>
                 </div>
             </form>

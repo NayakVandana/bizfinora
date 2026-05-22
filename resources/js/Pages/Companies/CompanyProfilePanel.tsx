@@ -56,12 +56,12 @@ export default function CompanyProfilePanel() {
     if (!currentCompany) {
         return (
             <div className="flex flex-1 flex-col items-center justify-center py-12 text-center">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-2xl text-slate-400">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-muted text-2xl text-muted-foreground">
                     +
                 </div>
-                <p className="mt-4 text-sm text-slate-600">
+                <p className="text-muted-foreground mt-4 text-sm">
                     No company selected yet. Use{' '}
-                    <strong className="font-medium text-slate-800">
+                    <strong className="font-medium text-foreground">
                         New company
                     </strong>{' '}
                     in the header company menu.
@@ -76,7 +76,7 @@ export default function CompanyProfilePanel() {
                 {Array.from({ length: 10 }).map((_, i) => (
                     <div
                         key={i}
-                        className="h-14 animate-pulse rounded-lg bg-slate-100"
+                        className="h-14 animate-pulse rounded-lg bg-muted"
                     />
                 ))}
             </div>
@@ -85,7 +85,7 @@ export default function CompanyProfilePanel() {
 
     if (!profile) {
         return (
-            <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm text-red-600">
+            <p className="rounded-lg border border-dashed border-border bg-muted px-4 py-3 text-sm text-destructive">
                 {error ?? 'Could not load company profile.'}
             </p>
         );
@@ -93,16 +93,16 @@ export default function CompanyProfilePanel() {
 
     return (
         <>
-            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
                 <div className="flex min-w-0 gap-4">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-xl font-semibold text-white shadow-md shadow-indigo-200">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-sidebar-primary text-xl font-semibold text-sidebar-primary-foreground">
                         {companyInitial(displayName)}
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-xl font-semibold tracking-tight text-slate-900">
+                        <h3 className="text-xl font-semibold tracking-tight text-foreground">
                             {displayName}
                         </h3>
-                        <p className="mt-0.5 text-sm text-slate-500">
+                        <p className="mt-0.5 text-sm text-muted-foreground">
                             {currentCompany.role ?? 'Member'}
                         </p>
                     </div>

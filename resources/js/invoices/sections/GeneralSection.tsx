@@ -35,7 +35,7 @@ export default function GeneralSection({ draft, onChange }: Props) {
                 <div>
                     <InputLabel value="Status" />
                     <select
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        className="app-field"
                         value={draft.status}
                         onChange={(e) =>
                             onChange({
@@ -104,7 +104,7 @@ export default function GeneralSection({ draft, onChange }: Props) {
             <div>
                 <InputLabel value="Header notes" />
                 <textarea
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                    className="app-field"
                     rows={2}
                     value={draft.header_notes ?? ''}
                     onChange={(e) => onChange({ header_notes: e.target.value })}

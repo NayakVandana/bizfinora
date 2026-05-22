@@ -134,7 +134,7 @@ export default function TemplateEdit({ templateId }: Props) {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-foreground text-xl font-semibold">
                     Customize template
                 </h2>
             }
@@ -145,13 +145,13 @@ export default function TemplateEdit({ templateId }: Props) {
                 <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
                     <Link
                         href={route('settings.templates.library')}
-                        className="text-sm text-indigo-600 hover:text-indigo-800"
+                        className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
                     >
                         ← Back to template library
                     </Link>
 
                     {loading ? (
-                        <p className="mt-6 text-gray-500">Loading…</p>
+                        <p className="text-muted-foreground mt-6 text-sm">Loading…</p>
                     ) : error && !template ? (
                         <p className="mt-6 text-red-600">{error}</p>
                     ) : (
@@ -195,14 +195,14 @@ export default function TemplateEdit({ templateId }: Props) {
                                     previewDraft && seller ? (
                                         <InvoicePreview draft={previewDraft} />
                                     ) : (
-                                        <div className="flex h-[min(50vh,400px)] items-center justify-center rounded-lg border border-gray-200 bg-gray-50 text-sm text-gray-500">
+                                        <div className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground flex h-[min(50vh,400px)] items-center justify-center">
                                             Preview unavailable
                                         </div>
                                     )
                                 }
                                 form={
                                     <div className="space-y-6">
-                                <p className="text-sm text-gray-600">
+                                <p className="text-muted-foreground text-sm">
                                     Customize labels, notes, and other content
                                     for this template. The invoice format stays
                                     the same as when you cloned it. Save to
@@ -210,7 +210,7 @@ export default function TemplateEdit({ templateId }: Props) {
                                 </p>
 
                                 {message ? (
-                                    <div className="rounded-md border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                                    <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300">
                                         {message}
                                     </div>
                                 ) : null}
@@ -242,10 +242,10 @@ export default function TemplateEdit({ templateId }: Props) {
 
                                 <div>
                                     <InputLabel value="Based on" />
-                                    <p className="mt-1 text-sm font-medium text-gray-900">
+                                    <p className="text-foreground mt-1 text-sm font-medium">
                                         {baseTypeLabel}
                                     </p>
-                                    <p className="mt-1 text-xs text-gray-500">
+                                    <p className="text-muted-foreground mt-1 text-xs">
                                         Format is fixed from the template you
                                         cloned. Change labels and notes below.
                                     </p>
@@ -283,7 +283,7 @@ export default function TemplateEdit({ templateId }: Props) {
                                         }
                                         placeholder="Invoice date"
                                     />
-                                    <p className="mt-1 text-xs text-gray-500">
+                                    <p className="text-muted-foreground mt-1 text-xs">
                                         Label shown on the PDF next to the
                                         invoice date.
                                     </p>
@@ -292,7 +292,7 @@ export default function TemplateEdit({ templateId }: Props) {
                                 <div>
                                     <InputLabel value="Header notes" />
                                     <textarea
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="app-field"
                                         rows={2}
                                         value={draft?.header_notes ?? ''}
                                         onChange={(e) =>
@@ -306,7 +306,7 @@ export default function TemplateEdit({ templateId }: Props) {
                                 <div>
                                     <InputLabel value="Payment terms" />
                                     <textarea
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="app-field"
                                         rows={2}
                                         value={
                                             draft?.document.payment_terms ?? ''
@@ -332,7 +332,7 @@ export default function TemplateEdit({ templateId }: Props) {
                                 <div>
                                     <InputLabel value="Document notes" />
                                     <textarea
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        className="app-field"
                                         rows={2}
                                         value={draft?.document.notes ?? ''}
                                         onChange={(e) =>
