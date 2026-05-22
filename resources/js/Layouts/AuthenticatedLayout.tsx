@@ -5,81 +5,9 @@ import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { Link, router } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { profileMenuLinks } from '@/Pages/Profile/profileMenu';
 import { requireAuthPage } from '@/utils/requireAuth';
-
-type NavLinkItem = {
-    type: 'link';
-    href: string;
-    label: string;
-    isActive: () => boolean;
-};
-
-type NavHeading = {
-    type: 'heading';
-    label: string;
-};
-
-type NavEntry = NavLinkItem | NavHeading;
-
-function useNavEntries(): NavEntry[] {
-    return [
-        {
-            type: 'link',
-            href: route('dashboard'),
-            label: 'Dashboard',
-            isActive: () => Boolean(route().current('dashboard')),
-        },
-        {
-            type: 'link',
-            href: route('companies.index'),
-            label: 'Companies',
-            isActive: () =>
-                Boolean(route().current()?.startsWith('companies.')),
-        },
-        {
-            type: 'link',
-            href: route('buyers.index'),
-            label: 'Buyers',
-            isActive: () =>
-                Boolean(route().current()?.startsWith('buyers.')),
-        },
-        {
-            type: 'link',
-            href: route('invoices.index'),
-            label: 'Invoices',
-            isActive: () =>
-                Boolean(route().current()?.startsWith('invoices.')),
-        },
-        { type: 'heading', label: 'Templates' },
-        {
-            type: 'link',
-            href: route('settings.templates.library'),
-            label: 'Template library',
-            isActive: () =>
-                route().current() === 'settings.templates.library' ||
-                route().current() === 'settings.templates.edit',
-        },
-        {
-            type: 'link',
-            href: route('settings.templates'),
-            label: 'Default template',
-            isActive: () => route().current() === 'settings.templates',
-        },
-        {
-            type: 'link',
-            href: route('settings.templates.preview'),
-            label: 'Preview',
-            isActive: () =>
-                route().current() === 'settings.templates.preview',
-        },
-        {
-            type: 'link',
-            href: route('settings.tax'),
-            label: 'Tax',
-            isActive: () => Boolean(route().current('settings.tax')),
-        },
-    ];
-}
+import { type NavEntry, sidebarNavEntries } from '@/Layouts/sidebarNav';
 
 function SidebarNav({
     entries,
@@ -90,25 +18,29 @@ function SidebarNav({
 }) {
     return (
         <nav className="flex flex-1 flex-col gap-0.5 px-3 py-4">
-            {entries.map((entry) =>
-                entry.type === 'heading' ? (
-                    <p
-                        key={entry.label}
-                        className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 first:mt-0"
-                    >
-                        {entry.label}
-                    </p>
-                ) : (
+            {entries.map((entry, index) => {
+                if (entry.type === 'heading') {
+                    return (
+                        <p
+                            key={`${entry.type}-${entry.label}-${index}`}
+                            className="mb-1 mt-4 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 first:mt-0"
+                        >
+                            {entry.label}
+                        </p>
+                    );
+                }
+
+                return (
                     <ResponsiveNavLink
-                        key={entry.label}
+                        key={`${entry.href}-${entry.label}`}
                         href={entry.href}
                         active={entry.isActive()}
                         onClick={onNavigate}
                     >
                         {entry.label}
                     </ResponsiveNavLink>
-                ),
-            )}
+                );
+            })}
         </nav>
     );
 }
@@ -141,15 +73,24 @@ function UserMenu({ onLogout }: { onLogout: () => void }) {
                 </span>
             </Dropdown.Trigger>
             <Dropdown.Content>
-                <Dropdown.Link href={route('profile.edit')}>
-                    Profile
-                </Dropdown.Link>
+                <p className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Account
+                </p>
+                {profileMenuLinks.map((item) => (
+                    <Dropdown.Link
+                        key={item.routeName}
+                        href={route(item.routeName)}
+                    >
+                        {item.label}
+                    </Dropdown.Link>
+                ))}
+                <div className="my-1 border-t border-gray-100" />
                 <button
                     type="button"
                     onClick={onLogout}
                     className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                 >
-                    Log Out
+                    Log out
                 </button>
             </Dropdown.Content>
         </Dropdown>
@@ -161,7 +102,7 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const { user, loading, logout } = useAuthUser();
-    const navEntries = useNavEntries();
+    const navEntries = sidebarNavEntries();
 
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -248,21 +189,13 @@ export default function Authenticated({
                                 {user.name}
                             </p>
                             <p className="text-xs text-gray-500">{user.email}</p>
-                            <div className="mt-2 space-y-1">
-                                <ResponsiveNavLink
-                                    href={route('profile.edit')}
-                                    onClick={() => setMobileNavOpen(false)}
-                                >
-                                    Profile
-                                </ResponsiveNavLink>
-                                <button
-                                    type="button"
-                                    onClick={() => void handleLogout()}
-                                    className="block w-full px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-                                >
-                                    Log Out
-                                </button>
-                            </div>
+                            <button
+                                type="button"
+                                onClick={() => void handleLogout()}
+                                className="mt-3 block w-full px-4 py-2 text-start text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                            >
+                                Log out
+                            </button>
                         </div>
                     </aside>
                 </div>

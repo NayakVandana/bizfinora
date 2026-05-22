@@ -6,16 +6,19 @@ import { userApiPost, type ApiEnvelope } from '@/api/userClient';
 import { useAuthUser } from '@/auth/useAuthUser';
 import type { User } from '@/types';
 import { Transition } from '@headlessui/react';
+import { router } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
     status,
     className = '',
+    redirectOnSave = false,
 }: {
     mustVerifyEmail: boolean;
     status?: string;
     className?: string;
+    redirectOnSave?: boolean;
 }) {
     const { user, refresh } = useAuthUser();
     const [name, setName] = useState(user?.name ?? '');
@@ -77,6 +80,12 @@ export default function UpdateProfileInformation({
             }
 
             await refresh();
+
+            if (redirectOnSave) {
+                router.visit(route('profile.information'));
+                return;
+            }
+
             setRecentlySuccessful(true);
         } catch {
             setErrors({ email: 'Could not update profile.' });
@@ -91,15 +100,10 @@ export default function UpdateProfileInformation({
 
     return (
         <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
-                </h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account details and address.
-                </p>
-            </header>
+            <p className="text-sm text-gray-600">
+                Update your name, email, and address. Used for your login
+                account (not the company seller on invoices).
+            </p>
 
             <form onSubmit={submit} className="mt-6 space-y-6">
                 <div>

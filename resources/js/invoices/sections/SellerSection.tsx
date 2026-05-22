@@ -24,7 +24,7 @@ export default function SellerSection({
             <p className="text-xs leading-snug text-gray-600">
                 From{' '}
                 <Link
-                    href={route('companies.profile')}
+                    href={route('companies.edit')}
                     className="font-medium text-indigo-600 hover:text-indigo-800"
                 >
                     company profile

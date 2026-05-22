@@ -59,7 +59,7 @@ const quickLinks = [
     {
         title: 'Company profile',
         description: 'Logo, seller details, tax',
-        href: 'companies.profile',
+        href: 'companies.index',
     },
     {
         title: 'Templates',
