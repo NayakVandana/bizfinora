@@ -1,13 +1,21 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
-| Web routes — Inertia page renders only (no business POST/PATCH here).
-| Data & mutations: routes/api.php, user-api.php, company-api.php, admin-api.php
+| Web — Inertia page shells only (GET, no DB / no business logic).
+|--------------------------------------------------------------------------
+|
+| Browser and mobile app share the same JSON API:
+|   /api/v1/...           guest (login, register, share)
+|   /api/v1/user/...      auth:sanctum — profile, companies
+|   /api/v1/company/...   auth:sanctum + company context
+|
+| Pass route params (id, token) into the page; React loads data via API.
 |--------------------------------------------------------------------------
 */
 
@@ -20,18 +28,34 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+Route::middleware('guest')->group(function () {
+    Route::get('register', fn (Request $request) => Inertia::render('Auth/Register', [
+        'redirect' => $request->query('redirect'),
+    ]))->name('register');
+
+    Route::get('login', fn (Request $request) => Inertia::render('Auth/Login', [
+        'canResetPassword' => true,
+        'status' => session('status'),
+        'redirect' => $request->query('redirect'),
+    ]))->name('login');
+
+    Route::get('forgot-password', fn () => Inertia::render('Auth/ForgotPassword', [
+        'status' => session('status'),
+    ]))->name('password.request');
+
+    Route::get('reset-password/{token}', fn (Request $request, string $token) => Inertia::render('Auth/ResetPassword', [
+        'token' => $token,
+        'email' => $request->query('email', ''),
+    ]))->name('password.reset');
+});
+
 Route::get('/dashboard', fn () => Inertia::render('Dashboard'))->name('dashboard');
 
 Route::get('/companies', fn () => Inertia::render('Companies/Index'))->name('companies.index');
-
 Route::get('/companies/create', fn () => Inertia::render('Companies/Create'))->name('companies.create');
-
 Route::get('/companies/profile', fn () => Inertia::render('Companies/Profile'))->name('companies.profile');
 
-Route::get('/profile', fn () => Inertia::render('Profile/Edit', [
-    'mustVerifyEmail' => false,
-    'status' => null,
-]))->name('profile.edit');
+Route::get('/profile', fn () => Inertia::render('Profile/Edit'))->name('profile.edit');
 
 Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.index');
 Route::get('/buyers/create', fn () => Inertia::render('Buyers/Create'))->name('buyers.create');
@@ -43,15 +67,11 @@ Route::get('/buyers/{id}/edit', fn (int $id) => Inertia::render('Buyers/Edit', [
     ->name('buyers.edit');
 
 Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplateDefault'))->name('settings.templates');
-
 Route::get('/settings/templates/library', fn () => Inertia::render('Settings/TemplatesIndex'))->name('settings.templates.library');
-
 Route::get('/settings/templates/preview', fn () => Inertia::render('Settings/TemplatePreview'))->name('settings.templates.preview');
-
 Route::get('/settings/templates/{id}/edit', fn (int $id) => Inertia::render('Settings/TemplateEdit', ['templateId' => $id]))
     ->whereNumber('id')
     ->name('settings.templates.edit');
-
 Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
 
 Route::get('/invoices', fn () => Inertia::render('Invoices/Index'))->name('invoices.index');
@@ -62,5 +82,3 @@ Route::get('/invoices/{id}/edit', fn (int $id) => Inertia::render('Invoices/Edit
 
 Route::get('/i/{token}', fn (string $token) => Inertia::render('Invoices/Share', ['shareToken' => $token]))
     ->name('invoices.share');
-
-require __DIR__.'/auth.php';
