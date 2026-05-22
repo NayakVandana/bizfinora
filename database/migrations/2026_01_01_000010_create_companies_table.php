@@ -13,6 +13,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('postal_code')->nullable();
             $table->string('tax_id')->nullable();
             $table->string('tax_id_label', 50)->default('GSTIN');
             $table->string('email')->nullable();

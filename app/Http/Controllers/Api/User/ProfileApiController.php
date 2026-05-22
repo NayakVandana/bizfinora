@@ -44,13 +44,22 @@ class ProfileApiController extends Controller
                     'max:255',
                     Rule::unique('users', 'email')->ignore($user->id),
                 ],
+                'address' => ['nullable', 'string', 'max:2000'],
+                'city' => ['nullable', 'string', 'max:100'],
+                'state' => ['nullable', 'string', 'max:100'],
+                'postal_code' => ['nullable', 'string', 'max:20'],
             ]);
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
             }
 
-            $user->update($validation->validated());
+            $data = $validation->validated();
+            foreach (['address', 'city', 'state', 'postal_code'] as $field) {
+                $data[$field] = trim((string) ($data[$field] ?? '')) ?: null;
+            }
+
+            $user->update($data);
 
             return $this->sendJsonResponse(
                 true,

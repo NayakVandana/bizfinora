@@ -10,6 +10,10 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postal_code?: string | null;
     email_verified_at?: string;
     current_company_id?: number | null;
     current_company?: Company | null;

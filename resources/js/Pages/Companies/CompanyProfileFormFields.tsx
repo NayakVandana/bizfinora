@@ -61,6 +61,38 @@ export default function CompanyProfileFormFields({
                 <InputError message={errors.address} className="mt-1" />
             </div>
 
+            <div className="grid gap-4 sm:grid-cols-3">
+                <div>
+                    <InputLabel value="City" />
+                    <TextInput
+                        className="mt-1.5 block w-full"
+                        value={form.city}
+                        onChange={(e) => onChange({ city: e.target.value })}
+                    />
+                    <InputError message={errors.city} className="mt-1" />
+                </div>
+                <div>
+                    <InputLabel value="State" />
+                    <TextInput
+                        className="mt-1.5 block w-full"
+                        value={form.state}
+                        onChange={(e) => onChange({ state: e.target.value })}
+                    />
+                    <InputError message={errors.state} className="mt-1" />
+                </div>
+                <div>
+                    <InputLabel value="Postal code" />
+                    <TextInput
+                        className="mt-1.5 block w-full"
+                        value={form.postal_code}
+                        onChange={(e) =>
+                            onChange({ postal_code: e.target.value })
+                        }
+                    />
+                    <InputError message={errors.postal_code} className="mt-1" />
+                </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                     <InputLabel value="GST" />

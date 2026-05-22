@@ -6,6 +6,9 @@ export type CompanyProfileFieldErrors = Partial<
     Record<
         | 'name'
         | 'address'
+        | 'city'
+        | 'state'
+        | 'postal_code'
         | 'email'
         | 'phone'
         | 'gst'

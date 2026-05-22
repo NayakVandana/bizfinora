@@ -5,6 +5,9 @@ import { normalizeGst, normalizePan } from '@/utils/indianTaxId';
 export type CompanyProfileFormState = {
     name: string;
     address: string;
+    city: string;
+    state: string;
+    postal_code: string;
     gst: string;
     pan: string;
     email: string;
@@ -19,6 +22,9 @@ export function emptyCompanyProfileForm(): CompanyProfileFormState {
     return {
         name: '',
         address: '',
+        city: '',
+        state: '',
+        postal_code: '',
         gst: '',
         pan: '',
         email: '',
@@ -36,6 +42,9 @@ export function companyProfileFormFromApi(
     return {
         name: data.name ?? '',
         address: data.address ?? '',
+        city: data.city ?? '',
+        state: data.state ?? '',
+        postal_code: data.postal_code ?? '',
         gst: data.gst ?? data.tax_id ?? '',
         pan: data.pan ?? '',
         email: data.email ?? '',
@@ -53,6 +62,9 @@ export function companyProfileFormPayload(
     return {
         name: form.name.trim(),
         address: form.address,
+        city: form.city.trim() || null,
+        state: form.state.trim() || null,
+        postal_code: form.postal_code.trim() || null,
         gst: normalizeGst(form.gst) || null,
         pan: normalizePan(form.pan) || null,
         email: form.email,

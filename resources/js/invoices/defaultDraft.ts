@@ -55,7 +55,14 @@ export function partyFromSeller(seller: PartyDetails): PartyDetails {
         name: seller.name || '',
         address:
             seller.address ||
-            [seller.address_line1, seller.address_line2, seller.city, seller.country]
+            [
+                seller.address_line1,
+                seller.address_line2,
+                [seller.city, seller.state, seller.postal_code]
+                    .filter(Boolean)
+                    .join(', '),
+                seller.country,
+            ]
                 .filter(Boolean)
                 .join('\n'),
     };

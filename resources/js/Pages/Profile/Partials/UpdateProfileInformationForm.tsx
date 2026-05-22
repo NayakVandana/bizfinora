@@ -20,6 +20,10 @@ export default function UpdateProfileInformation({
     const { user, refresh } = useAuthUser();
     const [name, setName] = useState(user?.name ?? '');
     const [email, setEmail] = useState(user?.email ?? '');
+    const [address, setAddress] = useState(user?.address ?? '');
+    const [city, setCity] = useState(user?.city ?? '');
+    const [state, setState] = useState(user?.state ?? '');
+    const [postalCode, setPostalCode] = useState(user?.postal_code ?? '');
     const [processing, setProcessing] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
@@ -33,11 +37,41 @@ export default function UpdateProfileInformation({
         try {
             const res = await userApiPost<ApiEnvelope<User>>(
                 '/profile/profile-update',
-                { name, email },
+                {
+                    name,
+                    email,
+                    address,
+                    city,
+                    state,
+                    postal_code: postalCode,
+                },
             );
 
             if (!res.success) {
-                setErrors({ email: res.message });
+                const data = res.data as unknown as Record<
+                    string,
+                    unknown
+                > | null;
+                const next: Record<string, string> = {};
+                if (data) {
+                    for (const key of [
+                        'name',
+                        'email',
+                        'address',
+                        'city',
+                        'state',
+                        'postal_code',
+                    ]) {
+                        const val = data[key];
+                        if (Array.isArray(val) && typeof val[0] === 'string') {
+                            next[key] = val[0];
+                        }
+                    }
+                }
+                if (Object.keys(next).length === 0) {
+                    next.email = res.message ?? 'Could not update profile.';
+                }
+                setErrors(next);
 
                 return;
             }
@@ -63,8 +97,7 @@ export default function UpdateProfileInformation({
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600">
-                    Update your account&apos;s profile information and email
-                    address.
+                    Update your account details and address.
                 </p>
             </header>
 
@@ -98,6 +131,55 @@ export default function UpdateProfileInformation({
                     />
 
                     <InputError className="mt-2" message={errors.email} />
+                </div>
+
+                <div>
+                    <InputLabel htmlFor="address" value="Address" />
+                    <textarea
+                        id="address"
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                        rows={3}
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder="Street, building, area"
+                    />
+                    <InputError className="mt-2" message={errors.address} />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                        <InputLabel htmlFor="city" value="City" />
+                        <TextInput
+                            id="city"
+                            className="mt-1 block w-full"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                        />
+                        <InputError className="mt-2" message={errors.city} />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="state" value="State" />
+                        <TextInput
+                            id="state"
+                            className="mt-1 block w-full"
+                            value={state}
+                            onChange={(e) => setState(e.target.value)}
+                        />
+                        <InputError className="mt-2" message={errors.state} />
+                    </div>
+                    <div>
+                        <InputLabel htmlFor="postal_code" value="Postal code" />
+                        <TextInput
+                            id="postal_code"
+                            className="mt-1 block w-full"
+                            value={postalCode}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                        />
+                        <InputError
+                            className="mt-2"
+                            message={errors.postal_code}
+                        />
+                    </div>
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (

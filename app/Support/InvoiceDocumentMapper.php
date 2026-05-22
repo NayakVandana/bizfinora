@@ -24,11 +24,47 @@ class InvoiceDocumentMapper
             'pan' => $company->pan,
             'tax_id' => $gst,
             'tax_id_label' => $gst ? 'GSTIN' : ($company->tax_id_label ?? 'GSTIN'),
-            'address' => $company->address,
+            'address' => self::formattedAddress(
+                $company->address,
+                null,
+                null,
+                $company->city,
+                $company->state,
+                $company->postal_code,
+                null,
+            ),
+            'city' => $company->city,
+            'state' => $company->state,
+            'postal_code' => $company->postal_code,
             'account_number' => $company->account_number,
             'swift_bic' => $company->swift_bic,
             'notes' => $company->seller_notes,
         ];
+    }
+
+    private static function formattedAddress(
+        ?string $address,
+        ?string $line1,
+        ?string $line2,
+        ?string $city,
+        ?string $state,
+        ?string $postalCode,
+        ?string $country,
+    ): ?string {
+        if ($address !== null && trim($address) !== '') {
+            return $address;
+        }
+
+        $parts = collect([
+            $line1,
+            $line2,
+            trim(implode(', ', array_filter([$city, $state, $postalCode]))),
+            $country,
+        ])->filter(fn ($part) => $part !== null && trim($part) !== '');
+
+        $built = $parts->implode("\n");
+
+        return $built !== '' ? $built : null;
     }
 
     /**
@@ -36,15 +72,15 @@ class InvoiceDocumentMapper
      */
     public static function buyerToParty(Buyer $buyer): array
     {
-        $address = $buyer->address;
-        if ($address === null || $address === '') {
-            $address = collect([
-                $buyer->address_line1,
-                $buyer->address_line2,
-                trim(implode(', ', array_filter([$buyer->city, $buyer->state, $buyer->postal_code]))),
-                $buyer->country,
-            ])->filter()->implode("\n");
-        }
+        $address = self::formattedAddress(
+            $buyer->address,
+            $buyer->address_line1,
+            $buyer->address_line2,
+            $buyer->city,
+            $buyer->state,
+            $buyer->postal_code,
+            $buyer->country,
+        );
 
         $gst = $buyer->gst ?: $buyer->tax_id;
 
@@ -58,6 +94,9 @@ class InvoiceDocumentMapper
             'tax_id' => $gst,
             'tax_id_label' => $gst ? 'GSTIN' : ($buyer->tax_id_label ?? 'GSTIN'),
             'address' => $address,
+            'city' => $buyer->city,
+            'state' => $buyer->state,
+            'postal_code' => $buyer->postal_code,
             'account_number' => $buyer->account_number,
             'swift_bic' => $buyer->swift_bic,
             'notes' => $buyer->notes,

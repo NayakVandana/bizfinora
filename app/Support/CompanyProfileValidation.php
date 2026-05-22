@@ -16,6 +16,9 @@ class CompanyProfileValidation
         return [
             'name' => ['required', 'string', 'max:255'],
             'address' => ['nullable', 'string', 'max:2000'],
+            'city' => ['nullable', 'string', 'max:100'],
+            'state' => ['nullable', 'string', 'max:100'],
+            'postal_code' => ['nullable', 'string', 'max:20'],
             'gst' => ['nullable', 'string', 'max:15'],
             'pan' => ['nullable', 'string', 'max:10'],
             'email' => ['nullable', 'email', 'max:255'],
@@ -77,6 +80,9 @@ class CompanyProfileValidation
         return [
             'name' => trim((string) $validated['name']),
             'address' => trim((string) ($validated['address'] ?? '')) ?: null,
+            'city' => self::nullableString($validated['city'] ?? null),
+            'state' => self::nullableString($validated['state'] ?? null),
+            'postal_code' => self::nullableString($validated['postal_code'] ?? null),
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'gst' => $gst !== '' ? $gst : null,
@@ -88,5 +94,12 @@ class CompanyProfileValidation
             'logo_data_url' => $validated['logo_data_url'] ?? null,
             'seller_notes' => $validated['seller_notes'] ?? null,
         ];
+    }
+
+    private static function nullableString(mixed $value): ?string
+    {
+        $trimmed = trim((string) ($value ?? ''));
+
+        return $trimmed !== '' ? $trimmed : null;
     }
 }

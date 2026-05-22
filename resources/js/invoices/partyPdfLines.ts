@@ -24,7 +24,14 @@ export function partyDetailLines(
 
     const address =
         party.address?.trim() ||
-        [party.address_line1, party.address_line2, party.city, party.country]
+        [
+            party.address_line1,
+            party.address_line2,
+            [party.city, party.state, party.postal_code]
+                .filter(Boolean)
+                .join(', '),
+            party.country,
+        ]
             .filter(Boolean)
             .join(', ');
 

@@ -12,6 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->text('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('postal_code')->nullable();
             $table->foreignId('current_company_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');

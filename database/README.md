@@ -54,7 +54,7 @@ php artisan migrate:fresh
 
 | Migration | Table |
 |-----------|--------|
-| `000000_create_users_table` | `users` (incl. `current_company_id`) |
+| `000000_create_users_table` | `users` (address, city, state, postal_code, `current_company_id`) |
 | `000001` … `000007` | cache, jobs, sessions, etc. |
 
 ### Bizfinora (`2026_01_01_*`)
@@ -62,7 +62,7 @@ php artisan migrate:fresh
 <!-- APP_MIGRATIONS_START -->
 | # | Migration file | `up()` | `down()` |
 |---|----------------|--------|----------|
-| 010 | `create_companies_table` | creates `companies` | drops `companies` |
+| 010 | `create_companies_table` | creates `companies` (incl. city, state, postal_code) | drops `companies` |
 | 011 | `create_company_user_table` | creates `company_user` | drops `company_user` |
 | 013 | `create_personal_access_tokens_table` | creates `personal_access_tokens` | drops `personal_access_tokens` |
 | 020 | `create_buyers_table` | creates `buyers` | drops `buyers` |

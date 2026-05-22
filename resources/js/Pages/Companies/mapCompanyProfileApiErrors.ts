@@ -3,6 +3,9 @@ import type { CompanyProfileFieldErrors } from './validateCompanyProfileForm';
 const API_FIELD_KEYS: (keyof CompanyProfileFieldErrors)[] = [
     'name',
     'address',
+    'city',
+    'state',
+    'postal_code',
     'email',
     'phone',
     'gst',

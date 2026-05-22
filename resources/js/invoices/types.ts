@@ -100,6 +100,9 @@ export interface CompanySellerProfile {
     id: number;
     name: string;
     address?: string | null;
+    city?: string | null;
+    state?: string | null;
+    postal_code?: string | null;
     gst?: string | null;
     pan?: string | null;
     tax_id?: string | null;
