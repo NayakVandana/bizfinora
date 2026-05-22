@@ -1,6 +1,8 @@
+import ListingIndex from '@/Components/ListingIndex';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { listingIndexThClass } from '@/utils/listingIndex';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { formatMoney } from '@/invoices/formatMoney';
@@ -273,11 +275,17 @@ export default function Dashboard() {
                                     <>
                                         <ul className="divide-y divide-gray-100 md:hidden">
                                             {summary.recent_invoices.map(
-                                                (row) => (
+                                                (row, index) => (
                                                     <li
                                                         key={row.id}
                                                         className="px-4 py-3"
                                                     >
+                                                        <div className="mb-1">
+                                                            <ListingIndex
+                                                                index={index}
+                                                                variant="mobile"
+                                                            />
+                                                        </div>
                                                         <Link
                                                             href={route(
                                                                 'invoices.edit',
@@ -315,6 +323,13 @@ export default function Dashboard() {
                                             <table className="min-w-full divide-y divide-gray-200 text-sm">
                                                 <thead className="bg-gray-50">
                                                     <tr>
+                                                        <th
+                                                            className={
+                                                                listingIndexThClass
+                                                            }
+                                                        >
+                                                            #
+                                                        </th>
                                                         <th className="px-4 py-3 text-left font-medium text-gray-600">
                                                             Number
                                                         </th>
@@ -337,8 +352,13 @@ export default function Dashboard() {
                                                 </thead>
                                                 <tbody className="divide-y divide-gray-100">
                                                     {summary.recent_invoices.map(
-                                                        (row) => (
+                                                        (row, index) => (
                                                             <tr key={row.id}>
+                                                                <ListingIndex
+                                                                    index={
+                                                                        index
+                                                                    }
+                                                                />
                                                                 <td className="px-4 py-3 font-medium">
                                                                     {
                                                                         row.invoice_number

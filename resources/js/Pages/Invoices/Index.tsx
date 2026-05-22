@@ -1,5 +1,7 @@
+import ListingIndex from '@/Components/ListingIndex';
 import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { listingIndexThClass } from '@/utils/listingIndex';
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { formatMoney } from '@/invoices/formatMoney';
@@ -91,9 +93,79 @@ export default function InvoicesIndex() {
                                 .
                             </p>
                         ) : (
-                            <table className="min-w-full divide-y divide-gray-200">
+                            <>
+                                <ul className="divide-y divide-gray-100 md:hidden">
+                                    {rows.map((row, index) => (
+                                        <li
+                                            key={row.id}
+                                            className="px-4 py-3"
+                                        >
+                                            <div className="mb-1">
+                                                <ListingIndex
+                                                    index={index}
+                                                    variant="mobile"
+                                                />
+                                            </div>
+                                            <Link
+                                                href={route(
+                                                    'invoices.edit',
+                                                    row.id,
+                                                )}
+                                                className="font-medium text-indigo-600"
+                                            >
+                                                {row.invoice_number}
+                                            </Link>
+                                            <p className="mt-1 text-sm text-gray-600">
+                                                {row.buyer_name ?? '—'} ·{' '}
+                                                {row.invoice_date}
+                                            </p>
+                                            <div className="mt-2 flex items-center justify-between">
+                                                <span className="rounded-full bg-gray-100 px-2 py-1 text-xs capitalize">
+                                                    {row.status}
+                                                </span>
+                                                <span className="text-sm font-medium">
+                                                    {formatMoney(row.total)}
+                                                </span>
+                                            </div>
+                                            <div className="mt-2 flex gap-3 text-sm">
+                                                <Link
+                                                    href={route(
+                                                        'invoices.edit',
+                                                        row.id,
+                                                    )}
+                                                    className="text-indigo-600"
+                                                >
+                                                    Edit
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        downloadingId ===
+                                                        row.id
+                                                    }
+                                                    onClick={() =>
+                                                        void downloadInvoice(
+                                                            row.id,
+                                                        )
+                                                    }
+                                                    className="text-indigo-600 disabled:opacity-50"
+                                                >
+                                                    {downloadingId === row.id
+                                                        ? 'PDF…'
+                                                        : 'Download'}
+                                                </button>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <table className="hidden min-w-full divide-y divide-gray-200 md:table">
                                 <thead className="bg-gray-50">
                                     <tr>
+                                        <th
+                                            className={listingIndexThClass}
+                                        >
+                                            #
+                                        </th>
                                         <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
                                             Number
                                         </th>
@@ -115,8 +187,9 @@ export default function InvoicesIndex() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                    {rows.map((row) => (
+                                    {rows.map((row, index) => (
                                         <tr key={row.id}>
+                                            <ListingIndex index={index} />
                                             <td className="px-4 py-3 font-medium">
                                                 {row.invoice_number}
                                             </td>
@@ -169,6 +242,7 @@ export default function InvoicesIndex() {
                                     ))}
                                 </tbody>
                             </table>
+                            </>
                         )}
                     </div>
                 </div>

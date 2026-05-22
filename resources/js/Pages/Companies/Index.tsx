@@ -1,3 +1,4 @@
+import ListingIndex from '@/Components/ListingIndex';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { companyApiPost } from '@/api/invoiceClient';
@@ -327,9 +328,15 @@ export default function CompaniesIndex() {
                     >
                         {otherCompanies.length > 0 ? (
                             <ul className="-mx-1 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto px-1 lg:max-h-[min(32rem,70vh)]">
-                                {otherCompanies.map((company) => (
+                                {otherCompanies.map((company, index) => (
                                     <li key={company.id}>
-                                        <div className="flex items-center gap-4 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-4 sm:py-3.5">
+                                        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-4 sm:gap-4 sm:py-3.5">
+                                            <div className="w-8 shrink-0 text-center">
+                                                <ListingIndex
+                                                    index={index}
+                                                    variant="mobile"
+                                                />
+                                            </div>
                                             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-sm font-semibold text-slate-600 shadow-sm ring-1 ring-slate-200/80">
                                                 {companyInitial(company.name)}
                                             </div>

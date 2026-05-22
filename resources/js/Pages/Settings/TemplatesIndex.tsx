@@ -1,5 +1,6 @@
 import InputLabel from '@/Components/InputLabel';
 import Modal from '@/Components/Modal';
+import ListingIndex from '@/Components/ListingIndex';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
@@ -232,12 +233,16 @@ export default function TemplatesIndex() {
             systemRows.length === 0 &&
             customRows.length === 0);
 
-    const renderSystemRow = (row: SystemTemplateRow) => (
+    const renderSystemRow = (row: SystemTemplateRow, index: number) => (
         <li
             key={`sys-${row.id}`}
             className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
         >
-            <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+                <div className="w-8 shrink-0 pt-0.5 text-center">
+                    <ListingIndex index={index} variant="mobile" />
+                </div>
+                <div className="min-w-0 flex-1">
                 <p className="font-medium text-gray-900">
                     {row.name}
                     <span className="ml-2 rounded bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
@@ -250,6 +255,7 @@ export default function TemplatesIndex() {
                     ) : null}
                 </p>
                 <p className="text-sm text-gray-500">{row.description}</p>
+                </div>
             </div>
             <div className="flex flex-wrap gap-2">
                 <SecondaryButton
@@ -278,12 +284,16 @@ export default function TemplatesIndex() {
         </li>
     );
 
-    const renderCustomRow = (row: CustomTemplateRow) => (
+    const renderCustomRow = (row: CustomTemplateRow, index: number) => (
         <li
             key={`custom-${row.id}`}
             className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
         >
-            <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+                <div className="w-8 shrink-0 pt-0.5 text-center">
+                    <ListingIndex index={index} variant="mobile" />
+                </div>
+                <div className="min-w-0 flex-1">
                 <p className="font-medium text-gray-900">
                     {row.name}
                     <span className="ml-2 rounded bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-800">
@@ -301,6 +311,7 @@ export default function TemplatesIndex() {
                         invoiceTypeLabel(row.base_invoice_type)}
                     {row.description ? ` · ${row.description}` : ''}
                 </p>
+                </div>
             </div>
             <div className="flex flex-wrap gap-2">
                 <SecondaryButton
@@ -434,7 +445,9 @@ export default function TemplatesIndex() {
                                         </h3>
                                     ) : null}
                                     <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
-                                        {systemRows.map(renderSystemRow)}
+                                        {systemRows.map((row, index) =>
+                                            renderSystemRow(row, index),
+                                        )}
                                     </ul>
                                 </section>
                             ) : null}
@@ -447,7 +460,9 @@ export default function TemplatesIndex() {
                                         </h3>
                                     ) : null}
                                     <ul className="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white shadow-sm">
-                                        {customRows.map(renderCustomRow)}
+                                        {customRows.map((row, index) =>
+                                            renderCustomRow(row, index),
+                                        )}
                                     </ul>
                                 </section>
                             ) : null}

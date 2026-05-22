@@ -1,5 +1,7 @@
+import ListingIndex from '@/Components/ListingIndex';
 import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { listingIndexThClass } from '@/utils/listingIndex';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head, Link } from '@inertiajs/react';
@@ -81,11 +83,17 @@ export default function BuyersIndex() {
                             <>
                                 {/* Mobile cards */}
                                 <ul className="divide-y divide-gray-100 md:hidden">
-                                    {buyers.map((b) => (
+                                    {buyers.map((b, index) => (
                                         <li
                                             key={b.id}
                                             className="px-4 py-4"
                                         >
+                                            <div className="mb-1">
+                                                <ListingIndex
+                                                    index={index}
+                                                    variant="mobile"
+                                                />
+                                            </div>
                                             <Link
                                                 href={route(
                                                     'buyers.show',
@@ -155,6 +163,13 @@ export default function BuyersIndex() {
                                     <table className="min-w-full divide-y divide-gray-200 text-sm">
                                         <thead className="bg-gray-50">
                                             <tr>
+                                                <th
+                                                    className={
+                                                        listingIndexThClass
+                                                    }
+                                                >
+                                                    #
+                                                </th>
                                                 <th className="px-4 py-3 text-left font-medium text-gray-600">
                                                     Company
                                                 </th>
@@ -176,8 +191,11 @@ export default function BuyersIndex() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
-                                            {buyers.map((b) => (
+                                            {buyers.map((b, index) => (
                                                 <tr key={b.id}>
+                                                    <ListingIndex
+                                                        index={index}
+                                                    />
                                                     <td className="px-4 py-3">
                                                         <Link
                                                             href={route(
