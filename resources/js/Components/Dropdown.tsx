@@ -54,11 +54,13 @@ const Content = ({
     align = 'right',
     width = '48',
     contentClasses = 'py-1 bg-white',
+    panelClassName = '',
     children,
 }: PropsWithChildren<{
     align?: 'left' | 'right';
-    width?: '48';
+    width?: '48' | 'auto';
     contentClasses?: string;
+    panelClassName?: string;
 }>) => {
     const { open, setOpen } = useContext(DropDownContext);
 
@@ -74,6 +76,8 @@ const Content = ({
 
     if (width === '48') {
         widthClasses = 'w-48';
+    } else if (width === 'auto') {
+        widthClasses = panelClassName || 'min-w-[14rem] max-w-[20rem]';
     }
 
     return (

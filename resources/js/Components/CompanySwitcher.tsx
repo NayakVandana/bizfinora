@@ -4,11 +4,37 @@ import { useAuthUser } from '@/auth/useAuthUser';
 import type { Company } from '@/types';
 import { Link } from '@inertiajs/react';
 
+function PlusIcon({ className = 'h-4 w-4' }: { className?: string }) {
+    return (
+        <svg
+            className={className}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden
+        >
+            <path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+        </svg>
+    );
+}
+
+function NewCompanyButton({ className = '' }: { className?: string }) {
+    return (
+        <Link
+            href={route('companies.create')}
+            className={`inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 ${className}`}
+        >
+            <PlusIcon />
+            New company
+        </Link>
+    );
+}
+
 export default function CompanySwitcher() {
     const { currentCompany, companies, refresh } = useAuthUser();
 
     if (companies.length === 0) {
-        return null;
+        return <NewCompanyButton className="w-auto" />;
     }
 
     const switchCompany = async (company: Company) => {
@@ -32,9 +58,9 @@ export default function CompanySwitcher() {
                 <span className="inline-flex rounded-md">
                     <button
                         type="button"
-                        className="inline-flex items-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none"
+                        className="inline-flex max-w-[14rem] items-center rounded-md border border-gray-200 bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none"
                     >
-                        <span className="max-w-[10rem] truncate">
+                        <span className="truncate">
                             {currentCompany?.name ?? 'Select company'}
                         </span>
                         <svg
@@ -53,30 +79,61 @@ export default function CompanySwitcher() {
                 </span>
             </Dropdown.Trigger>
 
-            <Dropdown.Content align="left" width="48">
-                {companies.map((company) => (
-                    <button
-                        key={company.id}
-                        type="button"
-                        onClick={() => void switchCompany(company)}
-                        className={`block w-full px-4 py-2 text-start text-sm leading-5 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none ${
-                            company.id === currentCompany?.id
-                                ? 'bg-indigo-50 font-medium text-indigo-700'
-                                : 'text-gray-700'
-                        }`}
-                    >
-                        {company.name}
-                        {company.id === currentCompany?.id && (
-                            <span className="ms-1 text-xs text-indigo-500">
-                                (active)
-                            </span>
-                        )}
-                    </button>
-                ))}
-                <div className="border-t border-gray-100" />
-                <Dropdown.Link href={route('companies.index')}>
-                    Manage companies
-                </Dropdown.Link>
+            <Dropdown.Content
+                align="left"
+                width="auto"
+                contentClasses="overflow-hidden rounded-md bg-white py-1"
+            >
+                <ul className="max-h-64 overflow-y-auto" role="listbox">
+                    {companies.map((company) => {
+                        const isActive = company.id === currentCompany?.id;
+
+                        return (
+                            <li key={company.id}>
+                                <button
+                                    type="button"
+                                    role="option"
+                                    aria-selected={isActive}
+                                    onClick={() => void switchCompany(company)}
+                                    className={`flex w-full items-start gap-2 px-3 py-2.5 text-start text-sm transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none ${
+                                        isActive
+                                            ? 'bg-indigo-50 text-indigo-800'
+                                            : 'text-slate-700'
+                                    }`}
+                                >
+                                    <span
+                                        className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
+                                            isActive
+                                                ? 'bg-indigo-500'
+                                                : 'bg-transparent'
+                                        }`}
+                                        aria-hidden
+                                    />
+                                    <span className="min-w-0 flex-1">
+                                        <span
+                                            className={`block truncate ${
+                                                isActive
+                                                    ? 'font-semibold'
+                                                    : 'font-medium'
+                                            }`}
+                                        >
+                                            {company.name}
+                                        </span>
+                                        {isActive ? (
+                                            <span className="mt-0.5 block text-xs font-medium text-indigo-600">
+                                                Active workspace
+                                            </span>
+                                        ) : null}
+                                    </span>
+                                </button>
+                            </li>
+                        );
+                    })}
+                </ul>
+
+                <div className="border-t border-slate-100 bg-slate-50/80 p-2">
+                    <NewCompanyButton />
+                </div>
             </Dropdown.Content>
         </Dropdown>
     );

@@ -172,10 +172,10 @@ export default function Dashboard() {
                                 Select or create a company to use invoices and
                                 buyers.{' '}
                                 <Link
-                                    href={route('companies.index')}
+                                    href={route('companies.create')}
                                     className="font-medium underline"
                                 >
-                                    Manage companies
+                                    New company
                                 </Link>
                             </p>
                         )}

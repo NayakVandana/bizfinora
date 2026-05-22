@@ -60,14 +60,12 @@ export default function CompanyProfilePanel() {
                     +
                 </div>
                 <p className="mt-4 text-sm text-slate-600">
-                    No company selected yet.
+                    No company selected yet. Use{' '}
+                    <strong className="font-medium text-slate-800">
+                        New company
+                    </strong>{' '}
+                    in the header company menu.
                 </p>
-                <Link
-                    href={route('companies.create')}
-                    className="mt-4 inline-flex rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-                >
-                    Create your first company
-                </Link>
             </div>
         );
     }

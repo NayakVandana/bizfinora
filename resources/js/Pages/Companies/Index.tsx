@@ -1,7 +1,7 @@
 import ListingIndex from '@/Components/ListingIndex';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useAuthUser } from '@/auth/useAuthUser';
-import { Head, Link } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 import CompanyProfilePanel from './CompanyProfilePanel';
 
@@ -65,24 +65,15 @@ export default function CompaniesIndex() {
 
             <div className="py-6 sm:py-8">
                 <div className="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8">
-                    <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <p className="max-w-2xl text-sm text-slate-600">
-                            Seller details for your active workspace. Switch
-                            company from the{' '}
-                            <strong className="font-medium text-slate-800">
-                                header menu
-                            </strong>
-                            . Choose which fields appear on invoices in the
-                            builder.
-                        </p>
-                        <Link
-                            href={route('companies.create')}
-                            className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-800 sm:w-auto"
-                        >
-                            <span className="text-lg leading-none">+</span>
-                            New company
-                        </Link>
-                    </div>
+                    <p className="mb-6 max-w-2xl text-sm text-slate-600">
+                        Seller details for your active workspace. Switch
+                        company or add a new one from the{' '}
+                        <strong className="font-medium text-slate-800">
+                            company menu in the header
+                        </strong>
+                        . Choose which fields appear on invoices in the
+                        builder.
+                    </p>
 
                     <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch xl:gap-8">
                         <WorkspaceCardShell
@@ -129,27 +120,13 @@ export default function CompaniesIndex() {
                                         </li>
                                     ))}
                                 </ul>
-                            ) : companies.length > 0 ? (
+                            ) : (
                                 <div className="flex flex-1 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/80 px-6 py-12 text-center">
                                     <p className="text-sm text-slate-600">
-                                        Add another business workspace anytime.
+                                        {companies.length > 0
+                                            ? 'Add another workspace from the company menu in the header.'
+                                            : 'Use New company in the header company menu to get started.'}
                                     </p>
-                                    <Link
-                                        href={route('companies.create')}
-                                        className="mt-4 inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 shadow-sm hover:bg-slate-50"
-                                    >
-                                        Create workspace
-                                    </Link>
-                                </div>
-                            ) : (
-                                <div className="flex flex-1 flex-col items-center justify-center py-12 text-center text-sm text-slate-500">
-                                    No companies yet.{' '}
-                                    <Link
-                                        href={route('companies.create')}
-                                        className="font-medium text-indigo-600 hover:text-indigo-800"
-                                    >
-                                        Create one
-                                    </Link>
                                 </div>
                             )}
                         </WorkspaceCardShell>
