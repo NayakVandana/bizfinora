@@ -14,12 +14,16 @@ class InvoiceDocumentMapper
      */
     public static function sellerFromCompany(Company $company): array
     {
+        $gst = $company->gst ?: $company->tax_id;
+
         return [
             'name' => $company->name,
             'email' => $company->email,
             'phone' => $company->phone,
-            'tax_id' => $company->tax_id,
-            'tax_id_label' => $company->tax_id_label ?? 'VAT no',
+            'gst' => $company->gst,
+            'pan' => $company->pan,
+            'tax_id' => $gst,
+            'tax_id_label' => $gst ? 'GSTIN' : ($company->tax_id_label ?? 'GSTIN'),
             'address' => $company->address,
             'account_number' => $company->account_number,
             'swift_bic' => $company->swift_bic,

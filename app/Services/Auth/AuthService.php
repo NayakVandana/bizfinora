@@ -22,7 +22,9 @@ class AuthService
                 'password' => Hash::make($data['password']),
             ]);
 
-            $this->membership->createForUser($user, $data['company_name']);
+            $this->membership->createForUser($user, [
+                'name' => $data['company_name'],
+            ]);
 
             return $user->fresh(['currentCompany']);
         });

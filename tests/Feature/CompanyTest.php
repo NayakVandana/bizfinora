@@ -15,7 +15,7 @@ class CompanyTest extends TestCase
     public function test_user_can_create_additional_company(): void
     {
         $user = User::factory()->create();
-        app(CompanyMembership::class)->createForUser($user, 'First Co');
+        app(CompanyMembership::class)->createForUser($user, ['name' => 'First Co']);
 
         $response = $this->actingAs($user)->post('/companies', [
             'name' => 'Second Co',
@@ -34,8 +34,8 @@ class CompanyTest extends TestCase
     {
         $user = User::factory()->create();
         $membership = app(CompanyMembership::class);
-        $membership->createForUser($user, 'Alpha');
-        $beta = $membership->createForUser($user, 'Beta');
+        $membership->createForUser($user, ['name' => 'Alpha']);
+        $beta = $membership->createForUser($user, ['name' => 'Beta']);
 
         $response = $this->actingAs($user)->patch(route('companies.switch', $beta));
 

@@ -48,16 +48,16 @@ export default function SellerSection({
                     onVisibilityChange={onVisibilityChange}
                 />
                 <PartyFieldRow
-                    label="Tax label"
-                    value={seller.tax_id_label}
+                    label="GSTIN"
+                    value={seller.gst ?? seller.tax_id}
+                    visibilityField="seller_tax_id"
                     visibility={visibility}
                     onVisibilityChange={onVisibilityChange}
-                    showToggle={false}
                 />
                 <PartyFieldRow
-                    label="Tax ID"
-                    value={seller.tax_id}
-                    visibilityField="seller_tax_id"
+                    label="PAN"
+                    value={seller.pan}
+                    visibilityField="seller_pan"
                     visibility={visibility}
                     onVisibilityChange={onVisibilityChange}
                 />

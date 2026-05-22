@@ -19,13 +19,17 @@ class CompanyMembership
         $user->forceFill(['current_company_id' => $company->id])->save();
     }
 
-    public function createForUser(User $user, string $name): Company
+    /**
+     * @param  array<string, mixed>  $attributes  Company attributes (must include name; slug optional)
+     */
+    public function createForUser(User $user, array $attributes): Company
     {
-        return DB::transaction(function () use ($user, $name) {
-            $company = Company::query()->create([
-                'name' => $name,
-                'slug' => Company::uniqueSlugFromName($name),
-            ]);
+        return DB::transaction(function () use ($user, $attributes) {
+            $name = (string) $attributes['name'];
+            $attributes['slug'] = $attributes['slug']
+                ?? Company::uniqueSlugFromName($name);
+
+            $company = Company::query()->create($attributes);
 
             $this->attachOwner($user, $company);
 

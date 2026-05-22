@@ -20,6 +20,8 @@ class Company extends Model
         'tax_id_label',
         'email',
         'phone',
+        'gst',
+        'pan',
         'account_number',
         'swift_bic',
         'logo_data_url',

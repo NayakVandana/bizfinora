@@ -1,32 +1,79 @@
 import InputError from '@/Components/InputError';
-import InputLabel from '@/Components/InputLabel';
-import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { userApiPost, type ApiEnvelope } from '@/api/userClient';
 import type { Company } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
+import CompanyProfileFormFields from './CompanyProfileFormFields';
+import {
+    companyProfileFormPayload,
+    emptyCompanyProfileForm,
+    type CompanyProfileFormState,
+} from './companyProfileForm';
+import { mapCompanyProfileApiErrors } from './mapCompanyProfileApiErrors';
+import {
+    validateCompanyProfileForm,
+    type CompanyProfileFieldErrors,
+} from './validateCompanyProfileForm';
 
 export default function CompaniesCreate() {
     const { refresh } = useAuthUser();
-    const [name, setName] = useState('');
+    const [form, setForm] = useState<CompanyProfileFormState>(
+        emptyCompanyProfileForm,
+    );
     const [processing, setProcessing] = useState(false);
-    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [formError, setFormError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<CompanyProfileFieldErrors>(
+        {},
+    );
+
+    const update = (patch: Partial<CompanyProfileFormState>) => {
+        setForm((prev) => ({ ...prev, ...patch }));
+    };
+
+    const clearFieldError = (key: keyof CompanyProfileFieldErrors) => {
+        setFieldErrors((prev) => {
+            if (!prev[key]) {
+                return prev;
+            }
+            const next = { ...prev };
+            delete next[key];
+            return next;
+        });
+    };
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setFormError(null);
+
+        const clientErrors = validateCompanyProfileForm(form);
+        if (Object.keys(clientErrors).length > 0) {
+            setFieldErrors(clientErrors);
+            setFormError('Please fix the highlighted fields.');
+            return;
+        }
+
         setProcessing(true);
-        setErrors({});
+        setFieldErrors({});
+
+        const payload = companyProfileFormPayload(form);
 
         try {
             const res = await userApiPost<ApiEnvelope<Company>>(
                 '/companies/company-store',
-                { name },
+                payload,
             );
 
             if (!res.success) {
-                setErrors({ name: res.message });
+                const apiErrors = mapCompanyProfileApiErrors(
+                    res.data as unknown as Record<string, unknown> | null,
+                );
+                if (Object.keys(apiErrors).length > 0) {
+                    setFieldErrors(apiErrors);
+                } else {
+                    setFormError(res.message ?? 'Could not create company.');
+                }
 
                 return;
             }
@@ -34,7 +81,7 @@ export default function CompaniesCreate() {
             await refresh();
             router.visit(route('companies.index'));
         } catch {
-            setErrors({ name: 'Could not create company.' });
+            setFormError('Could not create company.');
         } finally {
             setProcessing(false);
         }
@@ -51,7 +98,7 @@ export default function CompaniesCreate() {
             <Head title="New company" />
 
             <div className="py-6 sm:py-8">
-                <div className="mx-auto max-w-lg px-3 sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-2xl px-3 sm:px-6 lg:px-8">
                     <Link
                         href={route('companies.index')}
                         className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-800"
@@ -62,37 +109,32 @@ export default function CompaniesCreate() {
                     <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
                         <div className="border-b border-slate-100 px-5 py-4 sm:px-6">
                             <h3 className="font-semibold text-slate-900">
-                                Workspace details
+                                Workspace & seller profile
                             </h3>
                             <p className="mt-1 text-sm text-slate-500">
-                                You can add logo, tax ID, and seller address on
-                                the profile page after creating.
+                                Same details as your company profile — used as
+                                the seller on invoices. You can change these
+                                anytime from the profile page.
                             </p>
                         </div>
 
                         <form
+                            noValidate
                             onSubmit={submit}
                             className="space-y-5 px-5 py-6 sm:px-6"
                         >
-                            <div>
-                                <InputLabel htmlFor="name" value="Company name" />
-                                <TextInput
-                                    id="name"
-                                    name="name"
-                                    value={name}
-                                    className="mt-1.5 block w-full rounded-lg border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    onChange={(e) => setName(e.target.value)}
-                                    required
-                                    autoFocus
-                                    placeholder="e.g. Acme Trading Pvt Ltd"
-                                />
-                                <InputError
-                                    message={errors.name}
-                                    className="mt-2"
-                                />
-                            </div>
+                            {formError ? (
+                                <InputError message={formError} />
+                            ) : null}
 
-                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <CompanyProfileFormFields
+                                form={form}
+                                errors={fieldErrors}
+                                onChange={update}
+                                onClearError={clearFieldError}
+                            />
+
+                            <div className="flex flex-col gap-2 border-t border-slate-100 pt-5 sm:flex-row sm:items-center">
                                 <button
                                     type="submit"
                                     disabled={processing}

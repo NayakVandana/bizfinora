@@ -236,13 +236,31 @@ export default function CompaniesIndex() {
                                                     }
                                                 />
                                             ) : null}
-                                            {profile.tax_id?.trim() ? (
+                                            {profile.gst?.trim() ? (
                                                 <ProfileMeta
-                                                    label={
-                                                        profile.tax_id_label ??
-                                                        'Tax ID'
+                                                    label="GSTIN"
+                                                    value={profile.gst}
+                                                    icon={
+                                                        <svg
+                                                            className="h-4 w-4"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke="currentColor"
+                                                            strokeWidth={1.5}
+                                                        >
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c1.07 0 2.04.174 2.922.48M6.75 3h7.5v1.5H6.75V3z"
+                                                            />
+                                                        </svg>
                                                     }
-                                                    value={profile.tax_id}
+                                                />
+                                            ) : null}
+                                            {profile.pan?.trim() ? (
+                                                <ProfileMeta
+                                                    label="PAN"
+                                                    value={profile.pan}
                                                     icon={
                                                         <svg
                                                             className="h-4 w-4"

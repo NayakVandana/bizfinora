@@ -23,6 +23,8 @@ class CompanyPresentation
             'tax_id_label' => $company->tax_id_label ?? 'VAT no',
             'email' => $company->email,
             'phone' => $company->phone,
+            'gst' => $company->gst,
+            'pan' => $company->pan,
             'account_number' => $company->account_number,
             'swift_bic' => $company->swift_bic,
             'logo_data_url' => $company->logo_data_url,

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Company;
 use App\Support\CompanyMembership;
 use App\Support\CompanyPresentation;
+use App\Support\CompanyProfileValidation;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -68,18 +70,16 @@ class CompanyApiController extends Controller
     public function postCompanyStore(Request $request)
     {
         try {
-            $validation = Validator::make($request->all(), [
-                'name' => ['required', 'string', 'max:255'],
-            ]);
+            $validation = CompanyProfileValidation::makeValidator($request->all());
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
             }
 
-            $company = $this->membership->createForUser(
-                $request->user(),
-                $validation->validated()['name'],
-            );
+            $data = CompanyProfileValidation::preparePayload($validation->validated());
+            $data['slug'] = Company::uniqueSlugFromName($data['name']);
+
+            $company = $this->membership->createForUser($request->user(), $data);
 
             return $this->sendJsonResponse(
                 true,
