@@ -10,21 +10,23 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('buyer_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('company_id');
+            $table->foreignId('user_id');
+            $table->foreignId('buyer_id')->nullable();
             $table->string('invoice_number');
             $table->string('invoice_number_label')->nullable();
             $table->string('status', 20)->default('draft');
-            $table->date('issue_date');
+            $table->date('invoice_date');
+            $table->string('invoice_date_label', 50)->nullable();
             $table->date('due_date')->nullable();
             $table->date('date_of_service')->nullable();
-            $table->string('currency', 3)->default('USD');
+            $table->string('currency', 3)->default('INR');
             $table->string('language', 5)->default('en');
             $table->string('date_format', 20)->default('YYYY-MM-DD');
             $table->string('template', 20)->default('stripe');
-            $table->string('tax_type', 20)->default('vat');
-            $table->string('tax_label', 50)->default('VAT');
+            $table->string('invoice_type', 40)->default('standard');
+            $table->string('tax_type', 20)->default('gst');
+            $table->string('tax_label', 50)->default('GST');
             $table->decimal('tax_rate', 8, 4)->default(0);
             $table->string('tax_calculation_mode', 20)->default('exclusive');
             $table->boolean('tax_per_line')->default(false);

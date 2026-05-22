@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('invoice_line_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('invoice_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('invoice_id');
             $table->unsignedSmallInteger('sort_order')->default(0);
             $table->string('description');
             $table->decimal('quantity', 14, 4)->default(1);

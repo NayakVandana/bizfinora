@@ -10,13 +10,16 @@ return new class extends Migration
     {
         Schema::create('buyers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('company_id');
+            $table->string('company_name')->nullable();
             $table->string('name');
             $table->text('address')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->string('gst', 15)->nullable();
+            $table->string('pan', 10)->nullable();
             $table->string('tax_id')->nullable();
-            $table->string('tax_id_label', 50)->default('VAT no');
+            $table->string('tax_id_label', 50)->default('GSTIN');
             $table->string('address_line1')->nullable();
             $table->string('address_line2')->nullable();
             $table->string('city')->nullable();

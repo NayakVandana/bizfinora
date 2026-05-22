@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('invoice_templates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('company_id');
+            $table->foreignId('user_id');
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('base_invoice_type', 40)->default('standard');
@@ -21,22 +21,10 @@ return new class extends Migration
 
             $table->index(['company_id', 'name']);
         });
-
-        Schema::table('companies', function (Blueprint $table) {
-            $table->foreignId('default_custom_template_id')
-                ->nullable()
-                ->after('default_invoice_type')
-                ->constrained('invoice_templates')
-                ->nullOnDelete();
-        });
     }
 
     public function down(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('default_custom_template_id');
-        });
-
         Schema::dropIfExists('invoice_templates');
     }
 };
