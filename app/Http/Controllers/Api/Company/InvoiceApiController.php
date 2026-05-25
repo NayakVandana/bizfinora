@@ -246,7 +246,7 @@ class InvoiceApiController extends Controller
     {
         try {
             $rules = [
-                'buyer_id' => ['nullable', 'integer'],
+                'buyer_id' => [$existing === null ? 'required' : 'nullable', 'integer'],
                 'invoice_number' => ['required', 'string', 'max:50'],
                 'status' => ['required', 'string', Rule::in(['draft', 'sent', 'paid'])],
                 'invoice_date' => ['required', 'date'],

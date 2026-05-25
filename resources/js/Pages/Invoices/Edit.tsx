@@ -3,7 +3,12 @@ import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoiceBuilder from '@/invoices/InvoiceBuilder';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
-import { serializeInvoiceDraft } from '@/invoices/serializeDraft';
+import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
+import {
+    clearResolvedInvoiceErrors,
+    scrollToFirstInvoiceError,
+    type InvoiceFieldErrors,
+} from '@/invoices/validateInvoiceForm';
 import type { InvoiceDraft } from '@/invoices/types';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head } from '@inertiajs/react';
@@ -18,6 +23,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
     const [draft, setDraft] = useState<InvoiceDraft | null>(null);
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
+    const [errors, setErrors] = useState<InvoiceFieldErrors>({});
     const [shareUrl, setShareUrl] = useState<string | null>(null);
     useEffect(() => {
         Promise.all([
@@ -47,19 +53,16 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
         }
         setSaving(true);
         try {
-            const res = await companyApiPost<ApiEnvelope<InvoicePayload>>(
-                '/invoices/invoice-update',
-                serializeInvoiceDraft(draft),
-            );
-            if (res.success && res.data) {
-                setDraft(
-                    invoicePayloadToDraft(
-                        res.data as unknown as Record<string, unknown>,
-                    ),
-                );
-                if (res.data.share_url) {
-                    setShareUrl(res.data.share_url);
+            const result = await submitInvoiceForm(draft);
+            if (result.ok) {
+                setErrors({});
+                setDraft(invoicePayloadToDraft(result.data));
+                if (typeof result.data.share_url === 'string') {
+                    setShareUrl(result.data.share_url);
                 }
+            } else {
+                setErrors(result.errors);
+                scrollToFirstInvoiceError(result.errors);
             }
         } finally {
             setSaving(false);
@@ -96,7 +99,14 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                         <InvoiceBuilder
                             draft={draft}
                             buyers={buyers}
-                            onChange={setDraft}
+                            errors={errors}
+                            onErrors={setErrors}
+                            onChange={(next) => {
+                                setDraft(next);
+                                setErrors((prev) =>
+                                    clearResolvedInvoiceErrors(next, prev),
+                                );
+                            }}
                             onSave={() => void save()}
                             onDownload={() => void downloadInvoicePdf(draft)}
                             onEnableShare={() => void enableShare()}

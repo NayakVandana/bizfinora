@@ -1,14 +1,20 @@
+import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import Accordion from './Accordion';
+import {
+    invoiceFieldClass,
+    type InvoiceFieldErrors,
+} from '../validateInvoiceForm';
 import type { InvoiceDraft } from '../types';
 
 type Props = {
     draft: InvoiceDraft;
     onChange: (patch: Partial<InvoiceDraft>) => void;
+    errors?: InvoiceFieldErrors;
 };
 
-export default function GeneralSection({ draft, onChange }: Props) {
+export default function GeneralSection({ draft, onChange, errors = {} }: Props) {
     return (
         <Accordion title="General" defaultOpen>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -22,15 +28,21 @@ export default function GeneralSection({ draft, onChange }: Props) {
                         }
                     />
                 </div>
-                <div>
-                    <InputLabel value="Invoice number" />
+                <div data-invoice-field="invoice_number">
+                    <InputLabel value="Invoice number *" />
                     <TextInput
-                        className="mt-1 block w-full"
+                        className={invoiceFieldClass(
+                            Boolean(errors.invoice_number),
+                            'mt-1 block w-full',
+                        )}
                         value={draft.invoice_number}
+                        required
+                        aria-invalid={Boolean(errors.invoice_number)}
                         onChange={(e) =>
                             onChange({ invoice_number: e.target.value })
                         }
                     />
+                    <InputError message={errors.invoice_number} className="mt-1" />
                 </div>
                 <div>
                     <InputLabel value="Status" />
@@ -62,16 +74,22 @@ export default function GeneralSection({ draft, onChange }: Props) {
                         placeholder="Invoice date"
                     />
                 </div>
-                <div>
-                    <InputLabel value="Invoice date" />
+                <div data-invoice-field="invoice_date">
+                    <InputLabel value="Invoice date *" />
                     <TextInput
                         type="date"
-                        className="mt-1 block w-full"
+                        className={invoiceFieldClass(
+                            Boolean(errors.invoice_date),
+                            'mt-1 block w-full',
+                        )}
                         value={draft.invoice_date}
+                        required
+                        aria-invalid={Boolean(errors.invoice_date)}
                         onChange={(e) =>
                             onChange({ invoice_date: e.target.value })
                         }
                     />
+                    <InputError message={errors.invoice_date} className="mt-1" />
                 </div>
                 <div>
                     <InputLabel value="Due date (optional)" />

@@ -1,13 +1,18 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoiceBuilder from '@/invoices/InvoiceBuilder';
+import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
+import {
+    clearResolvedInvoiceErrors,
+    scrollToFirstInvoiceError,
+    type InvoiceFieldErrors,
+} from '@/invoices/validateInvoiceForm';
 import {
     buildDefaultDraft,
     ensureDefaultInvoiceDates,
 } from '@/invoices/defaultDraft';
 import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
 import type { TemplatePreset } from '@/invoices/templatePresets';
-import { serializeInvoiceDraft } from '@/invoices/serializeDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import type { InvoiceDraft } from '@/invoices/types';
 import type { CompanyTaxSettings } from '@/invoices/taxPresets';
@@ -30,6 +35,7 @@ export default function InvoicesCreate() {
     const [draft, setDraft] = useState<InvoiceDraft | null>(null);
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
+    const [errors, setErrors] = useState<InvoiceFieldErrors>({});
     const [shareUrl, setShareUrl] = useState<string | null>(null);
     const [companyTax, setCompanyTax] = useState<CompanyTaxSettings | null>(
         null,
@@ -67,21 +73,26 @@ export default function InvoicesCreate() {
         });
     }, []);
 
+    const handleChange = (next: InvoiceDraft) => {
+        setDraft(next);
+        setErrors((prev) => clearResolvedInvoiceErrors(next, prev));
+    };
+
     const save = async () => {
         if (!draft) {
             return;
         }
         setSaving(true);
         try {
-            const res = await companyApiPost<ApiEnvelope<{ id: number; share_url?: string }>>(
-                '/invoices/invoice-store',
-                serializeInvoiceDraft(draft),
-            );
-            if (res.success && res.data?.id) {
-                if (res.data.share_url) {
-                    setShareUrl(res.data.share_url);
+            const result = await submitInvoiceForm(draft);
+            if (result.ok) {
+                if (typeof result.data.share_url === 'string') {
+                    setShareUrl(result.data.share_url);
                 }
-                router.visit(route('invoices.edit', res.data.id));
+                router.visit(route('invoices.edit', result.data.id as number));
+            } else {
+                setErrors(result.errors);
+                scrollToFirstInvoiceError(result.errors);
             }
         } finally {
             setSaving(false);
@@ -120,7 +131,9 @@ export default function InvoicesCreate() {
                         <InvoiceBuilder
                             draft={draft}
                             buyers={buyers}
-                            onChange={setDraft}
+                            errors={errors}
+                            onErrors={setErrors}
+                            onChange={handleChange}
                             onSave={() => void save()}
                             onDownload={() => void downloadInvoicePdf(draft)}
                             onEnableShare={

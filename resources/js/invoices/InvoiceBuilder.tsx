@@ -1,3 +1,4 @@
+import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import InvoiceEditorLayout from '@/invoices/InvoiceEditorLayout';
@@ -13,13 +14,20 @@ import PaymentNotesSection from './sections/PaymentNotesSection';
 import SellerSection from './sections/SellerSection';
 import { buyerToDocumentParty } from './sections/BuyerSection';
 import { emptyParty } from './defaultDraft';
+import {
+    scrollToFirstInvoiceError,
+    validateInvoiceForm,
+    type InvoiceFieldErrors,
+} from './validateInvoiceForm';
 import type { InvoiceDraft, InvoiceLineItem } from './types';
 
 type Props = {
     draft: InvoiceDraft;
     buyers: BuyerOption[];
     onChange: (draft: InvoiceDraft) => void;
-    onSave: () => void;
+    errors?: InvoiceFieldErrors;
+    onErrors?: (errors: InvoiceFieldErrors) => void;
+    onSave: () => void | Promise<void>;
     onDownload: () => void;
     onEnableShare?: () => void;
     saving?: boolean;
@@ -32,6 +40,8 @@ export default function InvoiceBuilder({
     draft,
     buyers,
     onChange,
+    errors = {},
+    onErrors,
     onSave,
     onDownload,
     onEnableShare,
@@ -111,12 +121,22 @@ export default function InvoiceBuilder({
         });
     };
 
+    const handleSave = () => {
+        const clientErrors = validateInvoiceForm(draft);
+        if (Object.keys(clientErrors).length > 0) {
+            onErrors?.(clientErrors);
+            scrollToFirstInvoiceError(clientErrors);
+            return;
+        }
+        void onSave();
+    };
+
     const actions = (
         <>
             <PrimaryButton
-                type="button"
+                type="submit"
+                form="invoice-builder-form"
                 disabled={saving}
-                onClick={onSave}
                 className="w-full justify-center lg:w-auto"
             >
                 {saving ? 'Saving…' : 'Save invoice'}
@@ -145,7 +165,14 @@ export default function InvoiceBuilder({
             actions={actions}
             preview={<InvoicePreview draft={draft} />}
             form={
-                <>
+                <form
+                    id="invoice-builder-form"
+                    noValidate
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        handleSave();
+                    }}
+                >
                 {shareUrl ? (
                     <div className="rounded border border-indigo-100 bg-indigo-50 p-3 text-sm">
                         <p className="font-medium text-indigo-900">Shareable link</p>
@@ -160,12 +187,18 @@ export default function InvoiceBuilder({
                     </div>
                 ) : null}
 
+                <InputError message={errors._form} className="mb-2" />
+
                 <TemplateSection
                     draft={draft}
                     onChange={update}
                     isNewInvoice={isNewInvoice}
                 />
-                <GeneralSection draft={draft} onChange={update} />
+                <GeneralSection
+                    draft={draft}
+                    onChange={update}
+                    errors={errors}
+                />
                 <SellerSection
                     draft={draft}
                     onVisibilityChange={updateVisibility}
@@ -175,6 +208,7 @@ export default function InvoiceBuilder({
                     buyers={buyers}
                     onBuyerSelect={applyBuyer}
                     onVisibilityChange={updateVisibility}
+                    errors={errors}
                 />
                 <TaxSettingsSection
                     draft={draft}
@@ -188,13 +222,14 @@ export default function InvoiceBuilder({
                     onItemChange={updateItem}
                     onAddItem={addItem}
                     onRemoveItem={removeItem}
+                    errors={errors}
                 />
                 <PaymentNotesSection
                     draft={draft}
                     onChange={update}
                     onDocChange={updateDoc}
                 />
-                </>
+                </form>
             }
         />
     );

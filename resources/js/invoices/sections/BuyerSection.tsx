@@ -1,6 +1,11 @@
+import InputError from '@/Components/InputError';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import Accordion from './Accordion';
 import PartyFieldRow from './PartyFieldRow';
+import {
+    invoiceFieldClass,
+    type InvoiceFieldErrors,
+} from '../validateInvoiceForm';
 import type { InvoiceDraft } from '../types';
 import { Link } from '@inertiajs/react';
 
@@ -9,6 +14,7 @@ type Props = {
     buyers: BuyerOption[];
     onBuyerSelect: (buyerId: string) => void;
     onVisibilityChange: (field: string, visible: boolean) => void;
+    errors?: InvoiceFieldErrors;
 };
 
 function buyerToDocumentParty(buyer: BuyerOption): InvoiceDraft['document']['buyer'] {
@@ -41,6 +47,7 @@ export default function BuyerSection({
     buyers,
     onBuyerSelect,
     onVisibilityChange,
+    errors = {},
 }: Props) {
     const buyer = draft.document.buyer;
     const visibility = draft.field_visibility ?? {};
@@ -55,9 +62,18 @@ export default function BuyerSection({
                 . Toggle PDF visibility per field.
             </p>
 
+            <div data-invoice-field="buyer_id">
+            <label className="block text-sm font-medium text-foreground">
+                Buyer *
+            </label>
             <select
-                className="app-field"
+                className={invoiceFieldClass(
+                    Boolean(errors.buyer_id),
+                    'app-field mt-1',
+                )}
                 value={draft.buyer_id ?? ''}
+                required
+                aria-invalid={Boolean(errors.buyer_id)}
                 onChange={(e) => onBuyerSelect(e.target.value)}
             >
                 <option value="">Select saved buyer…</option>
@@ -67,6 +83,8 @@ export default function BuyerSection({
                     </option>
                 ))}
             </select>
+            <InputError message={errors.buyer_id} className="mt-1" />
+            </div>
 
             {!draft.buyer_id ? (
                 <p className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground">
