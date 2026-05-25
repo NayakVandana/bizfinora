@@ -218,7 +218,6 @@ export default function InvoiceBuilder({
                 <ItemsSection
                     draft={draft}
                     onChange={update}
-                    onDocChange={updateDoc}
                     onItemChange={updateItem}
                     onAddItem={addItem}
                     onRemoveItem={removeItem}

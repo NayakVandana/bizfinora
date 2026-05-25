@@ -1,10 +1,11 @@
 import { APP_CURRENCY } from './currency';
+import { readDiscountPercent, resolveDiscountForDraft } from './discount';
 import type { InvoiceDraft } from './types';
 
 /** Payload shape expected by company invoice store/update APIs. */
 export function serializeInvoiceDraft(draft: InvoiceDraft): Record<string, unknown> {
-    const discount =
-        draft.discount_amount ?? draft.document.discount_amount ?? 0;
+    const discountPercent = readDiscountPercent(draft);
+    const discount = resolveDiscountForDraft(draft);
     const qr = draft.qr_code_data ?? draft.document.qr_payload ?? '';
 
     return {
@@ -34,11 +35,15 @@ export function serializeInvoiceDraft(draft: InvoiceDraft): Record<string, unkno
         qr_code_description: draft.qr_code_description ?? null,
         person_authorized_receive: draft.person_authorized_receive ?? null,
         person_authorized_issue: draft.person_authorized_issue ?? null,
+        discount_type: 'percent',
+        discount_value: discountPercent,
         discount_amount: discount,
         vat_summary_visible: draft.vat_summary_visible ?? true,
         field_visibility: draft.field_visibility ?? {},
         document: {
             ...draft.document,
+            discount_type: 'percent',
+            discount_value: discountPercent,
             discount_amount: discount,
             qr_payload: qr,
         },

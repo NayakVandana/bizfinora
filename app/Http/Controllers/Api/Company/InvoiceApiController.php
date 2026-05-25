@@ -7,9 +7,11 @@ use App\Models\Buyer;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Support\InvoiceCalculator;
+use App\Support\InvoiceDiscount;
 use App\Support\InvoiceTypes;
 use App\Support\InvoiceDocumentMapper;
 use App\Support\InvoicePresentation;
+use App\Support\TaxCalculator;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -280,12 +282,50 @@ class InvoiceApiController extends Controller
                 'qr_code_description' => ['nullable', 'string', 'max:500'],
                 'person_authorized_receive' => ['nullable', 'string', 'max:255'],
                 'person_authorized_issue' => ['nullable', 'string', 'max:255'],
+                'discount_type' => ['nullable', 'string', Rule::in(['percent'])],
+                'discount_value' => [
+                    'nullable',
+                    'numeric',
+                    'min:0',
+                    'max:'.InvoiceDiscount::PERCENT_MAX,
+                ],
                 'discount_amount' => ['nullable', 'numeric', 'min:0'],
                 'vat_summary_visible' => ['nullable', 'boolean'],
                 'field_visibility' => ['nullable', 'array'],
             ];
 
             $validation = Validator::make($request->all(), $rules);
+
+            $validation->after(function ($validator) use ($request) {
+                $document = $request->input('document', []);
+                $items = is_array($document['items'] ?? null) ? $document['items'] : [];
+                $lineGross = TaxCalculator::grossLineSubtotal($items);
+                $discountPercent = InvoiceDiscount::normalizePercent((float) (
+                    $request->input('discount_value')
+                    ?? $document['discount_value']
+                    ?? 0
+                ));
+
+                if ($discountPercent <= 0) {
+                    return;
+                }
+
+                if ($lineGross <= 0) {
+                    $validator->errors()->add(
+                        'discount_amount',
+                        'Add valid line items before applying a discount.',
+                    );
+
+                    return;
+                }
+
+                if ($discountPercent > InvoiceDiscount::PERCENT_MAX) {
+                    $validator->errors()->add(
+                        'discount_amount',
+                        'Discount cannot exceed '.InvoiceDiscount::PERCENT_MAX.'%.',
+                    );
+                }
+            });
 
             if ($validation->fails()) {
                 return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
@@ -295,7 +335,15 @@ class InvoiceApiController extends Controller
             $company = $request->attributes->get('company');
             $data = $validation->validated();
             $document = $data['document'];
-            $discount = (float) ($data['discount_amount'] ?? $document['discount_amount'] ?? 0);
+            $discountPercent = InvoiceDiscount::normalizePercent((float) (
+                $data['discount_value'] ?? $document['discount_value'] ?? 0
+            ));
+            $discount = InvoiceDiscount::resolveAmount(
+                $document['items'],
+                $discountPercent,
+            );
+            $document['discount_type'] = 'percent';
+            $document['discount_value'] = $discountPercent;
             $document['discount_amount'] = $discount;
             $document['qr_payload'] = $data['qr_code_data'] ?? $document['qr_payload'] ?? null;
 

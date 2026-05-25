@@ -2,7 +2,14 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import Accordion from './Accordion';
+import { grossLineSubtotal } from '../calculateTotals';
 import {
+    DISCOUNT_PERCENT_MAX,
+    readDiscountPercent,
+    resolveDiscountForDraft,
+} from '../discount';
+import {
+    getDiscountAmountError,
     invoiceFieldClass,
     invoiceItemErrorKey,
     type InvoiceFieldErrors,
@@ -12,7 +19,6 @@ import type { InvoiceDraft, InvoiceLineItem } from '../types';
 type Props = {
     draft: InvoiceDraft;
     onChange: (patch: Partial<InvoiceDraft>) => void;
-    onDocChange: (patch: Partial<InvoiceDraft['document']>) => void;
     onItemChange: (index: number, patch: Partial<InvoiceLineItem>) => void;
     onAddItem: () => void;
     onRemoveItem: (index: number) => void;
@@ -22,13 +28,46 @@ type Props = {
 export default function ItemsSection({
     draft,
     onChange,
-    onDocChange,
     onItemChange,
     onAddItem,
     onRemoveItem,
     errors = {},
 }: Props) {
     const showLineTax = draft.tax_per_line && draft.tax_type !== 'none';
+    const lineGross = grossLineSubtotal(draft.document);
+    const discountPercent = readDiscountPercent(draft);
+    const resolvedDiscount = resolveDiscountForDraft(draft);
+    const discountError =
+        errors.discount_amount ?? getDiscountAmountError(draft);
+
+    const applyDiscountPercent = (percent: number) => {
+        const capped = Math.min(
+            DISCOUNT_PERCENT_MAX,
+            Math.max(0, percent),
+        );
+        const resolved = resolveDiscountForDraft({
+            ...draft,
+            discount_type: 'percent',
+            discount_value: capped,
+            document: {
+                ...draft.document,
+                discount_type: 'percent',
+                discount_value: capped,
+            },
+        });
+
+        onChange({
+            discount_type: 'percent',
+            discount_value: capped,
+            discount_amount: resolved,
+            document: {
+                ...draft.document,
+                discount_type: 'percent',
+                discount_value: capped,
+                discount_amount: resolved,
+            },
+        });
+    };
 
     return (
         <Accordion title="Invoice items *" defaultOpen>
@@ -122,7 +161,7 @@ export default function ItemsSection({
                             step="0.01"
                             className={invoiceFieldClass(Boolean(rateError), 'w-full')}
                             placeholder="Rate *"
-                            value={item.unit_price}
+                            value={item.unit_price > 0 ? item.unit_price : ''}
                             required
                             aria-invalid={Boolean(rateError)}
                             onChange={(e) =>
@@ -163,20 +202,39 @@ export default function ItemsSection({
             );
             })}
 
-            <div className="sm:col-span-3">
-                <InputLabel value="Discount amount" />
+            <div
+                className="sm:col-span-3 space-y-2"
+                data-invoice-field="discount_amount"
+            >
+                <InputLabel
+                    value={`Discount (%) — max ${DISCOUNT_PERCENT_MAX}%`}
+                />
                 <TextInput
                     type="number"
                     min="0"
+                    max={DISCOUNT_PERCENT_MAX}
                     step="0.01"
-                    className="mt-1 block w-full"
-                    value={draft.discount_amount ?? 0}
+                    className={invoiceFieldClass(
+                        Boolean(discountError),
+                        'mt-1 block w-full',
+                    )}
+                    aria-invalid={Boolean(discountError)}
+                    placeholder="e.g. 10"
+                    value={discountPercent > 0 ? discountPercent : ''}
                     onChange={(e) => {
-                        const amount = Number(e.target.value);
-                        onChange({ discount_amount: amount });
-                        onDocChange({ discount_amount: amount });
+                        const raw = e.target.value;
+                        const value =
+                            raw === '' ? 0 : Math.max(0, Number(raw) || 0);
+                        applyDiscountPercent(value);
                     }}
                 />
+                {discountPercent > 0 && lineGross > 0 && !discountError ? (
+                    <p className="text-muted-foreground text-xs">
+                        Applied: ₹{resolvedDiscount.toFixed(2)} (
+                        {discountPercent}% of ₹{lineGross.toFixed(2)})
+                    </p>
+                ) : null}
+                <InputError message={discountError} className="mt-1" />
             </div>
         </Accordion>
     );

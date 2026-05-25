@@ -99,6 +99,8 @@ export function buildDefaultDraft(
         payment_method: '',
         header_notes: '',
         discount_amount: 0,
+        discount_type: 'percent',
+        discount_value: 0,
         vat_summary_visible: true,
         field_visibility: {
             seller_address: true,
@@ -135,6 +137,8 @@ export function buildDefaultDraft(
             logo_data_url: logoDataUrl ?? null,
             qr_payload: '',
             discount_amount: 0,
+            discount_type: 'percent',
+            discount_value: 0,
         },
     };
 
@@ -187,6 +191,10 @@ export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDra
             data.person_authorized_receive ?? '',
         ),
         person_authorized_issue: String(data.person_authorized_issue ?? ''),
+        discount_type: 'percent',
+        discount_value: Number(
+            data.discount_value ?? document.discount_value ?? 0,
+        ),
         discount_amount: Number(
             data.discount_amount ?? document.discount_amount ?? 0,
         ),
@@ -195,6 +203,10 @@ export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDra
             (data.field_visibility as InvoiceDraft['field_visibility']) ?? {},
         document: {
             ...document,
+            discount_type: 'percent',
+            discount_value: Number(
+                data.discount_value ?? document.discount_value ?? 0,
+            ),
             discount_amount: Number(
                 data.discount_amount ?? document.discount_amount ?? 0,
             ),

@@ -5,6 +5,22 @@ namespace App\Support;
 class TaxCalculator
 {
     /**
+     * @param  list<array{quantity?: float|int, unit_price?: float|int}>  $items
+     */
+    public static function grossLineSubtotal(array $items): float
+    {
+        $sum = 0.0;
+
+        foreach ($items as $item) {
+            $qty = max(0, (float) ($item['quantity'] ?? 0));
+            $price = max(0, (float) ($item['unit_price'] ?? 0));
+            $sum += round($qty * $price, 2);
+        }
+
+        return round($sum, 2);
+    }
+
+    /**
      * @param  list<array{quantity: float|int, unit_price: float|int, tax_rate?: float|int|null}>  $items
      * @return array{
      *   subtotal: float,
@@ -64,27 +80,40 @@ class TaxCalculator
             $lineTaxes[] = $tax;
         }
 
-        $subtotal = round(array_sum($lineNetExTax), 2);
-        $taxAmount = round(array_sum($lineTaxes), 2);
+        $grossSubtotal = round(array_sum($lineTotals), 2);
+        $preDiscountNet = round(array_sum($lineNetExTax), 2);
+        $preDiscountTax = round(array_sum($lineTaxes), 2);
+        $appliedDiscount = min($discountAmount, $grossSubtotal);
+        $taxAmount = $preDiscountTax;
+        $subtotal = $grossSubtotal;
 
         if (! $taxPerLine && $taxType !== 'none' && $invoiceTaxRate > 0) {
-            $grossSubtotal = round(array_sum($lineTotals), 2);
-            $taxable = max(0, round($grossSubtotal - $discountAmount, 2));
+            $taxableGross = max(0, round($grossSubtotal - $appliedDiscount, 2));
 
             if ($calculationMode === 'inclusive') {
-                $taxAmount = round($taxable * ($invoiceTaxRate / (100 + $invoiceTaxRate)), 2);
-                $subtotal = round($taxable - $taxAmount, 2);
+                $taxAmount = round($taxableGross * ($invoiceTaxRate / (100 + $invoiceTaxRate)), 2);
+                $total = $taxableGross;
             } else {
-                $subtotal = $taxable;
-                $taxAmount = round($taxable * ($invoiceTaxRate / 100), 2);
+                $taxAmount = round($taxableGross * ($invoiceTaxRate / 100), 2);
+                $total = round($taxableGross + $taxAmount, 2);
             }
-        } elseif ($discountAmount > 0 && $subtotal > 0) {
-            $ratio = max(0, ($subtotal - min($discountAmount, $subtotal)) / $subtotal);
-            $subtotal = round($subtotal - min($discountAmount, $subtotal), 2);
-            $taxAmount = round($taxAmount * $ratio, 2);
-        }
+        } elseif ($appliedDiscount > 0 && $grossSubtotal > 0) {
+            $ratio = ($grossSubtotal - $appliedDiscount) / $grossSubtotal;
+            $taxAmount = round($preDiscountTax * $ratio, 2);
 
-        $total = round($subtotal + $taxAmount, 2);
+            if ($calculationMode === 'inclusive') {
+                $total = round($grossSubtotal - $appliedDiscount, 2);
+            } else {
+                $netAfter = round($preDiscountNet - min($appliedDiscount, $preDiscountNet), 2);
+                $total = round($netAfter + $taxAmount, 2);
+            }
+        } else {
+            if ($calculationMode === 'inclusive' && $taxType !== 'none') {
+                $total = $grossSubtotal;
+            } else {
+                $total = round($preDiscountNet + $preDiscountTax, 2);
+            }
+        }
 
         $taxBreakdown = self::buildBreakdown($items, $lineNetExTax, $lineTaxes, $taxPerLine, $invoiceTaxRate, $taxLabel, $taxType);
 
@@ -92,7 +121,7 @@ class TaxCalculator
             'subtotal' => $subtotal,
             'tax_amount' => $taxAmount,
             'total' => $total,
-            'discount_amount' => $discountAmount,
+            'discount_amount' => $appliedDiscount,
             'line_totals' => $lineTotals,
             'tax_breakdown' => $taxBreakdown,
         ];

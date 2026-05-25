@@ -81,6 +81,8 @@ class InvoicePresentation
             'person_authorized_receive' => $invoice->person_authorized_receive,
             'person_authorized_issue' => $invoice->person_authorized_issue,
             'discount_amount' => (float) $invoice->discount_amount,
+            'discount_type' => 'percent',
+            'discount_value' => (float) ($document['discount_value'] ?? 0),
             'vat_summary_visible' => (bool) $invoice->vat_summary_visible,
             'field_visibility' => $invoice->field_visibility ?? [],
             'subtotal' => (float) $invoice->subtotal,
@@ -95,6 +97,8 @@ class InvoicePresentation
                 'logo_data_url' => $document['logo_data_url'] ?? null,
                 'qr_payload' => $invoice->qr_code_data,
                 'discount_amount' => (float) $invoice->discount_amount,
+                'discount_type' => 'percent',
+                'discount_value' => (float) ($document['discount_value'] ?? 0),
             ], $document),
             'line_items' => $invoice->relationLoaded('lineItems')
                 ? $invoice->lineItems->map(fn ($row) => [

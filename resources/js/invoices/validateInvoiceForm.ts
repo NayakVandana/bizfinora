@@ -1,3 +1,8 @@
+import { grossLineSubtotal } from './calculateTotals';
+import {
+    DISCOUNT_PERCENT_MAX,
+    readDiscountPercent,
+} from './discount';
 import type { InvoiceDraft } from './types';
 
 export type InvoiceFieldErrors = Record<string, string>;
@@ -22,6 +27,7 @@ export function scrollToFirstInvoiceError(errors: InvoiceFieldErrors): void {
         'invoice_date',
         'buyer_id',
         'items',
+        'discount_amount',
     ];
 
     for (const key of order) {
@@ -41,6 +47,25 @@ export function scrollToFirstInvoiceError(errors: InvoiceFieldErrors): void {
     }
 }
 
+export function getDiscountAmountError(draft: InvoiceDraft): string | null {
+    const lineGross = grossLineSubtotal(draft.document);
+    const percent = readDiscountPercent(draft);
+
+    if (percent <= 0) {
+        return null;
+    }
+
+    if (lineGross <= 0) {
+        return 'Add valid line items before applying a discount.';
+    }
+
+    if (percent > DISCOUNT_PERCENT_MAX) {
+        return `Discount cannot exceed ${DISCOUNT_PERCENT_MAX}%.`;
+    }
+
+    return null;
+}
+
 export function validateInvoiceForm(draft: InvoiceDraft): InvoiceFieldErrors {
     const errors: InvoiceFieldErrors = {};
 
@@ -58,6 +83,11 @@ export function validateInvoiceForm(draft: InvoiceDraft): InvoiceFieldErrors {
 
     if (!draft.document.items.length) {
         errors.items = 'Add at least one line item.';
+    }
+
+    const discountError = getDiscountAmountError(draft);
+    if (discountError) {
+        errors.discount_amount = discountError;
     }
 
     draft.document.items.forEach((item, index) => {
@@ -114,6 +144,15 @@ export function clearResolvedInvoiceErrors(
         delete next.items;
     }
 
+    if (!getDiscountAmountError(draft)) {
+        delete next.discount_amount;
+    } else {
+        const discountError = getDiscountAmountError(draft);
+        if (discountError) {
+            next.discount_amount = discountError;
+        }
+    }
+
     draft.document.items.forEach((item, index) => {
         if (item.description.trim()) {
             delete next[invoiceItemErrorKey(index, 'description')];
@@ -125,6 +164,21 @@ export function clearResolvedInvoiceErrors(
             delete next[invoiceItemErrorKey(index, 'unit_price')];
         }
     });
+
+    return next;
+}
+
+/** Keep save-time errors; add or refresh live discount validation while editing. */
+export function syncLiveInvoiceErrors(
+    draft: InvoiceDraft,
+    errors: InvoiceFieldErrors,
+): InvoiceFieldErrors {
+    const next = clearResolvedInvoiceErrors(draft, errors);
+    const discountError = getDiscountAmountError(draft);
+
+    if (discountError) {
+        next.discount_amount = discountError;
+    }
 
     return next;
 }
@@ -146,6 +200,7 @@ export function mapInvoiceApiErrors(data: unknown): InvoiceFieldErrors {
         'tax_type',
         'document',
         'document.items',
+        'discount_amount',
     ];
 
     for (const key of topLevelKeys) {

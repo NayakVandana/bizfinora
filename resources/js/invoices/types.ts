@@ -1,6 +1,7 @@
 export type InvoiceTemplate = 'stripe' | 'classic';
 export type TaxType = 'none' | 'vat' | 'gst' | 'sales_tax' | 'custom';
 export type TaxCalculationMode = 'exclusive' | 'inclusive';
+export type DiscountType = 'percent';
 
 export type TaxBreakdownRow = {
     rate: number;
@@ -53,6 +54,8 @@ export interface InvoiceDocument {
     qr_payload?: string | null;
     qr_data_url?: string | null;
     discount_amount?: number;
+    discount_type?: DiscountType;
+    discount_value?: number;
 }
 
 export interface InvoiceDraft {
@@ -83,6 +86,8 @@ export interface InvoiceDraft {
     person_authorized_receive?: string;
     person_authorized_issue?: string;
     discount_amount?: number;
+    discount_type?: DiscountType;
+    discount_value?: number;
     vat_summary_visible?: boolean;
     field_visibility?: FieldVisibility;
     document: InvoiceDocument;
@@ -93,6 +98,8 @@ export interface InvoiceTotals {
     tax_amount: number;
     total: number;
     discount_amount: number;
+    discount_type?: DiscountType;
+    discount_percent?: number;
     tax_breakdown?: TaxBreakdownRow[];
 }
 

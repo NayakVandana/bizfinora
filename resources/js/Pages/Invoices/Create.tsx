@@ -5,6 +5,7 @@ import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
 import {
     clearResolvedInvoiceErrors,
     scrollToFirstInvoiceError,
+    syncLiveInvoiceErrors,
     type InvoiceFieldErrors,
 } from '@/invoices/validateInvoiceForm';
 import {
@@ -75,7 +76,7 @@ export default function InvoicesCreate() {
 
     const handleChange = (next: InvoiceDraft) => {
         setDraft(next);
-        setErrors((prev) => clearResolvedInvoiceErrors(next, prev));
+        setErrors((prev) => syncLiveInvoiceErrors(next, prev));
     };
 
     const save = async () => {

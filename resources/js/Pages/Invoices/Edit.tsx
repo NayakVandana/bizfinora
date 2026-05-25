@@ -5,8 +5,8 @@ import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
 import {
-    clearResolvedInvoiceErrors,
     scrollToFirstInvoiceError,
+    syncLiveInvoiceErrors,
     type InvoiceFieldErrors,
 } from '@/invoices/validateInvoiceForm';
 import type { InvoiceDraft } from '@/invoices/types';
@@ -104,7 +104,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                             onChange={(next) => {
                                 setDraft(next);
                                 setErrors((prev) =>
-                                    clearResolvedInvoiceErrors(next, prev),
+                                    syncLiveInvoiceErrors(next, prev),
                                 );
                             }}
                             onSave={() => void save()}

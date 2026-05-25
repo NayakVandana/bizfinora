@@ -1,3 +1,4 @@
+import { readDiscountPercent, resolveDiscountForDraft } from './discount';
 import type {
     InvoiceDocument,
     InvoiceDraft,
@@ -6,15 +7,34 @@ import type {
 } from './types';
 
 export function calculateTotalsForDraft(draft: InvoiceDraft): InvoiceTotals {
-    return calculateTotals(
+    const discountPercent = readDiscountPercent(draft);
+    const totals = calculateTotals(
         draft.document,
         draft.tax_rate,
         draft.tax_type,
-        draft.discount_amount ?? draft.document.discount_amount ?? 0,
+        resolveDiscountForDraft(draft),
         draft.tax_calculation_mode ?? 'exclusive',
         draft.tax_per_line ?? false,
         draft.tax_label,
     );
+
+    return {
+        ...totals,
+        discount_type: 'percent',
+        discount_percent:
+            discountPercent > 0 ? discountPercent : undefined,
+    };
+}
+
+export function grossLineSubtotal(document: InvoiceDocument): number {
+    return Math.round(
+        document.items.reduce((sum, item) => {
+            const qty = Math.max(0, Number(item.quantity) || 0);
+            const price = Math.max(0, Number(item.unit_price) || 0);
+
+            return sum + qty * price;
+        }, 0) * 100,
+    ) / 100;
 }
 
 export function calculateTotals(
@@ -60,54 +80,120 @@ export function calculateTotals(
         }
     }
 
-    let subtotal = Math.round(lineNetExTax.reduce((a, b) => a + b, 0) * 100) / 100;
-    let tax_amount = Math.round(lineTaxes.reduce((a, b) => a + b, 0) * 100) / 100;
+    const grossSubtotal =
+        Math.round(lineTotals.reduce((a, b) => a + b, 0) * 100) / 100;
+    const preDiscountNet =
+        Math.round(lineNetExTax.reduce((a, b) => a + b, 0) * 100) / 100;
+    const preDiscountTax =
+        Math.round(lineTaxes.reduce((a, b) => a + b, 0) * 100) / 100;
 
-    if (!taxPerLine && taxType !== 'none' && effectiveRate > 0) {
-        const grossSubtotal =
-            Math.round(lineTotals.reduce((a, b) => a + b, 0) * 100) / 100;
-        const taxable = Math.max(
+    let appliedDiscount = Math.min(discount, grossSubtotal);
+    let tax_amount = preDiscountTax;
+    let total = 0;
+    let tax_breakdown: TaxBreakdownRow[] = [];
+
+    const invoiceLevelTax =
+        !taxPerLine && taxType !== 'none' && effectiveRate > 0;
+
+    if (invoiceLevelTax) {
+        const taxableGross = Math.max(
             0,
-            Math.round((grossSubtotal - discount) * 100) / 100,
+            Math.round((grossSubtotal - appliedDiscount) * 100) / 100,
         );
 
         if (calculationMode === 'inclusive') {
             tax_amount =
                 Math.round(
-                    taxable * (effectiveRate / (100 + effectiveRate)) * 100,
+                    taxableGross * (effectiveRate / (100 + effectiveRate)) * 100,
                 ) / 100;
-            subtotal = Math.round((taxable - tax_amount) * 100) / 100;
+            total = taxableGross;
         } else {
-            subtotal = taxable;
             tax_amount =
-                Math.round(taxable * (effectiveRate / 100) * 100) / 100;
+                Math.round(taxableGross * (effectiveRate / 100) * 100) / 100;
+            total = Math.round((taxableGross + tax_amount) * 100) / 100;
         }
-    } else if (discount > 0 && subtotal > 0) {
-        const applied = Math.min(discount, subtotal);
-        const ratio = (subtotal - applied) / subtotal;
-        subtotal = Math.round((subtotal - applied) * 100) / 100;
-        tax_amount = Math.round(tax_amount * ratio * 100) / 100;
+
+        tax_breakdown = buildInvoiceLevelTaxBreakdown(
+            taxableGross,
+            tax_amount,
+            effectiveRate,
+            taxLabel,
+            calculationMode,
+        );
+    } else if (appliedDiscount > 0 && grossSubtotal > 0) {
+        const ratio = (grossSubtotal - appliedDiscount) / grossSubtotal;
+        tax_amount = Math.round(preDiscountTax * ratio * 100) / 100;
+
+        if (calculationMode === 'inclusive') {
+            total = Math.round((grossSubtotal - appliedDiscount) * 100) / 100;
+        } else {
+            const netAfter =
+                Math.round((preDiscountNet - Math.min(appliedDiscount, preDiscountNet)) * 100) /
+                100;
+            total = Math.round((netAfter + tax_amount) * 100) / 100;
+        }
+
+        tax_breakdown = buildTaxBreakdown(
+            document.items,
+            lineNetExTax,
+            lineTaxes,
+            taxPerLine,
+            effectiveRate,
+            taxLabel,
+            taxType,
+            ratio,
+        );
+    } else {
+        if (calculationMode === 'inclusive' && taxType !== 'none') {
+            total = grossSubtotal;
+        } else {
+            total = Math.round((preDiscountNet + preDiscountTax) * 100) / 100;
+        }
+
+        tax_breakdown = buildTaxBreakdown(
+            document.items,
+            lineNetExTax,
+            lineTaxes,
+            taxPerLine,
+            effectiveRate,
+            taxLabel,
+            taxType,
+        );
     }
 
-    const total = Math.round((subtotal + tax_amount) * 100) / 100;
-
-    const tax_breakdown = buildTaxBreakdown(
-        document.items,
-        lineNetExTax,
-        lineTaxes,
-        taxPerLine,
-        effectiveRate,
-        taxLabel,
-        taxType,
-    );
-
     return {
-        subtotal,
+        subtotal: grossSubtotal,
         tax_amount,
         total,
-        discount_amount: discount,
+        discount_amount: appliedDiscount,
         tax_breakdown,
     };
+}
+
+function buildInvoiceLevelTaxBreakdown(
+    taxableGross: number,
+    taxAmount: number,
+    rate: number,
+    taxLabel: string,
+    calculationMode: InvoiceDraft['tax_calculation_mode'],
+): TaxBreakdownRow[] {
+    if (taxAmount <= 0) {
+        return [];
+    }
+
+    const taxableBase =
+        calculationMode === 'inclusive'
+            ? Math.round((taxableGross - taxAmount) * 100) / 100
+            : taxableGross;
+
+    return [
+        {
+            rate,
+            label: taxLabel,
+            taxable: taxableBase,
+            tax: taxAmount,
+        },
+    ];
 }
 
 function buildTaxBreakdown(
@@ -118,6 +204,7 @@ function buildTaxBreakdown(
     invoiceTaxRate: number,
     taxLabel: string,
     taxType: InvoiceDraft['tax_type'],
+    scale = 1,
 ): TaxBreakdownRow[] {
     if (taxType === 'none') {
         return [];
@@ -126,7 +213,7 @@ function buildTaxBreakdown(
     const groups: Record<string, TaxBreakdownRow> = {};
 
     items.forEach((item, index) => {
-        const tax = lineTaxes[index] ?? 0;
+        const tax = Math.round((lineTaxes[index] ?? 0) * scale * 100) / 100;
         if (tax <= 0) {
             return;
         }
@@ -141,7 +228,9 @@ function buildTaxBreakdown(
             groups[key] = { rate, label: taxLabel, taxable: 0, tax: 0 };
         }
 
-        groups[key].taxable += lineNetExTax[index] ?? 0;
+        const taxable =
+            Math.round((lineNetExTax[index] ?? 0) * scale * 100) / 100;
+        groups[key].taxable += taxable;
         groups[key].tax += tax;
     });
 

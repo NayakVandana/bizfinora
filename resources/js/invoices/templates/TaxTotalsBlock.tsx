@@ -31,7 +31,12 @@ export function TaxTotalsBlock({
                         marginTop: 4,
                     }}
                 >
-                    <Text>Discount</Text>
+                    <Text>
+                        Discount
+                        {totals.discount_percent != null
+                            ? ` (${totals.discount_percent}%)`
+                            : ''}
+                    </Text>
                     <Text>-{formatMoney(totals.discount_amount, draft.currency)}</Text>
                 </View>
             ) : null}
