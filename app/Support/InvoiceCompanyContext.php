@@ -14,6 +14,14 @@ class InvoiceCompanyContext
         'payment_qr',
         'payment_terms',
         'terms_and_conditions',
+        'authorized_signature',
+    ];
+
+    /** Invoice columns always loaded from company settings, not saved from client. */
+    public const INVOICE_PAYLOAD_KEYS = [
+        'person_authorized_issue',
+        'person_authorized_receive',
+        'authorized_signature_data_url',
     ];
 
     /**
@@ -38,17 +46,23 @@ class InvoiceCompanyContext
         foreach (array_merge(
             PaymentSettings::defaultFieldVisibility($company),
             TermsAndConditionsSettings::defaultFieldVisibility($company),
+            AuthorizedSignatureSettings::defaultFieldVisibility($company),
         ) as $key => $value) {
             $visibility[$key] = $value;
         }
 
         $payload['document'] = $document;
         $payload['field_visibility'] = $visibility;
+        $payload['person_authorized_issue'] = null;
+        $payload['person_authorized_receive'] = null;
+        $payload['authorized_signature_data_url'] = null;
         $payload['payment_settings'] = PaymentSettings::fromCompany($company);
         $payload['payment_defaults'] = PaymentSettings::paymentDocumentFromCompany($company);
         $payload['payment_field_visibility'] = PaymentSettings::defaultFieldVisibility($company);
         $payload['terms_settings'] = TermsAndConditionsSettings::fromCompany($company);
         $payload['terms_field_visibility'] = TermsAndConditionsSettings::defaultFieldVisibility($company);
+        $payload['signature_settings'] = AuthorizedSignatureSettings::fromCompany($company);
+        $payload['signature_field_visibility'] = AuthorizedSignatureSettings::defaultFieldVisibility($company);
 
         return $payload;
     }
@@ -77,5 +91,18 @@ class InvoiceCompanyContext
         }
 
         return $visibility;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function stripInvoicePayload(array $data): array
+    {
+        foreach (self::INVOICE_PAYLOAD_KEYS as $key) {
+            $data[$key] = null;
+        }
+
+        return $data;
     }
 }

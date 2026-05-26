@@ -14,6 +14,7 @@ Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(
     Route::post('/company/company-tax-settings-update', [CompanyContextApiController::class, 'postCompanyTaxSettingsUpdate']);
     Route::post('/company/company-payment-settings-update', [CompanyContextApiController::class, 'postCompanyPaymentSettingsUpdate']);
     Route::post('/company/company-terms-settings-update', [CompanyContextApiController::class, 'postCompanyTermsSettingsUpdate']);
+    Route::post('/company/company-signature-settings-update', [CompanyContextApiController::class, 'postCompanySignatureSettingsUpdate']);
     Route::post('/company/company-template-settings-update', [CompanyContextApiController::class, 'postCompanyTemplateSettingsUpdate']);
 
     Route::post('/dashboard/dashboard-summary', [DashboardApiController::class, 'postDashboardSummary']);

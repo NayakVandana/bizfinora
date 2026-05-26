@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Company;
 use App\Models\Invoice;
+use App\Support\AuthorizedSignatureSettings;
 use App\Support\InvoiceCalculator;
 use App\Support\InvoiceCompanyContext;
 use App\Support\InvoiceDiscount;
@@ -164,6 +165,8 @@ class InvoiceApiController extends Controller
                 'default_payment_terms' => $company->default_payment_terms,
                 'terms_settings' => TermsAndConditionsSettings::fromCompany($company),
                 'terms_field_visibility' => TermsAndConditionsSettings::defaultFieldVisibility($company),
+                'signature_settings' => AuthorizedSignatureSettings::fromCompany($company),
+                'signature_field_visibility' => AuthorizedSignatureSettings::defaultFieldVisibility($company),
                 'payment_terms_presets' => PaymentTerms::presets(),
             ], 200);
         } catch (Exception $e) {
@@ -349,6 +352,7 @@ class InvoiceApiController extends Controller
             $data['field_visibility'] = InvoiceCompanyContext::stripVisibility(
                 $data['field_visibility'] ?? [],
             );
+            $data = InvoiceCompanyContext::stripInvoicePayload($data);
             $discountPercent = InvoiceDiscount::normalizePercent((float) (
                 $data['discount_value'] ?? $document['discount_value'] ?? 0
             ));

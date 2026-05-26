@@ -13,6 +13,7 @@ import { isPartyFieldVisible, showPartyLogo } from '../partyPdfLines';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceLineItem, InvoiceTotals } from '../types';
 import { isTermsAndConditionsVisible } from '../termsSettings';
+import { SignatureBlockPdf } from './SignatureBlockPdf';
 import { PartyBlock } from './shared';
 import { PaymentBlockPdf } from './PaymentBlockPdf';
 import { TaxTotalsBlock } from './TaxTotalsBlock';
@@ -334,6 +335,8 @@ export function UnifiedInvoicePdf({
         <PaymentBlockPdf draft={draft} totals={totals} />
     );
 
+    const signatureBlock = <SignatureBlockPdf draft={draft} />;
+
     const footerNotes = (
         <View style={s.footer}>
             {isTermsAndConditionsVisible(visibility) &&
@@ -408,6 +411,7 @@ export function UnifiedInvoicePdf({
                         {totalsBlock}
                         {paymentBlock}
                         {footerNotes}
+                        {signatureBlock}
                     </View>
                 </Page>
             </Document>
@@ -477,6 +481,7 @@ export function UnifiedInvoicePdf({
                     {totalsBlock}
                     {paymentBlock}
                     {footerNotes}
+                    {signatureBlock}
                 </Page>
             </Document>
         );
@@ -516,6 +521,7 @@ export function UnifiedInvoicePdf({
                         {totalsBlock}
                         {paymentBlock}
                         {footerNotes}
+                        {signatureBlock}
                     </View>
                 </Page>
             </Document>
@@ -541,6 +547,7 @@ export function UnifiedInvoicePdf({
                         {parties}
                         {items}
                         {footerNotes}
+                        {signatureBlock}
                     </View>
                 </Page>
             </Document>
@@ -590,6 +597,7 @@ export function UnifiedInvoicePdf({
                     {totalsBlock}
                     {paymentBlock}
                     {footerNotes}
+                    {signatureBlock}
                 </Page>
             </Document>
         );
@@ -638,6 +646,7 @@ export function UnifiedInvoicePdf({
                     {totalsBlock}
                     {paymentBlock}
                     {footerNotes}
+                    {signatureBlock}
                 </View>
             </Page>
         </Document>

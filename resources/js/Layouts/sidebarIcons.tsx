@@ -10,6 +10,7 @@ export type SidebarIconName =
     | 'tax'
     | 'payment'
     | 'terms'
+    | 'signature'
     | 'user'
     | 'key'
     | 'palette'
@@ -75,6 +76,12 @@ const paths: Record<SidebarIconName, JSX.Element> = {
         <>
             <path d="M6 4h12v16H6z" />
             <path d="M9 8h6M9 12h6M9 16h4" />
+        </>
+    ),
+    signature: (
+        <>
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
         </>
     ),
     user: (

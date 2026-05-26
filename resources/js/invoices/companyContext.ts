@@ -7,6 +7,11 @@ import {
     PAYMENT_VISIBILITY_TERMS,
     type CompanyPaymentSettings,
 } from './paymentTypes';
+import {
+    mergeSignatureVisibilityIntoDraft,
+    SIGNATURE_VISIBILITY,
+    type CompanySignatureSettings,
+} from './signatureSettings';
 import type { InvoiceDraft, InvoicePaymentDetails } from './types';
 import {
     mergeTermsAndConditionsIntoDraft,
@@ -21,6 +26,8 @@ export type InvoiceCompanyContext = {
     payment_field_visibility?: Record<string, boolean> | null;
     terms_settings?: CompanyTermsSettings | null;
     terms_field_visibility?: Record<string, boolean> | null;
+    signature_settings?: CompanySignatureSettings | null;
+    signature_field_visibility?: Record<string, boolean> | null;
 };
 
 export const COMPANY_DERIVED_VISIBILITY_KEYS = [
@@ -28,9 +35,10 @@ export const COMPANY_DERIVED_VISIBILITY_KEYS = [
     PAYMENT_VISIBILITY_QR,
     PAYMENT_VISIBILITY_TERMS,
     TERMS_VISIBILITY,
+    SIGNATURE_VISIBILITY,
 ] as const;
 
-/** Always overlay payment & terms from company settings (not stored on invoice). */
+/** Always overlay payment, terms & signature from company settings (not stored on invoice). */
 export function mergeCompanyContextIntoDraft(
     draft: InvoiceDraft,
     context?: InvoiceCompanyContext | null,
@@ -60,6 +68,11 @@ export function mergeCompanyContextIntoDraft(
         next,
         context.terms_field_visibility,
         context.terms_settings,
+    );
+    next = mergeSignatureVisibilityIntoDraft(
+        next,
+        context.signature_field_visibility,
+        context.signature_settings,
     );
 
     return next;
@@ -109,6 +122,11 @@ export function companyContextFromMeta(
         >,
         terms_settings: data.terms_settings as CompanyTermsSettings,
         terms_field_visibility: data.terms_field_visibility as Record<
+            string,
+            boolean
+        >,
+        signature_settings: data.signature_settings as CompanySignatureSettings,
+        signature_field_visibility: data.signature_field_visibility as Record<
             string,
             boolean
         >,

@@ -11,6 +11,7 @@ import TaxSettingsSection from './sections/TaxSettingsSection';
 import type { CompanyTaxSettings } from './taxPresets';
 import PaymentNotesSection from './sections/PaymentNotesSection';
 import TermsAndConditionsSection from './sections/TermsAndConditionsSection';
+import AuthorizedSignatureSection from './sections/AuthorizedSignatureSection';
 import SellerSection from './sections/SellerSection';
 import { buyerToDocumentParty } from './sections/BuyerSection';
 import { emptyParty } from './defaultDraft';
@@ -196,6 +197,11 @@ export default function InvoiceBuilder({
                     onCompanyContextChange={onCompanyContextChange ?? (() => {})}
                 />
                 <TermsAndConditionsSection
+                    draft={draft}
+                    companyContext={companyContext ?? {}}
+                    onCompanyContextChange={onCompanyContextChange ?? (() => {})}
+                />
+                <AuthorizedSignatureSection
                     draft={draft}
                     companyContext={companyContext ?? {}}
                     onCompanyContextChange={onCompanyContextChange ?? (() => {})}

@@ -98,6 +98,13 @@ export function sidebarNavSections(): NavSection[] {
                     icon: 'terms',
                     isActive: () => Boolean(route().current('settings.terms')),
                 },
+                {
+                    href: route('settings.signature'),
+                    label: 'Signature',
+                    icon: 'signature',
+                    isActive: () =>
+                        Boolean(route().current('settings.signature')),
+                },
             ],
         },
         {

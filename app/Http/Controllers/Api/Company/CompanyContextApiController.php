@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Company;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Support\AuthorizedSignatureSettings;
 use App\Support\CompanyMembership;
 use App\Support\CompanyPresentation;
 use App\Support\CompanyProfileValidation;
@@ -230,6 +231,44 @@ class CompanyContextApiController extends Controller
                 true,
                 'Terms and conditions saved successfully.',
                 TermsAndConditionsSettings::fromCompany($company->fresh()),
+                200,
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postCompanySignatureSettingsUpdate(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'default_show_authorized_signature_on_invoice' => ['nullable', 'boolean'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+            $user = $request->user();
+            $membership = $user->companies()->where('companies.id', $company->id)->first();
+
+            if ($membership === null || $membership->pivot->role !== CompanyMembership::ROLE_OWNER) {
+                return $this->sendJsonResponse(false, 'Only company owners can update authorised signature settings.', null, 200);
+            }
+
+            $company->update(
+                AuthorizedSignatureSettings::prepareUpdatePayload(
+                    $request,
+                    $validation->validated(),
+                ),
+            );
+
+            return $this->sendJsonResponse(
+                true,
+                'Authorised signature settings saved successfully.',
+                AuthorizedSignatureSettings::fromCompany($company->fresh()),
                 200,
             );
         } catch (Exception $e) {

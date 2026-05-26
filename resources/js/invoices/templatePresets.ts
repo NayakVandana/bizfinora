@@ -5,6 +5,7 @@ import {
     PAYMENT_VISIBILITY_TERMS,
 } from './paymentTypes';
 import { TERMS_VISIBILITY } from './termsSettings';
+import { SIGNATURE_VISIBILITY } from './signatureSettings';
 import type { InvoiceTemplate } from './types';
 import type {
     FieldVisibility,
@@ -124,6 +125,10 @@ export function applyTemplatePresetToDraft(
             [TERMS_VISIBILITY]:
                 draft.field_visibility?.[TERMS_VISIBILITY] ??
                 preset.field_visibility?.[TERMS_VISIBILITY] ??
+                true,
+            [SIGNATURE_VISIBILITY]:
+                draft.field_visibility?.[SIGNATURE_VISIBILITY] ??
+                preset.field_visibility?.[SIGNATURE_VISIBILITY] ??
                 true,
         },
         document: {

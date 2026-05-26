@@ -38,6 +38,7 @@ class CompanyPresentation
             'default_payment_terms' => $company->default_payment_terms,
             'default_terms_and_conditions' => $company->default_terms_and_conditions,
             'default_show_terms_on_invoice' => TermsAndConditionsSettings::termsDefaultOn($company),
+            'default_show_authorized_signature_on_invoice' => AuthorizedSignatureSettings::defaultOn($company),
             'default_show_payment_on_invoice' => (bool) ($company->default_show_payment_on_invoice ?? true),
             'default_show_bank_details_on_invoice' => PaymentSettings::bankDefaultOn($company),
             'default_show_qr_on_invoice' => PaymentSettings::qrDefaultOn($company),

@@ -96,6 +96,7 @@ export interface InvoiceDraft {
     qr_code_description?: string;
     person_authorized_receive?: string;
     person_authorized_issue?: string;
+    authorized_signature_data_url?: string | null;
     discount_amount?: number;
     discount_type?: DiscountType;
     discount_value?: number;
