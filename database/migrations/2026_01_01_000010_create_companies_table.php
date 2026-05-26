@@ -32,8 +32,6 @@ return new class extends Migration
             $table->text('default_payment_terms')->nullable();
             $table->text('default_terms_and_conditions')->nullable();
             $table->boolean('default_show_terms_on_invoice')->default(true);
-            $table->string('default_authorized_signatory')->nullable();
-            $table->longText('authorized_signature_data_url')->nullable();
             $table->boolean('default_show_authorized_signature_on_invoice')->default(true);
             $table->boolean('default_show_payment_on_invoice')->default(true);
             $table->boolean('default_show_bank_details_on_invoice')->default(true);

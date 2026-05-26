@@ -21,7 +21,6 @@ class InvoiceCompanyContext
     public const INVOICE_PAYLOAD_KEYS = [
         'person_authorized_issue',
         'person_authorized_receive',
-        'authorized_signature_data_url',
     ];
 
     /**
@@ -55,7 +54,6 @@ class InvoiceCompanyContext
         $payload['field_visibility'] = $visibility;
         $payload['person_authorized_issue'] = null;
         $payload['person_authorized_receive'] = null;
-        $payload['authorized_signature_data_url'] = null;
         $payload['payment_settings'] = PaymentSettings::fromCompany($company);
         $payload['payment_defaults'] = PaymentSettings::paymentDocumentFromCompany($company);
         $payload['payment_field_visibility'] = PaymentSettings::defaultFieldVisibility($company);

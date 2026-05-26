@@ -38,7 +38,6 @@ export function serializeInvoiceDraft(draft: InvoiceDraft): Record<string, unkno
         qr_code_description: draft.qr_code_description ?? null,
         person_authorized_receive: null,
         person_authorized_issue: null,
-        authorized_signature_data_url: null,
         discount_type: 'percent',
         discount_value: discountPercent,
         discount_amount: discount,
