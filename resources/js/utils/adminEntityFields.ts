@@ -5,6 +5,7 @@ import {
     adminTextField,
 } from '@/Components/admin/AdminDetailPanel';
 import type {
+    AdminBuyerDetail,
     AdminCompanyDetail,
     AdminUserCompany,
     AdminUserDetail,
@@ -211,6 +212,58 @@ export function companyFullProfileFields(
             company.default_custom_template_id,
         ),
         adminTextField('Seller notes', company.seller_notes, {
+            multiline: true,
+            fullWidth: true,
+        }),
+    ];
+}
+
+function buyerDisplayName(buyer: AdminBuyerDetail): string {
+    return buyer.company_name?.trim() || buyer.name;
+}
+
+export function buyerProfileFields(buyer: AdminBuyerDetail): AdminDetailField[] {
+    return [
+        adminTextField('ID', buyer.id),
+        adminTextField('Company name', buyerDisplayName(buyer)),
+        adminTextField('Owner / contact', buyer.name),
+        adminTextField('Email', buyer.email),
+        adminTextField('Mobile', buyer.phone),
+        adminTextField('Company', buyer.company?.name),
+        adminTextField('Company slug', buyer.company?.slug),
+        adminDateField('Created', buyer.created_at),
+        adminDateField('Updated', buyer.updated_at),
+    ];
+}
+
+export function buyerTaxFields(buyer: AdminBuyerDetail): AdminDetailField[] {
+    return [
+        adminTextField('Tax ID label', buyer.tax_id_label),
+        adminTextField('GSTIN', buyer.gst ?? buyer.tax_id),
+        adminTextField('PAN', buyer.pan),
+    ];
+}
+
+export function buyerAddressFields(buyer: AdminBuyerDetail): AdminDetailField[] {
+    return [
+        adminTextField('Address', buyer.address, {
+            multiline: true,
+            fullWidth: true,
+        }),
+        adminTextField('Address line 1', buyer.address_line1),
+        adminTextField('Address line 2', buyer.address_line2),
+        adminTextField('City', buyer.city),
+        adminTextField('State', buyer.state),
+        adminTextField('Postal code', buyer.postal_code),
+        adminTextField('Country', buyer.country),
+    ];
+}
+
+export function buyerOtherFields(buyer: AdminBuyerDetail): AdminDetailField[] {
+    return [
+        adminTextField('Account number', buyer.account_number),
+        adminTextField('SWIFT / BIC', buyer.swift_bic),
+        adminTextField('Notes', buyer.notes, {
             multiline: true,
             fullWidth: true,
         }),

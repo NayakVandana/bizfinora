@@ -114,9 +114,12 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                 {company.buyers.map((buyer, index) => (
                     <li key={buyer.id} className="px-4 py-2.5">
                         <ListingIndex index={index} variant="mobile" />
-                        <p className="text-foreground text-sm font-medium">
+                        <Link
+                            href={route('admin.buyers.show', buyer.id)}
+                            className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
+                        >
                             {buyerLabel(buyer)}
-                        </p>
+                        </Link>
                         <p className="text-muted-foreground text-xs">
                             {[buyer.email, buyer.phone, buyer.gst ?? buyer.tax_id]
                                 .filter(Boolean)
@@ -135,6 +138,7 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                         <th className={compactTh}>Phone</th>
                         <th className={compactTh}>GSTIN</th>
                         <th className={compactTh}>Location</th>
+                        <th className={`${compactTh} text-right`}>Action</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -142,7 +146,12 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                         <tr key={buyer.id}>
                             <ListingIndex index={index} />
                             <td className={`${compactTd} font-medium text-foreground`}>
-                                {buyerLabel(buyer)}
+                                <Link
+                                    href={route('admin.buyers.show', buyer.id)}
+                                    className="text-sidebar-primary hover:opacity-80"
+                                >
+                                    {buyerLabel(buyer)}
+                                </Link>
                             </td>
                             <td className={`${compactTd} text-muted-foreground`}>
                                 {buyer.email ?? '—'}
@@ -156,6 +165,14 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                             <td className={`${compactTd} text-muted-foreground`}>
                                 {[buyer.city, buyer.state].filter(Boolean).join(', ') ||
                                     '—'}
+                            </td>
+                            <td className={`${compactTd} text-right`}>
+                                <Link
+                                    href={route('admin.buyers.show', buyer.id)}
+                                    className="font-medium text-sidebar-primary hover:opacity-80"
+                                >
+                                    View
+                                </Link>
                             </td>
                         </tr>
                     ))}

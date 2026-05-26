@@ -104,4 +104,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('companies/{id}', fn (int $id) => Inertia::render('Admin/Companies/Show', ['companyId' => $id]))
         ->whereNumber('id')
         ->name('companies.show');
+    Route::get('buyers/{id}', fn (int $id) => Inertia::render('Admin/Buyers/Show', ['buyerId' => $id]))
+        ->whereNumber('id')
+        ->name('buyers.show');
 });

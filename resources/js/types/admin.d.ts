@@ -105,6 +105,17 @@ export type AdminCompanyBuyer = {
     notes?: string | null;
 };
 
+export type AdminBuyerDetail = AdminCompanyBuyer & {
+    company_id: number;
+    company?: {
+        id: number;
+        name: string;
+        slug: string;
+    } | null;
+    created_at?: string | null;
+    updated_at?: string | null;
+};
+
 export type AdminCompanyDetail = AdminCompanyRow &
     Omit<AdminUserCompany, 'role' | 'is_current'> & {
         users: AdminCompanyMember[];

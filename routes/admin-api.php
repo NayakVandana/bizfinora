@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\AuthApiController;
+use App\Http\Controllers\Api\Admin\BuyerApiController;
 use App\Http\Controllers\Api\Admin\CompanyApiController;
 use App\Http\Controllers\Api\Admin\UserApiController;
 use Illuminate\Support\Facades\Route;
@@ -17,4 +18,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
 
     Route::post('/companies/companies-list', [CompanyApiController::class, 'postCompaniesList']);
     Route::post('/companies/company-show', [CompanyApiController::class, 'postCompanyShow']);
+
+    Route::post('/buyers/buyer-show', [BuyerApiController::class, 'postBuyerShow']);
 });
