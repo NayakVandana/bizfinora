@@ -22,7 +22,8 @@ const profileIconByRoute: Record<string, SidebarIconName> = {
     'profile.appearance': 'palette',
 };
 
-export function sidebarNavSections(): NavSection[] {
+export function sidebarNavSections(options?: { isAdmin?: boolean }): NavSection[] {
+    const isAdmin = options?.isAdmin ?? false;
     const profileLinks: NavLinkItem[] = profileMenuLinks.map((item) => ({
         href: route(item.routeName),
         label: item.label,
@@ -119,5 +120,23 @@ export function sidebarNavSections(): NavSection[] {
                 },
             ],
         },
+        ...(isAdmin
+            ? [
+                  {
+                      title: 'Platform',
+                      links: [
+                          {
+                              href: route('admin.dashboard'),
+                              label: 'Admin',
+                              icon: 'admin',
+                              isActive: () =>
+                                  Boolean(
+                                      route().current()?.startsWith('admin.'),
+                                  ),
+                          },
+                      ],
+                  },
+              ]
+            : []),
     ];
 }

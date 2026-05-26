@@ -15,6 +15,7 @@ export type SidebarIconName =
     | 'key'
     | 'palette'
     | 'building'
+    | 'admin'
     | 'panelClose'
     | 'panelOpen';
 
@@ -106,6 +107,11 @@ const paths: Record<SidebarIconName, JSX.Element> = {
         <>
             <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18" />
             <path d="M6 12H4a2 2 0 0 0-2 2v6h20v-6a2 2 0 0 0-2-2h-2M10 6h4M10 10h4M10 14h4M10 18h4" />
+        </>
+    ),
+    admin: (
+        <>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </>
     ),
     panelClose: (

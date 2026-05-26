@@ -1,5 +1,9 @@
 import { SidebarIcon, type SidebarIconName } from '@/Layouts/sidebarIcons';
-import { sidebarNavSections } from '@/Layouts/sidebarNav';
+import {
+    sidebarNavSections,
+    type NavSection,
+} from '@/Layouts/sidebarNav';
+import { useAuthUser } from '@/auth/useAuthUser';
 import { Link } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 
@@ -68,15 +72,20 @@ function SidebarGroup({
 export default function SidebarNavMain({
     collapsed,
     onNavigate,
+    sections,
 }: {
     collapsed: boolean;
     onNavigate?: () => void;
+    sections?: NavSection[];
 }) {
-    const sections = sidebarNavSections();
+    const { user } = useAuthUser();
+    const navSections =
+        sections ??
+        sidebarNavSections({ isAdmin: Boolean(user?.is_admin) });
 
     return (
         <div className="flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
-            {sections.map((section) => (
+            {navSections.map((section) => (
                 <SidebarGroup
                     key={section.title ?? 'main'}
                     label={section.title}

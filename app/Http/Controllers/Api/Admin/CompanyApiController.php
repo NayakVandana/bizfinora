@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Buyer;
 use App\Models\Company;
 use App\Support\CompanyPresentation;
+use App\Support\InvoicePresentation;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -28,7 +30,7 @@ class CompanyApiController extends Controller
             $currentPage = (int) ($request->input('current_page') ?: 1);
 
             $query = Company::query()
-                ->withCount('users')
+                ->withCount(['users', 'buyers'])
                 ->orderBy('name');
 
             if ($request->filled('keyword')) {
@@ -50,6 +52,7 @@ class CompanyApiController extends Controller
             $paginator->getCollection()->transform(function (Company $company) {
                 $row = CompanyPresentation::format($company);
                 $row['users_count'] = $company->users_count;
+                $row['buyers_count'] = $company->buyers_count;
 
                 return $row;
             });
@@ -72,7 +75,7 @@ class CompanyApiController extends Controller
             }
 
             $company = Company::query()
-                ->withCount('users')
+                ->withCount(['users', 'buyers'])
                 ->with(['users:id,name,email'])
                 ->find($request->input('id'));
 
@@ -82,12 +85,20 @@ class CompanyApiController extends Controller
 
             $data = CompanyPresentation::format($company);
             $data['users_count'] = $company->users_count;
+            $data['buyers_count'] = $company->buyers_count;
             $data['users'] = $company->users->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->pivot->role,
             ])->values()->all();
+            $data['buyers'] = Buyer::query()
+                ->where('company_id', $company->id)
+                ->orderBy('name')
+                ->get()
+                ->map(fn (Buyer $buyer) => InvoicePresentation::formatBuyer($buyer))
+                ->values()
+                ->all();
 
             return $this->sendJsonResponse(true, 'Company fetched successfully.', $data, 200);
         } catch (Exception $e) {

@@ -90,3 +90,18 @@ Route::get('/invoices/{id}/edit', fn (int $id) => Inertia::render('Invoices/Edit
 
 Route::get('/i/{token}', fn (string $token) => Inertia::render('Invoices/Share', ['shareToken' => $token]))
     ->name('invoices.share');
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('login', fn () => Inertia::render('Admin/Login'))->name('login');
+
+    Route::redirect('/', '/admin/dashboard');
+    Route::get('dashboard', fn () => Inertia::render('Admin/Dashboard'))->name('dashboard');
+    Route::get('users', fn () => Inertia::render('Admin/Users/Index'))->name('users.index');
+    Route::get('users/{id}', fn (int $id) => Inertia::render('Admin/Users/Show', ['userId' => $id]))
+        ->whereNumber('id')
+        ->name('users.show');
+    Route::get('companies', fn () => Inertia::render('Admin/Companies/Index'))->name('companies.index');
+    Route::get('companies/{id}', fn (int $id) => Inertia::render('Admin/Companies/Show', ['companyId' => $id]))
+        ->whereNumber('id')
+        ->name('companies.show');
+});

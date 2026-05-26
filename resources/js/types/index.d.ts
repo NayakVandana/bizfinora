@@ -18,6 +18,7 @@ export interface User {
     current_company_id?: number | null;
     current_company?: Company | null;
     companies?: Company[];
+    is_admin?: boolean;
 }
 
 export type PageProps<

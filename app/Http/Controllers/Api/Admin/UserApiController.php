@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\User;
 use App\Support\UserPresentation;
 use Exception;
@@ -54,6 +55,42 @@ class UserApiController extends Controller
             );
 
             return $this->sendJsonResponse(true, 'Users fetched successfully.', $paginator, 200);
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postUserShow(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => ['required', 'integer'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            $user = User::query()
+                ->with(['companies:id,name,slug,created_at'])
+                ->find($request->input('id'));
+
+            if ($user === null) {
+                return $this->sendJsonResponse(false, 'User not found.', null, 200);
+            }
+
+            $data = UserPresentation::format($user);
+            $data['companies_count'] = $user->companies->count();
+            $data['companies'] = $user->companies->map(fn (Company $company) => [
+                'id' => $company->id,
+                'name' => $company->name,
+                'slug' => $company->slug,
+                'role' => $company->pivot->role,
+                'is_current' => $company->id === $user->current_company_id,
+                'created_at' => $company->created_at?->toIso8601String(),
+            ])->values()->all();
+
+            return $this->sendJsonResponse(true, 'User fetched successfully.', $data, 200);
         } catch (Exception $e) {
             return $this->sendError($e);
         }
