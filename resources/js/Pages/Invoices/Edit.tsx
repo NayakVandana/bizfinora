@@ -1,7 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoiceBuilder from '@/invoices/InvoiceBuilder';
-import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
 import {
@@ -31,7 +30,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<InvoiceFieldErrors>({});
-    const [shareUrl, setShareUrl] = useState<string | null>(null);
 
     const applyDraft = useCallback(
         (
@@ -62,7 +60,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                 applyDraft(
                     invoiceRes.data as unknown as Record<string, unknown>,
                 );
-                setShareUrl(invoiceRes.data.share_url ?? null);
             }
             if (buyersRes.success && buyersRes.data) {
                 setBuyers(buyersRes.data);
@@ -100,18 +97,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
         }
     };
 
-    const enableShare = async () => {
-        if (!draft?.id) {
-            return;
-        }
-        const res = await companyApiPost<
-            ApiEnvelope<{ share_url: string }>
-        >('/invoices/invoice-share-enable', { id: draft.id });
-        if (res.success && res.data?.share_url) {
-            setShareUrl(res.data.share_url);
-        }
-    };
-
     return (
         <AuthenticatedLayout
             header={
@@ -136,10 +121,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                             companyContext={companyContext}
                             onCompanyContextChange={handleCompanyContextChange}
                             onSave={() => void save()}
-                            onDownload={() => void downloadInvoicePdf(draft)}
-                            onEnableShare={() => void enableShare()}
                             saving={saving}
-                            shareUrl={shareUrl}
                         />
                     )}
                 </div>

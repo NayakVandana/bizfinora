@@ -13,7 +13,6 @@ import {
 } from '@/invoices/defaultDraft';
 import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
 import type { TemplatePreset } from '@/invoices/templatePresets';
-import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import type { InvoiceDraft } from '@/invoices/types';
 import {
     companyContextFromMeta,
@@ -52,7 +51,6 @@ export default function InvoicesCreate() {
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<InvoiceFieldErrors>({});
-    const [shareUrl, setShareUrl] = useState<string | null>(null);
     const [companyTax, setCompanyTax] = useState<CompanyTaxSettings | null>(
         null,
     );
@@ -129,18 +127,6 @@ export default function InvoicesCreate() {
         }
     };
 
-    const enableShare = async () => {
-        if (!draft?.id) {
-            return;
-        }
-        const res = await companyApiPost<
-            ApiEnvelope<{ share_url: string }>
-        >('/invoices/invoice-share-enable', { id: draft.id });
-        if (res.success && res.data?.share_url) {
-            setShareUrl(res.data.share_url);
-        }
-    };
-
     return (
         <AuthenticatedLayout
             header={
@@ -167,12 +153,7 @@ export default function InvoicesCreate() {
                             companyContext={companyContext}
                             onCompanyContextChange={handleCompanyContextChange}
                             onSave={() => void save()}
-                            onDownload={() => void downloadInvoicePdf(draft)}
-                            onEnableShare={
-                                draft.id ? () => void enableShare() : undefined
-                            }
                             saving={saving}
-                            shareUrl={shareUrl}
                             companyTax={companyTax}
                             isNewInvoice
                         />

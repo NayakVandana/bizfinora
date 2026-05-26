@@ -1,6 +1,5 @@
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
-import SecondaryButton from '@/Components/SecondaryButton';
 import InvoiceEditorLayout from '@/invoices/InvoiceEditorLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
 import type { BuyerOption } from '@/Pages/Invoices/types';
@@ -30,10 +29,7 @@ type Props = {
     errors?: InvoiceFieldErrors;
     onErrors?: (errors: InvoiceFieldErrors) => void;
     onSave: () => void | Promise<void>;
-    onDownload: () => void;
-    onEnableShare?: () => void;
     saving?: boolean;
-    shareUrl?: string | null;
     companyTax?: CompanyTaxSettings | null;
     companyContext?: InvoiceCompanyContext | null;
     onCompanyContextChange?: (context: InvoiceCompanyContext) => void;
@@ -47,10 +43,7 @@ export default function InvoiceBuilder({
     errors = {},
     onErrors,
     onSave,
-    onDownload,
-    onEnableShare,
     saving = false,
-    shareUrl,
     companyTax,
     companyContext,
     onCompanyContextChange,
@@ -138,32 +131,14 @@ export default function InvoiceBuilder({
     };
 
     const actions = (
-        <>
-            <PrimaryButton
-                type="submit"
-                form="invoice-builder-form"
-                disabled={saving}
-                className="w-full justify-center lg:w-auto"
-            >
-                {saving ? 'Saving…' : 'Save invoice'}
-            </PrimaryButton>
-            <SecondaryButton
-                type="button"
-                onClick={onDownload}
-                className="w-full justify-center lg:w-auto"
-            >
-                Download PDF
-            </SecondaryButton>
-            {onEnableShare ? (
-                <SecondaryButton
-                    type="button"
-                    onClick={onEnableShare}
-                    className="w-full justify-center lg:w-auto"
-                >
-                    {shareUrl ? 'Refresh share link' : 'Create share link'}
-                </SecondaryButton>
-            ) : null}
-        </>
+        <PrimaryButton
+            type="submit"
+            form="invoice-builder-form"
+            disabled={saving}
+            className="w-full justify-center lg:w-auto"
+        >
+            {saving ? 'Saving…' : 'Save invoice'}
+        </PrimaryButton>
     );
 
     return (
@@ -179,20 +154,6 @@ export default function InvoiceBuilder({
                         handleSave();
                     }}
                 >
-                {shareUrl ? (
-                    <div className="rounded border border-indigo-100 bg-indigo-50 p-3 text-sm">
-                        <p className="font-medium text-indigo-900">Shareable link</p>
-                        <a
-                            href={shareUrl}
-                            className="break-all text-indigo-700 underline"
-                            target="_blank"
-                            rel="noreferrer"
-                        >
-                            {shareUrl}
-                        </a>
-                    </div>
-                ) : null}
-
                 <InputError message={errors._form} className="mb-2" />
 
                 <TemplateSection
