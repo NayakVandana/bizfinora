@@ -7,7 +7,7 @@ import { listingIndexThClass } from '@/utils/listingIndex';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { formatMoney } from '@/invoices/formatMoney';
-import { statusBadgeClass } from '@/utils/statusBadgeClass';
+import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -294,11 +294,11 @@ export default function Dashboard() {
                                                             · {row.invoice_date}
                                                         </p>
                                                         <div className="mt-2 flex items-center justify-between">
-                                                            <span
-                                                                className={`rounded-full px-2 py-0.5 text-xs capitalize ${statusBadgeClass(row.status)}`}
-                                                            >
-                                                                {row.status}
-                                                            </span>
+                                                            <InvoiceStatusBadge
+                                                                status={
+                                                                    row.status
+                                                                }
+                                                            />
                                                             <span className="text-foreground text-sm font-medium">
                                                                 {formatMoney(
                                                                     row.total,
@@ -365,15 +365,11 @@ export default function Dashboard() {
                                                                     }
                                                                 </td>
                                                                 <td className="px-4 py-3 text-muted-foreground">
-                                                                    <span
-                                                                        className={statusBadgeClass(
-                                                                            row.status,
-                                                                        )}
-                                                                    >
-                                                                        {
+                                                                    <InvoiceStatusBadge
+                                                                        status={
                                                                             row.status
                                                                         }
-                                                                    </span>
+                                                                    />
                                                                 </td>
                                                                 <td className="px-4 py-3 text-muted-foreground text-right">
                                                                     {formatMoney(

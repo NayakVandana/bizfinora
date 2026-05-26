@@ -9,7 +9,7 @@ import {
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { formatMoney } from '@/invoices/formatMoney';
-import { statusBadgeClass } from '@/utils/statusBadgeClass';
+import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
 import type { InvoiceDraft } from '@/invoices/types';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { Head, Link } from '@inertiajs/react';
@@ -215,13 +215,9 @@ export default function InvoicesIndex() {
                                                 {row.invoice_date}
                                             </p>
                                             <div className="mt-2 flex items-center justify-between">
-                                                <span
-                                                    className={statusBadgeClass(
-                                                        row.status,
-                                                    )}
-                                                >
-                                                    {row.status}
-                                                </span>
+                                                <InvoiceStatusBadge
+                                                    status={row.status}
+                                                />
                                                 <span className="text-foreground text-sm font-medium">
                                                     {formatMoney(row.total)}
                                                 </span>
@@ -274,13 +270,9 @@ export default function InvoicesIndex() {
                                                     {row.invoice_date}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">
-                                                    <span
-                                                        className={statusBadgeClass(
-                                                            row.status,
-                                                        )}
-                                                    >
-                                                        {row.status}
-                                                    </span>
+                                                    <InvoiceStatusBadge
+                                                        status={row.status}
+                                                    />
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground text-right text-sm">
                                                     {formatMoney(row.total)}
