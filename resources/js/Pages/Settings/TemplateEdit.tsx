@@ -330,7 +330,7 @@ export default function TemplateEdit({ templateId }: Props) {
                                 </div>
 
                                 <div>
-                                    <InputLabel value="Document notes" />
+                                    <InputLabel value="Terms and conditions" />
                                     <textarea
                                         className="app-field"
                                         rows={2}

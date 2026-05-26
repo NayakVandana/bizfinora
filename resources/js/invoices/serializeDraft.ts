@@ -1,4 +1,5 @@
 import { APP_CURRENCY } from './currency';
+import { stripCompanyDerivedFromFieldVisibility } from './companyContext';
 import { readDiscountPercent, resolveDiscountForDraft } from './discount';
 import type { InvoiceDraft } from './types';
 
@@ -7,6 +8,8 @@ export function serializeInvoiceDraft(draft: InvoiceDraft): Record<string, unkno
     const discountPercent = readDiscountPercent(draft);
     const discount = resolveDiscountForDraft(draft);
     const qr = draft.qr_code_data ?? draft.document.qr_payload ?? '';
+    const { payment: _payment, payment_terms: _pt, notes: _notes, ...documentRest } =
+        draft.document;
 
     return {
         id: draft.id,
@@ -39,9 +42,11 @@ export function serializeInvoiceDraft(draft: InvoiceDraft): Record<string, unkno
         discount_value: discountPercent,
         discount_amount: discount,
         vat_summary_visible: draft.vat_summary_visible ?? true,
-        field_visibility: draft.field_visibility ?? {},
+        field_visibility: stripCompanyDerivedFromFieldVisibility(
+            draft.field_visibility,
+        ),
         document: {
-            ...draft.document,
+            ...documentRest,
             discount_type: 'percent',
             discount_value: discountPercent,
             discount_amount: discount,

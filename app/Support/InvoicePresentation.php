@@ -121,6 +121,14 @@ class InvoicePresentation
             $payload['share_url'] = url('/i/'.$invoice->share_token);
         }
 
+        $company = $invoice->relationLoaded('company')
+            ? $invoice->company
+            : $invoice->company()->first();
+
+        if ($company !== null) {
+            return InvoiceCompanyContext::enrichPayload($payload, $company);
+        }
+
         return $payload;
     }
 }

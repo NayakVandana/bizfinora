@@ -1,6 +1,16 @@
 import { APP_CURRENCY, normalizeCurrency } from './currency';
 import { defaultInvoiceDateLabel } from './invoiceDateLabels';
 import { applyInvoiceTypeToDraft } from './invoiceTypes';
+import { resolveDefaultPaymentTerms } from './paymentTermsPresets';
+import { applyCompanyTermsToDraft } from './termsSettings';
+import type { CompanyTermsSettings } from './termsSettings';
+import {
+    applyCompanyPaymentToDraft,
+} from './paymentTypes';
+import type {
+    CompanyPaymentSettings,
+    InvoicePaymentDetails,
+} from './paymentTypes';
 import type { CompanyTaxSettings } from './taxPresets';
 import type { InvoiceDraft, InvoiceTemplate, PartyDetails } from './types';
 
@@ -75,6 +85,10 @@ export function buildDefaultDraft(
     taxSettings?: CompanyTaxSettings | null,
     template: InvoiceTemplate = 'stripe',
     invoiceType: string = 'standard',
+    paymentSettings?: CompanyPaymentSettings | null,
+    paymentDefaults?: InvoicePaymentDetails | null,
+    paymentVisibility?: Record<string, boolean> | null,
+    termsSettings?: CompanyTermsSettings | null,
 ): InvoiceDraft {
     const today = localDateString();
 
@@ -133,7 +147,10 @@ export function buildDefaultDraft(
                 },
             ],
             notes: '',
-            payment_terms: 'Payment due within 14 days.',
+            payment_terms: resolveDefaultPaymentTerms(
+                paymentSettings?.default_payment_terms,
+                invoiceType,
+            ),
             logo_data_url: logoDataUrl ?? null,
             qr_payload: '',
             discount_amount: 0,
@@ -142,7 +159,16 @@ export function buildDefaultDraft(
         },
     };
 
-    return { ...base, ...applyInvoiceTypeToDraft(base, invoiceType) };
+    const typed = { ...base, ...applyInvoiceTypeToDraft(base, invoiceType) };
+
+    const withPayment = applyCompanyPaymentToDraft(
+        typed,
+        paymentSettings,
+        paymentDefaults,
+        paymentVisibility,
+    );
+
+    return applyCompanyTermsToDraft(withPayment, termsSettings, null);
 }
 
 export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDraft {
@@ -213,6 +239,7 @@ export function invoicePayloadToDraft(data: Record<string, unknown>): InvoiceDra
             qr_payload: String(
                 data.qr_code_data ?? document.qr_payload ?? '',
             ),
+            payment: document.payment ?? {},
         },
     };
 }

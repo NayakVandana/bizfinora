@@ -24,7 +24,7 @@ class InvoiceShareApiController extends Controller
 
             $invoice = Invoice::query()
                 ->where('share_token', $request->input('token'))
-                ->with(['buyer', 'company:id,name,slug'])
+                ->with(['buyer', 'company'])
                 ->first();
 
             if ($invoice === null) {

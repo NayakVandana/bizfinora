@@ -44,12 +44,23 @@ export interface InvoiceLineItem {
     line_tax?: number;
 }
 
+export interface InvoicePaymentDetails {
+    account_number?: string | null;
+    account_type?: string | null;
+    account_holder?: string | null;
+    upi_id?: string | null;
+    branch_ifsc?: string | null;
+    branch_name?: string | null;
+    note?: string | null;
+}
+
 export interface InvoiceDocument {
     seller: PartyDetails;
     buyer: PartyDetails;
     items: InvoiceLineItem[];
     notes?: string;
     payment_terms?: string;
+    payment?: InvoicePaymentDetails;
     logo_data_url?: string | null;
     qr_payload?: string | null;
     qr_data_url?: string | null;

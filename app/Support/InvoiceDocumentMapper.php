@@ -108,48 +108,17 @@ class InvoiceDocumentMapper
      */
     public static function invoiceToDraft(Invoice $invoice): array
     {
-        $document = $invoice->document ?? [];
+        $payload = InvoicePresentation::format($invoice, false);
 
-        return [
-            'id' => $invoice->id,
-            'buyer_id' => $invoice->buyer_id,
-            'invoice_number' => $invoice->invoice_number,
-            'invoice_number_label' => $invoice->invoice_number_label ?? 'Invoice #',
-            'status' => $invoice->status,
-            'invoice_date' => $invoice->invoice_date?->format('Y-m-d'),
-            'invoice_date_label' => $invoice->invoice_date_label ?? 'Invoice date',
-            'due_date' => $invoice->due_date?->format('Y-m-d') ?? '',
-            'date_of_service' => $invoice->date_of_service?->format('Y-m-d') ?? '',
-            'currency' => $invoice->currency,
-            'language' => $invoice->language,
-            'date_format' => $invoice->date_format ?? 'YYYY-MM-DD',
-            'template' => $invoice->template,
-            'invoice_type' => $invoice->invoice_type ?? 'standard',
-            'tax_type' => $invoice->tax_type,
-            'tax_label' => $invoice->tax_label,
-            'tax_rate' => (float) $invoice->tax_rate,
-            'tax_calculation_mode' => $invoice->tax_calculation_mode ?? 'exclusive',
-            'tax_per_line' => (bool) $invoice->tax_per_line,
-            'payment_method' => $invoice->payment_method,
-            'header_notes' => $invoice->header_notes,
-            'stripe_pay_url' => $invoice->stripe_pay_url,
-            'qr_code_data' => $invoice->qr_code_data,
-            'qr_code_description' => $invoice->qr_code_description,
-            'person_authorized_receive' => $invoice->person_authorized_receive,
-            'person_authorized_issue' => $invoice->person_authorized_issue,
-            'discount_amount' => (float) $invoice->discount_amount,
-            'vat_summary_visible' => (bool) $invoice->vat_summary_visible,
-            'field_visibility' => $invoice->field_visibility ?? [],
-            'document' => array_merge([
-                'seller' => $document['seller'] ?? self::sellerFromCompany($invoice->company),
-                'buyer' => $document['buyer'] ?? [],
-                'items' => $document['items'] ?? [],
-                'notes' => $document['notes'] ?? '',
-                'payment_terms' => $document['payment_terms'] ?? '',
-                'logo_data_url' => $document['logo_data_url'] ?? $invoice->company?->logo_data_url,
-                'qr_payload' => $invoice->qr_code_data,
-            ], $document),
-        ];
+        unset(
+            $payload['line_items'],
+            $payload['buyer'],
+            $payload['subtotal'],
+            $payload['tax_amount'],
+            $payload['total'],
+        );
+
+        return $payload;
     }
 
     /**

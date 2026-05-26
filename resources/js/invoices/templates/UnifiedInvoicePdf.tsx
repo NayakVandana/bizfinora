@@ -12,7 +12,9 @@ import { formatInvoiceDate, invoiceDateDisplay } from '../formatInvoiceDate';
 import { isPartyFieldVisible, showPartyLogo } from '../partyPdfLines';
 import { formatMoney } from '../formatMoney';
 import type { InvoiceDraft, InvoiceLineItem, InvoiceTotals } from '../types';
+import { isTermsAndConditionsVisible } from '../termsSettings';
 import { PartyBlock } from './shared';
+import { PaymentBlockPdf } from './PaymentBlockPdf';
 import { TaxTotalsBlock } from './TaxTotalsBlock';
 
 const s = StyleSheet.create({
@@ -328,13 +330,20 @@ export function UnifiedInvoicePdf({
         </View>
     );
 
+    const paymentBlock = (
+        <PaymentBlockPdf draft={draft} totals={totals} />
+    );
+
     const footerNotes = (
         <View style={s.footer}>
-            {doc.notes ? <Text style={s.muted}>{doc.notes}</Text> : null}
-            {doc.payment_terms ? (
-                <Text style={[s.muted, { marginTop: 4 }]}>
-                    {doc.payment_terms}
-                </Text>
+            {isTermsAndConditionsVisible(visibility) &&
+            doc.notes?.trim() ? (
+                <View style={{ marginBottom: 4 }}>
+                    <Text style={[s.muted, { fontWeight: 700 }]}>
+                        Terms and conditions
+                    </Text>
+                    <Text style={s.muted}>{doc.notes}</Text>
+                </View>
             ) : null}
             {cfg.footerDeclaration ? (
                 <Text style={s.declaration}>{cfg.footerDeclaration}</Text>
@@ -397,6 +406,7 @@ export function UnifiedInvoicePdf({
                         {parties}
                         {items}
                         {totalsBlock}
+                        {paymentBlock}
                         {footerNotes}
                     </View>
                 </Page>
@@ -458,15 +468,14 @@ export function UnifiedInvoicePdf({
                         ) : null}
                         <View style={s.tradeMetaCell}>
                             <Text style={s.tradeMetaLabel}>Terms of delivery</Text>
-                            <Text style={s.tradeMetaValue}>
-                                {doc.payment_terms?.slice(0, 40) || 'As agreed'}
-                            </Text>
+                            <Text style={s.tradeMetaValue}>As agreed</Text>
                         </View>
                     </View>
                     {headerNote}
                     {parties}
                     {items}
                     {totalsBlock}
+                    {paymentBlock}
                     {footerNotes}
                 </Page>
             </Document>
@@ -505,6 +514,7 @@ export function UnifiedInvoicePdf({
                             Total hours: {totalHours}
                         </Text>
                         {totalsBlock}
+                        {paymentBlock}
                         {footerNotes}
                     </View>
                 </Page>
@@ -578,18 +588,8 @@ export function UnifiedInvoicePdf({
                     {parties}
                     {items}
                     {totalsBlock}
+                    {paymentBlock}
                     {footerNotes}
-                    {doc.qr_data_url ? (
-                        <Image
-                            src={doc.qr_data_url}
-                            style={{
-                                width: 72,
-                                height: 72,
-                                marginTop: 12,
-                                alignSelf: 'flex-end',
-                            }}
-                        />
-                    ) : null}
                 </Page>
             </Document>
         );
@@ -636,21 +636,8 @@ export function UnifiedInvoicePdf({
                     {parties}
                     {items}
                     {totalsBlock}
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            marginTop: 16,
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        {footerNotes}
-                        {doc.qr_data_url ? (
-                            <Image
-                                src={doc.qr_data_url}
-                                style={{ width: 72, height: 72 }}
-                            />
-                        ) : null}
-                    </View>
+                    {paymentBlock}
+                    {footerNotes}
                 </View>
             </Page>
         </Document>

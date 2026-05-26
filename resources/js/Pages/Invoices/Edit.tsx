@@ -5,6 +5,11 @@ import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
 import {
+    companyContextFromMeta,
+    mergeCompanyContextIntoDraft,
+    type InvoiceCompanyContext,
+} from '@/invoices/companyContext';
+import {
     scrollToFirstInvoiceError,
     syncLiveInvoiceErrors,
     type InvoiceFieldErrors,
@@ -12,7 +17,7 @@ import {
 import type { InvoiceDraft } from '@/invoices/types';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 type InvoicePayload = InvoiceDraft & {
     id: number;
@@ -21,10 +26,30 @@ type InvoicePayload = InvoiceDraft & {
 
 export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
     const [draft, setDraft] = useState<InvoiceDraft | null>(null);
+    const [companyContext, setCompanyContext] =
+        useState<InvoiceCompanyContext | null>(null);
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<InvoiceFieldErrors>({});
     const [shareUrl, setShareUrl] = useState<string | null>(null);
+
+    const applyDraft = useCallback(
+        (
+            payload: Record<string, unknown>,
+            context?: InvoiceCompanyContext | null,
+        ) => {
+            const ctx = context ?? companyContextFromMeta(payload);
+            setCompanyContext(ctx);
+            setDraft(
+                mergeCompanyContextIntoDraft(
+                    invoicePayloadToDraft(payload),
+                    ctx,
+                ),
+            );
+        },
+        [],
+    );
+
     useEffect(() => {
         Promise.all([
             companyApiPost<ApiEnvelope<InvoicePayload>>(
@@ -34,10 +59,8 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
             companyApiPost<ApiEnvelope<BuyerOption[]>>('/buyers/buyers-list', {}),
         ]).then(([invoiceRes, buyersRes]) => {
             if (invoiceRes.success && invoiceRes.data) {
-                setDraft(
-                    invoicePayloadToDraft(
-                        invoiceRes.data as unknown as Record<string, unknown>,
-                    ),
+                applyDraft(
+                    invoiceRes.data as unknown as Record<string, unknown>,
                 );
                 setShareUrl(invoiceRes.data.share_url ?? null);
             }
@@ -45,7 +68,19 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                 setBuyers(buyersRes.data);
             }
         });
-    }, [invoiceId]);
+    }, [applyDraft, invoiceId]);
+
+    const handleChange = (next: InvoiceDraft) => {
+        setDraft(mergeCompanyContextIntoDraft(next, companyContext));
+        setErrors((prev) => syncLiveInvoiceErrors(next, prev));
+    };
+
+    const handleCompanyContextChange = (context: InvoiceCompanyContext) => {
+        setCompanyContext(context);
+        setDraft((prev) =>
+            prev ? mergeCompanyContextIntoDraft(prev, context) : prev,
+        );
+    };
 
     const save = async () => {
         if (!draft?.id) {
@@ -56,7 +91,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
             const result = await submitInvoiceForm(draft);
             if (result.ok) {
                 setErrors({});
-                setDraft(invoicePayloadToDraft(result.data));
+                applyDraft(result.data);
                 if (typeof result.data.share_url === 'string') {
                     setShareUrl(result.data.share_url);
                 }
@@ -101,12 +136,9 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                             buyers={buyers}
                             errors={errors}
                             onErrors={setErrors}
-                            onChange={(next) => {
-                                setDraft(next);
-                                setErrors((prev) =>
-                                    syncLiveInvoiceErrors(next, prev),
-                                );
-                            }}
+                            onChange={handleChange}
+                            companyContext={companyContext}
+                            onCompanyContextChange={handleCompanyContextChange}
                             onSave={() => void save()}
                             onDownload={() => void downloadInvoicePdf(draft)}
                             onEnableShare={() => void enableShare()}

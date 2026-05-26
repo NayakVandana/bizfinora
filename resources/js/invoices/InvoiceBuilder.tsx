@@ -11,6 +11,7 @@ import ItemsSection from './sections/ItemsSection';
 import TaxSettingsSection from './sections/TaxSettingsSection';
 import type { CompanyTaxSettings } from './taxPresets';
 import PaymentNotesSection from './sections/PaymentNotesSection';
+import TermsAndConditionsSection from './sections/TermsAndConditionsSection';
 import SellerSection from './sections/SellerSection';
 import { buyerToDocumentParty } from './sections/BuyerSection';
 import { emptyParty } from './defaultDraft';
@@ -20,6 +21,7 @@ import {
     type InvoiceFieldErrors,
 } from './validateInvoiceForm';
 import type { InvoiceDraft, InvoiceLineItem } from './types';
+import type { InvoiceCompanyContext } from './companyContext';
 
 type Props = {
     draft: InvoiceDraft;
@@ -33,6 +35,8 @@ type Props = {
     saving?: boolean;
     shareUrl?: string | null;
     companyTax?: CompanyTaxSettings | null;
+    companyContext?: InvoiceCompanyContext | null;
+    onCompanyContextChange?: (context: InvoiceCompanyContext) => void;
     isNewInvoice?: boolean;
 };
 
@@ -48,6 +52,8 @@ export default function InvoiceBuilder({
     saving = false,
     shareUrl,
     companyTax,
+    companyContext,
+    onCompanyContextChange,
     isNewInvoice = false,
 }: Props) {
     const update = (patch: Partial<InvoiceDraft>) =>
@@ -225,8 +231,13 @@ export default function InvoiceBuilder({
                 />
                 <PaymentNotesSection
                     draft={draft}
-                    onChange={update}
-                    onDocChange={updateDoc}
+                    companyContext={companyContext ?? {}}
+                    onCompanyContextChange={onCompanyContextChange ?? (() => {})}
+                />
+                <TermsAndConditionsSection
+                    draft={draft}
+                    companyContext={companyContext ?? {}}
+                    onCompanyContextChange={onCompanyContextChange ?? (() => {})}
                 />
                 </form>
             }

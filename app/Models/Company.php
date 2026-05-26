@@ -26,6 +26,20 @@ class Company extends Model
         'gst',
         'pan',
         'account_number',
+        'account_holder',
+        'account_type',
+        'upi_id',
+        'branch_ifsc',
+        'branch_name',
+        'payment_note',
+        'default_payment_terms',
+        'default_terms_and_conditions',
+        'default_show_terms_on_invoice',
+        'default_payment_qr_payload',
+        'default_show_payment_on_invoice',
+        'default_show_bank_details_on_invoice',
+        'default_show_qr_on_invoice',
+        'default_show_payment_terms_on_invoice',
         'swift_bic',
         'logo_data_url',
         'seller_notes',
@@ -44,6 +58,11 @@ class Company extends Model
         return [
             'default_tax_rate' => 'decimal:4',
             'tax_per_line' => 'boolean',
+            'default_show_payment_on_invoice' => 'boolean',
+            'default_show_bank_details_on_invoice' => 'boolean',
+            'default_show_qr_on_invoice' => 'boolean',
+            'default_show_payment_terms_on_invoice' => 'boolean',
+            'default_show_terms_on_invoice' => 'boolean',
         ];
     }
 

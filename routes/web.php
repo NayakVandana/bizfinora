@@ -78,6 +78,8 @@ Route::get('/settings/templates/{id}/edit', fn (int $id) => Inertia::render('Set
     ->whereNumber('id')
     ->name('settings.templates.edit');
 Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
+Route::get('/settings/payment', fn () => Inertia::render('Settings/Payment'))->name('settings.payment');
+Route::get('/settings/terms', fn () => Inertia::render('Settings/Terms'))->name('settings.terms');
 
 Route::get('/invoices', fn () => Inertia::render('Invoices/Index'))->name('invoices.index');
 Route::get('/invoices/create', fn () => Inertia::render('Invoices/Create'))->name('invoices.create');

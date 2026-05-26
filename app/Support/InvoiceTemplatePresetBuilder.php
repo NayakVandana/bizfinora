@@ -33,7 +33,10 @@ class InvoiceTemplatePresetBuilder
             'tax_calculation_mode' => $company?->tax_calculation_mode ?? 'exclusive',
             'tax_per_line' => (bool) ($company?->tax_per_line ?? false),
             'header_notes' => $meta['header_note'] ?? '',
-            'payment_terms' => self::paymentTermsForType($typeId),
+            'payment_terms' => PaymentTerms::resolveDefault(
+                $company?->default_payment_terms,
+                $typeId,
+            ),
             'language' => 'en',
             'date_format' => 'DD/MM/YYYY',
             'vat_summary_visible' => true,
@@ -50,7 +53,7 @@ class InvoiceTemplatePresetBuilder
                 'buyer_phone' => true,
             ],
             'default_items' => $items,
-            'document_notes' => 'Thank you for your business.',
+            'document_notes' => trim((string) ($company?->default_terms_and_conditions ?? '')),
         ];
     }
 
@@ -91,14 +94,4 @@ class InvoiceTemplatePresetBuilder
         ];
     }
 
-    private static function paymentTermsForType(string $typeId): string
-    {
-        return match ($typeId) {
-            'retainer' => 'Advance payment before work begins.',
-            'past_due' => 'Overdue — please pay immediately.',
-            'receipt' => 'Payment received. Thank you.',
-            'commercial', 'export', 'import' => 'Payment within 30 days of invoice date.',
-            default => 'Payment due within 14 days.',
-        };
-    }
 }

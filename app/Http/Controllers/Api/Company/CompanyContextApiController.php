@@ -8,6 +8,8 @@ use App\Support\CompanyMembership;
 use App\Support\CompanyPresentation;
 use App\Support\CompanyProfileValidation;
 use App\Support\InvoiceTypes;
+use App\Support\PaymentSettings;
+use App\Support\TermsAndConditionsSettings;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -138,6 +140,96 @@ class CompanyContextApiController extends Controller
                 true,
                 'Tax settings saved successfully.',
                 CompanyPresentation::format($company->fresh(), CompanyMembership::ROLE_OWNER, true),
+                200,
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postCompanyPaymentSettingsUpdate(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'account_number' => ['nullable', 'string', 'max:100'],
+                'account_holder' => ['nullable', 'string', 'max:255'],
+                'account_type' => ['nullable', 'string', 'max:32'],
+                'upi_id' => ['nullable', 'string', 'max:100'],
+                'branch_ifsc' => ['nullable', 'string', 'max:20'],
+                'branch_name' => ['nullable', 'string', 'max:255'],
+                'payment_note' => ['nullable', 'string', 'max:2000'],
+                'default_payment_terms' => ['nullable', 'string', 'max:2000'],
+                'default_show_payment_on_invoice' => ['nullable', 'boolean'],
+                'default_show_bank_details_on_invoice' => ['nullable', 'boolean'],
+                'default_show_qr_on_invoice' => ['nullable', 'boolean'],
+                'default_show_payment_terms_on_invoice' => ['nullable', 'boolean'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+            $user = $request->user();
+            $membership = $user->companies()->where('companies.id', $company->id)->first();
+
+            if ($membership === null || $membership->pivot->role !== CompanyMembership::ROLE_OWNER) {
+                return $this->sendJsonResponse(false, 'Only company owners can update payment settings.', null, 200);
+            }
+
+            $company->update(
+                PaymentSettings::prepareUpdatePayload($request, $validation->validated()),
+            );
+
+            $fresh = $company->fresh();
+
+            return $this->sendJsonResponse(
+                true,
+                'Payment settings saved successfully.',
+                array_merge(
+                    CompanyPresentation::format($fresh, CompanyMembership::ROLE_OWNER, true),
+                    PaymentSettings::fromCompany($fresh),
+                ),
+                200,
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postCompanyTermsSettingsUpdate(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'default_terms_and_conditions' => ['nullable', 'string', 'max:10000'],
+                'default_show_terms_on_invoice' => ['nullable', 'boolean'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            /** @var Company $company */
+            $company = $request->attributes->get('company');
+            $user = $request->user();
+            $membership = $user->companies()->where('companies.id', $company->id)->first();
+
+            if ($membership === null || $membership->pivot->role !== CompanyMembership::ROLE_OWNER) {
+                return $this->sendJsonResponse(false, 'Only company owners can update terms and conditions.', null, 200);
+            }
+
+            $company->update(
+                TermsAndConditionsSettings::prepareUpdatePayload(
+                    $request,
+                    $validation->validated(),
+                ),
+            );
+
+            return $this->sendJsonResponse(
+                true,
+                'Terms and conditions saved successfully.',
+                TermsAndConditionsSettings::fromCompany($company->fresh()),
                 200,
             );
         } catch (Exception $e) {

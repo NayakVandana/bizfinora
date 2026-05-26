@@ -85,6 +85,19 @@ export function sidebarNavSections(): NavSection[] {
                     icon: 'tax',
                     isActive: () => Boolean(route().current('settings.tax')),
                 },
+                {
+                    href: route('settings.payment'),
+                    label: 'Payment',
+                    icon: 'payment',
+                    isActive: () =>
+                        Boolean(route().current('settings.payment')),
+                },
+                {
+                    href: route('settings.terms'),
+                    label: 'Terms',
+                    icon: 'terms',
+                    isActive: () => Boolean(route().current('settings.terms')),
+                },
             ],
         },
         {

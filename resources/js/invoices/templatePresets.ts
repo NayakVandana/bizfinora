@@ -1,4 +1,10 @@
 import { applyInvoiceTypeToDraft } from './invoiceTypes';
+import {
+    PAYMENT_VISIBILITY_BANK,
+    PAYMENT_VISIBILITY_QR,
+    PAYMENT_VISIBILITY_TERMS,
+} from './paymentTypes';
+import { TERMS_VISIBILITY } from './termsSettings';
 import type { InvoiceTemplate } from './types';
 import type {
     FieldVisibility,
@@ -103,13 +109,32 @@ export function applyTemplatePresetToDraft(
         field_visibility: {
             ...draft.field_visibility,
             ...preset.field_visibility,
+            [PAYMENT_VISIBILITY_BANK]:
+                draft.field_visibility?.[PAYMENT_VISIBILITY_BANK] ??
+                preset.field_visibility?.[PAYMENT_VISIBILITY_BANK] ??
+                true,
+            [PAYMENT_VISIBILITY_QR]:
+                draft.field_visibility?.[PAYMENT_VISIBILITY_QR] ??
+                preset.field_visibility?.[PAYMENT_VISIBILITY_QR] ??
+                true,
+            [PAYMENT_VISIBILITY_TERMS]:
+                draft.field_visibility?.[PAYMENT_VISIBILITY_TERMS] ??
+                preset.field_visibility?.[PAYMENT_VISIBILITY_TERMS] ??
+                true,
+            [TERMS_VISIBILITY]:
+                draft.field_visibility?.[TERMS_VISIBILITY] ??
+                preset.field_visibility?.[TERMS_VISIBILITY] ??
+                true,
         },
         document: {
             ...draft.document,
             items,
             payment_terms:
                 preset.payment_terms ?? draft.document.payment_terms,
-            notes: preset.document_notes ?? draft.document.notes,
+            notes:
+                preset.document_notes?.trim()
+                    ? preset.document_notes
+                    : draft.document.notes,
         },
     };
 }

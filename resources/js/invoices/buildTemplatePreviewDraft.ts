@@ -200,7 +200,6 @@ export function buildTemplatePreviewDraft(
                 formatForInvoiceType(invoiceType) === 'trade'
                     ? 'FOB · Payment within 30 days of BL date.'
                     : 'Payment due within 14 days.',
-            notes: 'Thank you for your business.',
         },
     };
 }

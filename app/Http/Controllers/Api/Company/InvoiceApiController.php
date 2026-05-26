@@ -7,8 +7,12 @@ use App\Models\Buyer;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Support\InvoiceCalculator;
+use App\Support\InvoiceCompanyContext;
 use App\Support\InvoiceDiscount;
 use App\Support\InvoiceTypes;
+use App\Support\PaymentSettings;
+use App\Support\PaymentTerms;
+use App\Support\TermsAndConditionsSettings;
 use App\Support\InvoiceDocumentMapper;
 use App\Support\InvoicePresentation;
 use App\Support\TaxCalculator;
@@ -154,6 +158,13 @@ class InvoiceApiController extends Controller
                 'default_template_selection' => $company->default_custom_template_id
                     ? 'custom:'.$company->default_custom_template_id
                     : 'system:'.($company->default_invoice_type ?? 'standard'),
+                'payment_settings' => PaymentSettings::fromCompany($company),
+                'payment_defaults' => PaymentSettings::paymentDocumentFromCompany($company),
+                'payment_field_visibility' => PaymentSettings::defaultFieldVisibility($company),
+                'default_payment_terms' => $company->default_payment_terms,
+                'terms_settings' => TermsAndConditionsSettings::fromCompany($company),
+                'terms_field_visibility' => TermsAndConditionsSettings::defaultFieldVisibility($company),
+                'payment_terms_presets' => PaymentTerms::presets(),
             ], 200);
         } catch (Exception $e) {
             return $this->sendError($e);
@@ -334,7 +345,10 @@ class InvoiceApiController extends Controller
             /** @var Company $company */
             $company = $request->attributes->get('company');
             $data = $validation->validated();
-            $document = $data['document'];
+            $document = InvoiceCompanyContext::stripDocument($data['document']);
+            $data['field_visibility'] = InvoiceCompanyContext::stripVisibility(
+                $data['field_visibility'] ?? [],
+            );
             $discountPercent = InvoiceDiscount::normalizePercent((float) (
                 $data['discount_value'] ?? $document['discount_value'] ?? 0
             ));
@@ -444,7 +458,7 @@ class InvoiceApiController extends Controller
 
         return Invoice::query()
             ->where('company_id', $company->id)
-            ->with(['buyer', 'lineItems'])
+            ->with(['buyer', 'lineItems', 'company'])
             ->find($id);
     }
 }

@@ -3,7 +3,6 @@ import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import InvoiceBuilder from '@/invoices/InvoiceBuilder';
 import { submitInvoiceForm } from '@/invoices/submitInvoiceForm';
 import {
-    clearResolvedInvoiceErrors,
     scrollToFirstInvoiceError,
     syncLiveInvoiceErrors,
     type InvoiceFieldErrors,
@@ -16,16 +15,30 @@ import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
 import type { TemplatePreset } from '@/invoices/templatePresets';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import type { InvoiceDraft } from '@/invoices/types';
+import {
+    companyContextFromMeta,
+    mergeCompanyContextIntoDraft,
+    type InvoiceCompanyContext,
+} from '@/invoices/companyContext';
 import type { CompanyTaxSettings } from '@/invoices/taxPresets';
+import type { InvoicePaymentDetails } from '@/invoices/types';
 import type { PartyDetails } from '@/invoices/types';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import type { CompanyPaymentSettings } from '@/invoices/paymentTypes';
+import type { CompanyTermsSettings } from '@/invoices/termsSettings';
 
 type Meta = {
     seller: PartyDetails;
     next_invoice_number: string;
     tax_settings?: CompanyTaxSettings;
+    payment_settings?: CompanyPaymentSettings;
+    payment_defaults?: InvoicePaymentDetails;
+    payment_field_visibility?: Record<string, boolean>;
+    default_payment_terms?: string | null;
+    terms_settings?: CompanyTermsSettings;
+    terms_field_visibility?: Record<string, boolean>;
     default_template?: 'stripe' | 'classic';
     default_invoice_type?: string;
     default_custom_template_id?: number | null;
@@ -34,6 +47,8 @@ type Meta = {
 
 export default function InvoicesCreate() {
     const [draft, setDraft] = useState<InvoiceDraft | null>(null);
+    const [companyContext, setCompanyContext] =
+        useState<InvoiceCompanyContext | null>(null);
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<InvoiceFieldErrors>({});
@@ -49,6 +64,11 @@ export default function InvoicesCreate() {
         ]).then(([metaRes, buyersRes]) => {
             if (metaRes.success && metaRes.data) {
                 const seller = metaRes.data.seller;
+                const ctx = companyContextFromMeta(
+                    metaRes.data as unknown as Record<string, unknown>,
+                );
+                setCompanyContext(ctx);
+
                 if (metaRes.data.tax_settings) {
                     setCompanyTax(metaRes.data.tax_settings);
                 }
@@ -59,6 +79,10 @@ export default function InvoicesCreate() {
                     metaRes.data.tax_settings,
                     metaRes.data.default_template ?? 'stripe',
                     metaRes.data.default_invoice_type ?? 'standard',
+                    metaRes.data.payment_settings,
+                    metaRes.data.payment_defaults,
+                    metaRes.data.payment_field_visibility,
+                    metaRes.data.terms_settings,
                 );
                 if (metaRes.data.custom_template_preset) {
                     nextDraft = applyTemplatePresetToDraft(
@@ -66,6 +90,7 @@ export default function InvoicesCreate() {
                         metaRes.data.custom_template_preset,
                     );
                 }
+                nextDraft = mergeCompanyContextIntoDraft(nextDraft, ctx);
                 setDraft(ensureDefaultInvoiceDates(nextDraft));
             }
             if (buyersRes.success && buyersRes.data) {
@@ -75,8 +100,15 @@ export default function InvoicesCreate() {
     }, []);
 
     const handleChange = (next: InvoiceDraft) => {
-        setDraft(next);
+        setDraft(mergeCompanyContextIntoDraft(next, companyContext));
         setErrors((prev) => syncLiveInvoiceErrors(next, prev));
+    };
+
+    const handleCompanyContextChange = (context: InvoiceCompanyContext) => {
+        setCompanyContext(context);
+        setDraft((prev) =>
+            prev ? mergeCompanyContextIntoDraft(prev, context) : prev,
+        );
     };
 
     const save = async () => {
@@ -135,6 +167,8 @@ export default function InvoicesCreate() {
                             errors={errors}
                             onErrors={setErrors}
                             onChange={handleChange}
+                            companyContext={companyContext}
+                            onCompanyContextChange={handleCompanyContextChange}
                             onSave={() => void save()}
                             onDownload={() => void downloadInvoicePdf(draft)}
                             onEnableShare={
