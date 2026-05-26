@@ -119,10 +119,7 @@ export default function InvoicesCreate() {
         try {
             const result = await submitInvoiceForm(draft);
             if (result.ok) {
-                if (typeof result.data.share_url === 'string') {
-                    setShareUrl(result.data.share_url);
-                }
-                router.visit(route('invoices.edit', result.data.id as number));
+                router.visit(route('invoices.index'));
             } else {
                 setErrors(result.errors);
                 scrollToFirstInvoiceError(result.errors);

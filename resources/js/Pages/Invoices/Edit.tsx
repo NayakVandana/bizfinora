@@ -16,7 +16,7 @@ import {
 } from '@/invoices/validateInvoiceForm';
 import type { InvoiceDraft } from '@/invoices/types';
 import type { BuyerOption } from '@/Pages/Invoices/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
 
 type InvoicePayload = InvoiceDraft & {
@@ -90,11 +90,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
         try {
             const result = await submitInvoiceForm(draft);
             if (result.ok) {
-                setErrors({});
-                applyDraft(result.data);
-                if (typeof result.data.share_url === 'string') {
-                    setShareUrl(result.data.share_url);
-                }
+                router.visit(route('invoices.index'));
             } else {
                 setErrors(result.errors);
                 scrollToFirstInvoiceError(result.errors);

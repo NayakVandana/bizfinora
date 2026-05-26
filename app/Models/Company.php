@@ -35,7 +35,6 @@ class Company extends Model
         'default_payment_terms',
         'default_terms_and_conditions',
         'default_show_terms_on_invoice',
-        'default_payment_qr_payload',
         'default_show_payment_on_invoice',
         'default_show_bank_details_on_invoice',
         'default_show_qr_on_invoice',
