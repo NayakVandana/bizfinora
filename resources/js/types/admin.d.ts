@@ -74,6 +74,7 @@ export type AdminCompanyRow = {
     updated_at?: string | null;
     users_count?: number;
     buyers_count?: number;
+    invoices_count?: number;
 };
 
 export type AdminCompanyMember = {
@@ -116,8 +117,28 @@ export type AdminBuyerDetail = AdminCompanyBuyer & {
     updated_at?: string | null;
 };
 
+export type AdminInvoiceRow = {
+    id: number;
+    invoice_number: string;
+    status: string;
+    invoice_date: string;
+    due_date?: string | null;
+    currency: string;
+    total: number;
+    buyer_id?: number | null;
+    buyer_name?: string | null;
+    buyer_company_name?: string | null;
+    buyer_phone?: string | null;
+    company_id: number;
+    company_name?: string | null;
+    company_slug?: string | null;
+    created_at?: string | null;
+    has_share_link: boolean;
+};
+
 export type AdminCompanyDetail = AdminCompanyRow &
     Omit<AdminUserCompany, 'role' | 'is_current'> & {
         users: AdminCompanyMember[];
         buyers: AdminCompanyBuyer[];
+        invoices_count?: number;
     };

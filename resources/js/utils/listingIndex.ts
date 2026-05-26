@@ -1,3 +1,5 @@
+export const LISTING_PER_PAGE = 10;
+
 /** 1-based row number for list/table index columns. */
 export function listingIndex(arrayIndex: number, startAt = 1): number {
     return arrayIndex + startAt;

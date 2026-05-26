@@ -1,5 +1,6 @@
 import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
+import { LISTING_PER_PAGE } from '@/utils/listingIndex';
 import TextInput from '@/Components/TextInput';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
@@ -40,7 +41,7 @@ export default function AdminCompaniesIndex() {
         const res = await adminApiPost<ApiEnvelope<Paginated<AdminCompanyRow>>>(
             '/companies/companies-list',
             {
-                per_page: 15,
+                per_page: LISTING_PER_PAGE,
                 current_page: page,
                 keyword: search || undefined,
             },

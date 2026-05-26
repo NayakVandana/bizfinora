@@ -40,7 +40,7 @@ class InvoiceApiController extends Controller
 
             /** @var Company $company */
             $company = $request->attributes->get('company');
-            $perPage = (int) ($request->input('per_page') ?: 15);
+            $perPage = (int) ($request->input('per_page') ?: 10);
             $currentPage = (int) ($request->input('current_page') ?: 1);
 
             $query = Invoice::query()

@@ -11,6 +11,7 @@ import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { formatMoney } from '@/invoices/formatMoney';
 import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
 import type { InvoiceDraft } from '@/invoices/types';
+import { LISTING_PER_PAGE } from '@/utils/listingIndex';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -104,7 +105,10 @@ export default function InvoicesIndex() {
     };
 
     useEffect(() => {
-        companyApiPost<ApiEnvelope<Paginated>>('/invoices/invoices-list', {})
+        companyApiPost<ApiEnvelope<Paginated>>('/invoices/invoices-list', {
+            per_page: LISTING_PER_PAGE,
+            current_page: 1,
+        })
             .then((res) => {
                 if (res.success && res.data?.data) {
                     setRows(res.data.data);

@@ -32,6 +32,13 @@ export function adminSidebarNavSections(): NavSection[] {
                                 route().current('admin.companies.show'),
                         ),
                 },
+                {
+                    href: route('admin.invoices.index'),
+                    label: 'Invoices',
+                    icon: 'invoices',
+                    isActive: () =>
+                        Boolean(route().current('admin.invoices.index')),
+                },
             ],
         },
     ];

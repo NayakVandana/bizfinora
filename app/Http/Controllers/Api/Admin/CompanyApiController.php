@@ -75,7 +75,7 @@ class CompanyApiController extends Controller
             }
 
             $company = Company::query()
-                ->withCount(['users', 'buyers'])
+                ->withCount(['users', 'buyers', 'invoices'])
                 ->with(['users:id,name,email'])
                 ->find($request->input('id'));
 
@@ -86,6 +86,7 @@ class CompanyApiController extends Controller
             $data = CompanyPresentation::format($company);
             $data['users_count'] = $company->users_count;
             $data['buyers_count'] = $company->buyers_count;
+            $data['invoices_count'] = $company->invoices_count;
             $data['users'] = $company->users->map(fn ($user) => [
                 'id' => $user->id,
                 'name' => $user->name,
