@@ -161,11 +161,6 @@ export default function AdminUserShow({ userId }: { userId: number }) {
                                                     <th className={compactTh}>
                                                         Joined
                                                     </th>
-                                                    <th
-                                                        className={`${compactTh} text-right`}
-                                                    >
-                                                        Action
-                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-border">
@@ -211,19 +206,6 @@ export default function AdminUserShow({ userId }: { userId: number }) {
                                                                 {formatDisplayDateTime(
                                                                     company.created_at,
                                                                 )}
-                                                            </td>
-                                                            <td
-                                                                className={`${compactTd} text-right`}
-                                                            >
-                                                                <Link
-                                                                    href={route(
-                                                                        'admin.companies.show',
-                                                                        company.id,
-                                                                    )}
-                                                                    className="font-medium text-sidebar-primary hover:opacity-80"
-                                                                >
-                                                                    View
-                                                                </Link>
                                                             </td>
                                                         </tr>
                                                     ),

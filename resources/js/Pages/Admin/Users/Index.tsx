@@ -153,9 +153,6 @@ export default function AdminUsersIndex() {
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                 Role
                                             </th>
-                                            <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                                Action
-                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border">
@@ -163,7 +160,15 @@ export default function AdminUsersIndex() {
                                             <tr key={row.id}>
                                                 <ListingIndex index={index} />
                                                 <td className="px-4 py-3 font-medium text-foreground">
-                                                    {row.name}
+                                                    <Link
+                                                        href={route(
+                                                            'admin.users.show',
+                                                            row.id,
+                                                        )}
+                                                        className="text-sidebar-primary hover:opacity-80"
+                                                    >
+                                                        {row.name}
+                                                    </Link>
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">
                                                     {row.email}
@@ -179,17 +184,6 @@ export default function AdminUsersIndex() {
                                                     ) : (
                                                         'User'
                                                     )}
-                                                </td>
-                                                <td className="px-4 py-3 text-right">
-                                                    <Link
-                                                        href={route(
-                                                            'admin.users.show',
-                                                            row.id,
-                                                        )}
-                                                        className="font-medium text-sidebar-primary hover:opacity-80"
-                                                    >
-                                                        View
-                                                    </Link>
                                                 </td>
                                             </tr>
                                         ))}

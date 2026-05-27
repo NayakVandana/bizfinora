@@ -47,7 +47,7 @@ class InvoiceApiController extends Controller
 
             $query = Invoice::query()
                 ->where('company_id', $company->id)
-                ->with('buyer:id,name,email')
+                ->with('buyer:id,name,company_name,email')
                 ->orderByDesc('invoice_date')
                 ->orderByDesc('id');
 
@@ -84,7 +84,10 @@ class InvoiceApiController extends Controller
                     'due_date' => $invoice->due_date?->format('Y-m-d'),
                     'currency' => $invoice->currency,
                     'total' => (float) $invoice->total,
-                    'buyer_name' => $invoice->buyer?->name,
+                    'buyer_id' => $invoice->buyer_id,
+                    'buyer_name' => $invoice->buyer?->company_name
+                        ? trim($invoice->buyer->company_name) ?: $invoice->buyer->name
+                        : $invoice->buyer?->name,
                     'has_share_link' => $invoice->share_token !== null,
                     'created_at' => $invoice->created_at?->toIso8601String(),
                 ];

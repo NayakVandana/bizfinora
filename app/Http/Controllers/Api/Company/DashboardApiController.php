@@ -34,8 +34,10 @@ class DashboardApiController extends Controller
                     'status' => $invoice->status,
                     'invoice_date' => $invoice->invoice_date?->format('Y-m-d'),
                     'total' => (float) $invoice->total,
+                    'buyer_id' => $invoice->buyer_id,
                     'buyer_name' => $invoice->buyer?->company_name
-                        ?: $invoice->buyer?->name,
+                        ? trim($invoice->buyer->company_name) ?: $invoice->buyer->name
+                        : $invoice->buyer?->name,
                     'created_at' => $invoice->created_at?->toIso8601String(),
                 ])
                 ->values()

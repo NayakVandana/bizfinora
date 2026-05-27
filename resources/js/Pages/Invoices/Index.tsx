@@ -1,3 +1,4 @@
+import BuyerListingLink from '@/Components/BuyerListingLink';
 import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
 import InvoiceListingActions from '@/Components/InvoiceListingActions';
@@ -32,6 +33,7 @@ type InvoiceRow = {
     due_date?: string;
     currency: string;
     total: number;
+    buyer_id?: number | null;
     buyer_name?: string;
     has_share_link: boolean;
     created_at?: string | null;
@@ -274,7 +276,11 @@ export default function InvoicesIndex() {
                                                 {row.invoice_number}
                                             </Link>
                                             <p className="text-muted-foreground mt-1 text-sm">
-                                                {row.buyer_name ?? '—'} ·{' '}
+                                                <BuyerListingLink
+                                                    buyerId={row.buyer_id}
+                                                    buyerName={row.buyer_name}
+                                                />
+                                                {' · '}
                                                 {formatDisplayDateTime(row.created_at)}
                                             </p>
                                             <div className="mt-2 flex items-center justify-between">
@@ -335,7 +341,10 @@ export default function InvoicesIndex() {
                                                     </Link>
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground text-sm">
-                                                    {row.buyer_name ?? '—'}
+                                                    <BuyerListingLink
+                                                        buyerId={row.buyer_id}
+                                                        buyerName={row.buyer_name}
+                                                    />
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground text-sm">
                                                     {formatDisplayDateTime(row.created_at)}

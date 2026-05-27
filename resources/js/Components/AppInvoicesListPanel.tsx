@@ -1,3 +1,4 @@
+import BuyerListingLink from '@/Components/BuyerListingLink';
 import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
 import InvoiceListingActions from '@/Components/InvoiceListingActions';
@@ -30,6 +31,7 @@ type InvoiceRow = {
     due_date?: string;
     currency: string;
     total: number;
+    buyer_id?: number | null;
     buyer_name?: string;
     has_share_link: boolean;
     created_at?: string | null;
@@ -249,9 +251,15 @@ export default function AppInvoicesListPanel({
                                     {row.invoice_number}
                                 </Link>
                                 <p className="text-muted-foreground mt-1 text-sm">
-                                    {showBuyer && row.buyer_name
-                                        ? `${row.buyer_name} · `
-                                        : ''}
+                                    {showBuyer ? (
+                                        <>
+                                            <BuyerListingLink
+                                                buyerId={row.buyer_id}
+                                                buyerName={row.buyer_name}
+                                            />
+                                            {' · '}
+                                        </>
+                                    ) : null}
                                     {formatDisplayDateTime(row.created_at)}
                                 </p>
                                 <div className="mt-2 flex items-center justify-between">
@@ -310,7 +318,10 @@ export default function AppInvoicesListPanel({
                                     </td>
                                     {showBuyer ? (
                                         <td className="px-4 py-3 text-muted-foreground text-sm">
-                                            {row.buyer_name ?? '—'}
+                                            <BuyerListingLink
+                                                buyerId={row.buyer_id}
+                                                buyerName={row.buyer_name}
+                                            />
                                         </td>
                                     ) : null}
                                     <td className="px-4 py-3 text-muted-foreground text-sm">

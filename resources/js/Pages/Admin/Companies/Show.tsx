@@ -69,7 +69,6 @@ function MembersTab({ company }: { company: AdminCompanyDetail }) {
                         <th className={compactTh}>Name</th>
                         <th className={compactTh}>Email</th>
                         <th className={compactTh}>Role</th>
-                        <th className={`${compactTh} text-right`}>Action</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -89,14 +88,6 @@ function MembersTab({ company }: { company: AdminCompanyDetail }) {
                             </td>
                             <td className={`${compactTd} text-muted-foreground capitalize`}>
                                 {member.role}
-                            </td>
-                            <td className={`${compactTd} text-right`}>
-                                <Link
-                                    href={route('admin.users.show', member.id)}
-                                    className="font-medium text-sidebar-primary hover:opacity-80"
-                                >
-                                    View
-                                </Link>
                             </td>
                         </tr>
                     ))}
@@ -145,7 +136,6 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                         <th className={compactTh}>Phone</th>
                         <th className={compactTh}>GSTIN</th>
                         <th className={compactTh}>Location</th>
-                        <th className={`${compactTh} text-right`}>Action</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -172,14 +162,6 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                             <td className={`${compactTd} text-muted-foreground`}>
                                 {[buyer.city, buyer.state].filter(Boolean).join(', ') ||
                                     '—'}
-                            </td>
-                            <td className={`${compactTd} text-right`}>
-                                <Link
-                                    href={route('admin.buyers.show', buyer.id)}
-                                    className="font-medium text-sidebar-primary hover:opacity-80"
-                                >
-                                    View
-                                </Link>
                             </td>
                         </tr>
                     ))}
