@@ -23,4 +23,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
     Route::post('/buyers/buyer-show', [BuyerApiController::class, 'postBuyerShow']);
 
     Route::post('/invoices/invoices-list', [InvoiceApiController::class, 'postInvoicesList']);
+    Route::post('/invoices/invoice-show', [InvoiceApiController::class, 'postInvoiceShow']);
+    Route::post('/invoices/invoice-share-enable', [InvoiceApiController::class, 'postInvoiceShareEnable']);
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
+use App\Support\InvoicePresentation;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -97,6 +98,71 @@ class InvoiceApiController extends Controller
             });
 
             return $this->sendJsonResponse(true, 'Invoices fetched successfully.', $paginator, 200);
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postInvoiceShow(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => ['required', 'integer'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            $invoice = Invoice::query()
+                ->with(['buyer', 'lineItems', 'company'])
+                ->find($request->input('id'));
+
+            if ($invoice === null) {
+                return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
+            }
+
+            return $this->sendJsonResponse(
+                true,
+                'Invoice fetched successfully.',
+                InvoicePresentation::format($invoice, true),
+                200,
+            );
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postInvoiceShareEnable(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => ['required', 'integer'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            $invoice = Invoice::query()->find($request->input('id'));
+
+            if ($invoice === null) {
+                return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
+            }
+
+            if ($invoice->share_token === null) {
+                $invoice->update(['share_token' => Invoice::generateShareToken()]);
+            }
+
+            return $this->sendJsonResponse(
+                true,
+                'Share link enabled.',
+                [
+                    'share_url' => url('/i/'.$invoice->fresh()->share_token),
+                    'share_token' => $invoice->share_token,
+                ],
+                200,
+            );
         } catch (Exception $e) {
             return $this->sendError($e);
         }

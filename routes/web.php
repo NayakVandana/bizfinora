@@ -64,19 +64,13 @@ Route::get('/profile/appearance', fn () => Inertia::render('Profile/Appearance')
 
 Route::get('/buyers', fn () => Inertia::render('Buyers/Index'))->name('buyers.index');
 Route::get('/buyers/create', fn () => Inertia::render('Buyers/Create'))->name('buyers.create');
-Route::get('/buyers/{id}', fn (int $id) => Inertia::render('Buyers/Show', ['buyerId' => $id]))
-    ->whereNumber('id')
-    ->name('buyers.show');
-Route::get('/buyers/{id}/edit', fn (int $id) => Inertia::render('Buyers/Edit', ['buyerId' => $id]))
-    ->whereNumber('id')
-    ->name('buyers.edit');
+Route::get('/buyers/{id}', fn ($id) => Inertia::render('Buyers/Show', ['buyerId' => $id]))->name('buyers.show');
+Route::get('/buyers/{id}/edit', fn ($id) => Inertia::render('Buyers/Edit', ['buyerId' => $id]))->name('buyers.edit');
 
 Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplateDefault'))->name('settings.templates');
 Route::get('/settings/templates/library', fn () => Inertia::render('Settings/TemplatesIndex'))->name('settings.templates.library');
 Route::get('/settings/templates/preview', fn () => Inertia::render('Settings/TemplatePreview'))->name('settings.templates.preview');
-Route::get('/settings/templates/{id}/edit', fn (int $id) => Inertia::render('Settings/TemplateEdit', ['templateId' => $id]))
-    ->whereNumber('id')
-    ->name('settings.templates.edit');
+Route::get('/settings/templates/{id}/edit', fn ($id) => Inertia::render('Settings/TemplateEdit', ['templateId' => $id]))->name('settings.templates.edit');
 Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
 Route::get('/settings/payment', fn () => Inertia::render('Settings/Payment'))->name('settings.payment');
 Route::get('/settings/terms', fn () => Inertia::render('Settings/Terms'))->name('settings.terms');
@@ -84,9 +78,8 @@ Route::get('/settings/signature', fn () => Inertia::render('Settings/Signature')
 
 Route::get('/invoices', fn () => Inertia::render('Invoices/Index'))->name('invoices.index');
 Route::get('/invoices/create', fn () => Inertia::render('Invoices/Create'))->name('invoices.create');
-Route::get('/invoices/{id}/edit', fn (int $id) => Inertia::render('Invoices/Edit', ['invoiceId' => $id]))
-    ->whereNumber('id')
-    ->name('invoices.edit');
+Route::get('/invoices/{id}', fn ($id) => Inertia::render('Invoices/Show', ['invoiceId' => $id]))->name('invoices.show');
+Route::get('/invoices/{id}/edit', fn ($id) => Inertia::render('Invoices/Edit', ['invoiceId' => $id]))->name('invoices.edit');
 
 Route::get('/i/{token}', fn (string $token) => Inertia::render('Invoices/Share', ['shareToken' => $token]))
     ->name('invoices.share');
@@ -97,15 +90,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/dashboard');
     Route::get('dashboard', fn () => Inertia::render('Admin/Dashboard'))->name('dashboard');
     Route::get('users', fn () => Inertia::render('Admin/Users/Index'))->name('users.index');
-    Route::get('users/{id}', fn (int $id) => Inertia::render('Admin/Users/Show', ['userId' => $id]))
-        ->whereNumber('id')
-        ->name('users.show');
+    Route::get('users/{id}', fn ($id) => Inertia::render('Admin/Users/Show', ['userId' => $id]))->name('users.show');
     Route::get('companies', fn () => Inertia::render('Admin/Companies/Index'))->name('companies.index');
-    Route::get('companies/{id}', fn (int $id) => Inertia::render('Admin/Companies/Show', ['companyId' => $id]))
-        ->whereNumber('id')
-        ->name('companies.show');
+    Route::get('companies/{id}', fn ($id) => Inertia::render('Admin/Companies/Show', ['companyId' => $id]))->name('companies.show');
     Route::get('invoices', fn () => Inertia::render('Admin/Invoices/Index'))->name('invoices.index');
-    Route::get('buyers/{id}', fn (int $id) => Inertia::render('Admin/Buyers/Show', ['buyerId' => $id]))
-        ->whereNumber('id')
-        ->name('buyers.show');
+    Route::get('invoices/{id}', fn ($id) => Inertia::render('Admin/Invoices/Show', ['invoiceId' => $id]))->name('invoices.show');
+    Route::get('buyers/{id}', fn ($id) => Inertia::render('Admin/Buyers/Show', ['buyerId' => $id]))->name('buyers.show');
 });

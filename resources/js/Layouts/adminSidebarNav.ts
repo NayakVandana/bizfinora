@@ -37,7 +37,10 @@ export function adminSidebarNavSections(): NavSection[] {
                     label: 'Invoices',
                     icon: 'invoices',
                     isActive: () =>
-                        Boolean(route().current('admin.invoices.index')),
+                        Boolean(
+                            route().current('admin.invoices.index') ||
+                                route().current('admin.invoices.show'),
+                        ),
                 },
             ],
         },

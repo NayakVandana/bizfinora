@@ -120,6 +120,13 @@ export default function InvoicesIndex() {
     const renderRowActions = (row: InvoiceRow) => (
         <>
             <Link
+                href={route('invoices.show', row.id)}
+                className={rowActionsClass(false)}
+            >
+                View
+            </Link>
+            <span className="mx-2 text-border">|</span>
+            <Link
                 href={route('invoices.edit', row.id)}
                 className={rowActionsClass(false)}
             >
@@ -207,7 +214,7 @@ export default function InvoicesIndex() {
                                             </div>
                                             <Link
                                                 href={route(
-                                                    'invoices.edit',
+                                                    'invoices.show',
                                                     row.id,
                                                 )}
                                                 className="font-medium text-sidebar-primary hover:opacity-80 font-medium"
@@ -265,7 +272,15 @@ export default function InvoicesIndex() {
                                             <tr key={row.id}>
                                                 <ListingIndex index={index} />
                                                 <td className="px-4 py-3 font-medium text-foreground">
-                                                    {row.invoice_number}
+                                                    <Link
+                                                        href={route(
+                                                            'invoices.show',
+                                                            row.id,
+                                                        )}
+                                                        className="text-sidebar-primary hover:opacity-80"
+                                                    >
+                                                        {row.invoice_number}
+                                                    </Link>
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground text-sm">
                                                     {row.buyer_name ?? '—'}
