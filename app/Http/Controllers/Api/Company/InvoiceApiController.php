@@ -16,6 +16,7 @@ use App\Support\PaymentTerms;
 use App\Support\TermsAndConditionsSettings;
 use App\Support\InvoiceDocumentMapper;
 use App\Support\InvoicePresentation;
+use App\Support\InvoiceSummary;
 use App\Support\TaxCalculator;
 use Exception;
 use Illuminate\Http\Request;
@@ -49,6 +50,8 @@ class InvoiceApiController extends Controller
                 ->orderByDesc('invoice_date')
                 ->orderByDesc('id');
 
+            $summaryQuery = clone $query;
+
             if ($request->filled('status')) {
                 $query->where('status', $request->input('status'));
             }
@@ -80,7 +83,10 @@ class InvoiceApiController extends Controller
                 ];
             });
 
-            return $this->sendJsonResponse(true, 'Invoices fetched successfully.', $paginator, 200);
+            return $this->sendJsonResponse(true, 'Invoices fetched successfully.', array_merge(
+                $paginator->toArray(),
+                ['summary' => InvoiceSummary::fromQuery($summaryQuery)],
+            ), 200);
         } catch (Exception $e) {
             return $this->sendError($e);
         }

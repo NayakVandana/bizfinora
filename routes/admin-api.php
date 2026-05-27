@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\Admin\AuthApiController;
 use App\Http\Controllers\Api\Admin\BuyerApiController;
 use App\Http\Controllers\Api\Admin\CompanyApiController;
+use App\Http\Controllers\Api\Admin\DashboardApiController;
 use App\Http\Controllers\Api\Admin\InvoiceApiController;
 use App\Http\Controllers\Api\Admin\UserApiController;
 use Illuminate\Support\Facades\Route;
@@ -13,6 +14,8 @@ Route::prefix('v1/admin')->group(function () {
 
 Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function () {
     Route::post('/auth/admin-logout', [AuthApiController::class, 'postAdminLogout']);
+
+    Route::post('/dashboard/dashboard-summary', [DashboardApiController::class, 'postDashboardSummary']);
 
     Route::post('/users/users-list', [UserApiController::class, 'postUsersList']);
     Route::post('/users/user-show', [UserApiController::class, 'postUserShow']);

@@ -1,10 +1,9 @@
 import ListingIndex from '@/Components/ListingIndex';
 import AdminDetailPanel from '@/Components/admin/AdminDetailPanel';
-import AdminInvoicesTable from '@/Components/admin/AdminInvoicesTable';
+import AdminInvoicesListPanel from '@/Components/admin/AdminInvoicesListPanel';
 import AdminTabs, { AdminTabPanel } from '@/Components/admin/AdminTabs';
-import ListingPagination from '@/Components/ListingPagination';
 import AdminLayout from '@/Layouts/AdminLayout';
-import { LISTING_PER_PAGE, listingIndexThClass } from '@/utils/listingIndex';
+import { listingIndexThClass } from '@/utils/listingIndex';
 import {
     companyAddressFields,
     companyInvoiceFields,
@@ -13,10 +12,10 @@ import {
     companyTaxFields,
     companyTermsFields,
 } from '@/utils/adminEntityFields';
-import { adminApiPost, type ApiEnvelope, type Paginated } from '@/api/adminClient';
-import type { AdminCompanyDetail, AdminInvoiceRow } from '@/types/admin';
+import { adminApiPost, type ApiEnvelope } from '@/api/adminClient';
+import type { AdminCompanyDetail } from '@/types/admin';
 import { Head, Link } from '@inertiajs/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type CompanyTab =
     | 'profile'
@@ -191,68 +190,7 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
 }
 
 function InvoicesTab({ companyId }: { companyId: number }) {
-    const [rows, setRows] = useState<AdminInvoiceRow[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [pagination, setPagination] = useState({
-        current_page: 1,
-        last_page: 1,
-        total: 0,
-        from: null as number | null,
-        to: null as number | null,
-    });
-
-    const load = useCallback(async () => {
-        setLoading(true);
-
-        const res = await adminApiPost<ApiEnvelope<Paginated<AdminInvoiceRow>>>(
-            '/invoices/invoices-list',
-            {
-                per_page: LISTING_PER_PAGE,
-                current_page: page,
-                company_id: companyId,
-            },
-        );
-
-        if (res.success && res.data) {
-            setRows(res.data.data);
-            setPagination({
-                current_page: res.data.current_page,
-                last_page: res.data.last_page,
-                total: res.data.total,
-                from: res.data.from,
-                to: res.data.to,
-            });
-        }
-
-        setLoading(false);
-    }, [companyId, page]);
-
-    useEffect(() => {
-        void load();
-    }, [load]);
-
-    if (loading) {
-        return (
-            <p className="text-muted-foreground text-center text-sm">
-                Loading…
-            </p>
-        );
-    }
-
-    return (
-        <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm">
-            <AdminInvoicesTable rows={rows} showCompany={false} />
-            <ListingPagination
-                currentPage={pagination.current_page}
-                lastPage={pagination.last_page}
-                total={pagination.total}
-                from={pagination.from}
-                to={pagination.to}
-                onPageChange={setPage}
-            />
-        </div>
-    );
+    return <AdminInvoicesListPanel companyId={companyId} />;
 }
 
 export default function AdminCompanyShow({

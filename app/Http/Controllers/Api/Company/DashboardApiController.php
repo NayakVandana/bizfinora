@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Buyer;
 use App\Models\Company;
 use App\Models\Invoice;
+use App\Support\InvoiceSummary;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -19,14 +20,7 @@ class DashboardApiController extends Controller
 
             $base = Invoice::query()->where('company_id', $company->id);
 
-            $byStatus = (clone $base)
-                ->selectRaw('status, COUNT(*) as count, COALESCE(SUM(total), 0) as amount')
-                ->groupBy('status')
-                ->get()
-                ->keyBy('status');
-
-            $statusCount = fn (string $status): int => (int) ($byStatus->get($status)?->count ?? 0);
-            $statusAmount = fn (string $status): float => (float) ($byStatus->get($status)?->amount ?? 0);
+            $statusSummary = InvoiceSummary::forDashboard($base);
 
             $recent = (clone $base)
                 ->with('buyer:id,name,company_name')
@@ -47,18 +41,9 @@ class DashboardApiController extends Controller
                 ->all();
 
             return $this->sendJsonResponse(true, 'Dashboard summary fetched successfully.', [
-                'invoices' => [
-                    'total' => (clone $base)->count(),
-                    'draft' => $statusCount('draft'),
-                    'sent' => $statusCount('sent'),
-                    'paid' => $statusCount('paid'),
-                ],
-                'amounts' => [
-                    'draft' => $statusAmount('draft'),
-                    'sent' => $statusAmount('sent'),
-                    'paid' => $statusAmount('paid'),
-                    'all' => (float) (clone $base)->sum('total'),
-                ],
+                'invoices' => $statusSummary['invoices'],
+                'amounts' => $statusSummary['amounts'],
+                'summary' => InvoiceSummary::fromQuery($base),
                 'buyers_count' => Buyer::query()
                     ->where('company_id', $company->id)
                     ->count(),

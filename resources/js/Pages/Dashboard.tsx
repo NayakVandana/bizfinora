@@ -182,26 +182,31 @@ export default function Dashboard() {
                         </p>
                     ) : summary ? (
                         <>
-                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                                 <StatCard
-                                    label="Invoices"
-                                    value={summary.invoices.total}
-                                    sub={`${summary.invoices.draft} draft · ${summary.invoices.sent} sent · ${summary.invoices.paid} paid`}
+                                    label="All invoices"
+                                    value={formatMoney(summary.amounts.all)}
+                                    sub={`${summary.invoices.total} invoice${summary.invoices.total === 1 ? '' : 's'}`}
+                                />
+                                <StatCard
+                                    label="Draft"
+                                    value={formatMoney(summary.amounts.draft)}
+                                    sub={`${summary.invoices.draft} invoice${summary.invoices.draft === 1 ? '' : 's'}`}
+                                />
+                                <StatCard
+                                    label="Sent"
+                                    value={formatMoney(summary.amounts.sent)}
+                                    sub={`${summary.invoices.sent} invoice${summary.invoices.sent === 1 ? '' : 's'}`}
+                                />
+                                <StatCard
+                                    label="Paid"
+                                    value={formatMoney(summary.amounts.paid)}
+                                    sub={`${summary.invoices.paid} invoice${summary.invoices.paid === 1 ? '' : 's'}`}
                                 />
                                 <StatCard
                                     label="Buyers"
                                     value={summary.buyers_count}
                                     sub="Saved bill-to contacts"
-                                />
-                                <StatCard
-                                    label="Outstanding (sent)"
-                                    value={formatMoney(summary.amounts.sent)}
-                                    sub={`${summary.invoices.sent} invoice${summary.invoices.sent === 1 ? '' : 's'}`}
-                                />
-                                <StatCard
-                                    label="Paid total"
-                                    value={formatMoney(summary.amounts.paid)}
-                                    sub={`${summary.invoices.paid} invoice${summary.invoices.paid === 1 ? '' : 's'}`}
                                 />
                             </div>
 

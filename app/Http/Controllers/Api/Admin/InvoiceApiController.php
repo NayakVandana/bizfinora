@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Support\InvoicePresentation;
+use App\Support\InvoiceSummary;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -42,10 +43,6 @@ class InvoiceApiController extends Controller
                 $query->where('company_id', $request->input('company_id'));
             }
 
-            if ($request->filled('status')) {
-                $query->where('status', $request->input('status'));
-            }
-
             if ($request->filled('keyword')) {
                 $keyword = $request->input('keyword');
                 $query->where(function ($q) use ($keyword) {
@@ -60,6 +57,12 @@ class InvoiceApiController extends Controller
                                 ->orWhere('slug', 'like', '%'.$keyword.'%');
                         });
                 });
+            }
+
+            $summaryQuery = clone $query;
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->input('status'));
             }
 
             $paginator = $query->paginate($perPage, [
@@ -97,7 +100,10 @@ class InvoiceApiController extends Controller
                 ];
             });
 
-            return $this->sendJsonResponse(true, 'Invoices fetched successfully.', $paginator, 200);
+            return $this->sendJsonResponse(true, 'Invoices fetched successfully.', array_merge(
+                $paginator->toArray(),
+                ['summary' => InvoiceSummary::fromQuery($summaryQuery)],
+            ), 200);
         } catch (Exception $e) {
             return $this->sendError($e);
         }

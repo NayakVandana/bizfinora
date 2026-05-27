@@ -1,13 +1,16 @@
 import AdminLayout from '@/Layouts/AdminLayout';
 import { pageContainer, pageShell } from '@/lib/pageLayout';
-import {
-    adminApiPost,
-    type ApiEnvelope,
-    type Paginated,
-} from '@/api/adminClient';
-import type { AdminCompanyRow, AdminUserRow } from '@/types/admin';
+import { formatMoney } from '@/invoices/formatMoney';
+import { adminApiPost, type ApiEnvelope } from '@/api/adminClient';
+import type { InvoiceSummary } from '@/types/invoiceSummary';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+
+type AdminDashboardSummary = {
+    users_count: number;
+    companies_count: number;
+    invoices: InvoiceSummary;
+};
 
 function StatCard({
     label,
@@ -18,13 +21,13 @@ function StatCard({
     label: string;
     value: string | number;
     sub?: string;
-    href: string;
+    href?: string;
 }) {
-    return (
-        <Link
-            href={href}
-            className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm transition hover:border-sidebar-primary/40"
-        >
+    const className =
+        'rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm transition hover:border-sidebar-primary/40';
+
+    const content = (
+        <>
             <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                 {label}
             </p>
@@ -34,43 +37,38 @@ function StatCard({
             {sub ? (
                 <p className="text-muted-foreground mt-1 text-sm">{sub}</p>
             ) : null}
-        </Link>
+        </>
     );
+
+    if (href) {
+        return (
+            <Link href={href} className={className}>
+                {content}
+            </Link>
+        );
+    }
+
+    return <div className={className}>{content}</div>;
 }
 
 export default function AdminDashboard() {
-    const [usersTotal, setUsersTotal] = useState<number | null>(null);
-    const [companiesTotal, setCompaniesTotal] = useState<number | null>(null);
+    const [summary, setSummary] = useState<AdminDashboardSummary | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const load = async () => {
-            try {
-                const [usersRes, companiesRes] = await Promise.all([
-                    adminApiPost<ApiEnvelope<Paginated<AdminUserRow>>>(
-                        '/users/users-list',
-                        { per_page: 1, current_page: 1 },
-                    ),
-                    adminApiPost<ApiEnvelope<Paginated<AdminCompanyRow>>>(
-                        '/companies/companies-list',
-                        { per_page: 1, current_page: 1 },
-                    ),
-                ]);
-
-                if (usersRes.success && usersRes.data) {
-                    setUsersTotal(usersRes.data.total);
+        void adminApiPost<ApiEnvelope<AdminDashboardSummary>>(
+            '/dashboard/dashboard-summary',
+            {},
+        )
+            .then((res) => {
+                if (res.success && res.data) {
+                    setSummary(res.data);
                 }
-
-                if (companiesRes.success && companiesRes.data) {
-                    setCompaniesTotal(companiesRes.data.total);
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        void load();
+            })
+            .finally(() => setLoading(false));
     }, []);
+
+    const invoices = summary?.invoices;
 
     return (
         <AdminLayout
@@ -95,22 +93,56 @@ export default function AdminDashboard() {
                             <p className="text-muted-foreground p-6 text-center">
                                 Loading…
                             </p>
-                        ) : (
-                            <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-6">
-                                <StatCard
-                                    label="Users"
-                                    value={usersTotal ?? '—'}
-                                    sub="Registered accounts"
-                                    href={route('admin.users.index')}
-                                />
-                                <StatCard
-                                    label="Companies"
-                                    value={companiesTotal ?? '—'}
-                                    sub="Organisations on the platform"
-                                    href={route('admin.companies.index')}
-                                />
+                        ) : summary && invoices ? (
+                            <div className="space-y-6 p-4 sm:p-6">
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <StatCard
+                                        label="Users"
+                                        value={summary.users_count}
+                                        sub="Registered accounts"
+                                        href={route('admin.users.index')}
+                                    />
+                                    <StatCard
+                                        label="Companies"
+                                        value={summary.companies_count}
+                                        sub="Organisations on the platform"
+                                        href={route('admin.companies.index')}
+                                    />
+                                </div>
+
+                                <div>
+                                    <h3 className="text-muted-foreground mb-3 text-sm font-semibold uppercase tracking-wide">
+                                        Invoices
+                                    </h3>
+                                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                                        <StatCard
+                                            label="All invoices"
+                                            value={formatMoney(invoices.all.amount)}
+                                            sub={`${invoices.all.count} invoice${invoices.all.count === 1 ? '' : 's'}`}
+                                            href={route('admin.invoices.index')}
+                                        />
+                                        <StatCard
+                                            label="Draft"
+                                            value={formatMoney(invoices.draft.amount)}
+                                            sub={`${invoices.draft.count} invoice${invoices.draft.count === 1 ? '' : 's'}`}
+                                            href={route('admin.invoices.index')}
+                                        />
+                                        <StatCard
+                                            label="Sent"
+                                            value={formatMoney(invoices.sent.amount)}
+                                            sub={`${invoices.sent.count} invoice${invoices.sent.count === 1 ? '' : 's'}`}
+                                            href={route('admin.invoices.index')}
+                                        />
+                                        <StatCard
+                                            label="Paid"
+                                            value={formatMoney(invoices.paid.amount)}
+                                            sub={`${invoices.paid.count} invoice${invoices.paid.count === 1 ? '' : 's'}`}
+                                            href={route('admin.invoices.index')}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </div>
