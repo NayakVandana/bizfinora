@@ -145,6 +145,8 @@ class InvoiceApiController extends Controller
                 if ($custom) {
                     $customPreset = $custom->preset;
                     $defaultTemplateLabel = $custom->name;
+                } else {
+                    $company->update(['default_custom_template_id' => null]);
                 }
             }
 

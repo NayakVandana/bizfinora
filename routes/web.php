@@ -67,9 +67,9 @@ Route::get('/buyers/create', fn () => Inertia::render('Buyers/Create'))->name('b
 Route::get('/buyers/{id}', fn ($id) => Inertia::render('Buyers/Show', ['buyerId' => $id]))->name('buyers.show');
 Route::get('/buyers/{id}/edit', fn ($id) => Inertia::render('Buyers/Edit', ['buyerId' => $id]))->name('buyers.edit');
 
-Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplateDefault'))->name('settings.templates');
-Route::get('/settings/templates/library', fn () => Inertia::render('Settings/TemplatesIndex'))->name('settings.templates.library');
-Route::get('/settings/templates/preview', fn () => Inertia::render('Settings/TemplatePreview'))->name('settings.templates.preview');
+Route::get('/settings/templates', fn () => Inertia::render('Settings/TemplatesIndex'))->name('settings.templates');
+Route::redirect('/settings/templates/library', '/settings/templates');
+Route::redirect('/settings/templates/preview', '/settings/templates');
 Route::get('/settings/templates/{id}/edit', fn ($id) => Inertia::render('Settings/TemplateEdit', ['templateId' => $id]))->name('settings.templates.edit');
 Route::get('/settings/tax', fn () => Inertia::render('Settings/Tax'))->name('settings.tax');
 Route::get('/settings/payment', fn () => Inertia::render('Settings/Payment'))->name('settings.payment');

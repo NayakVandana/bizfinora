@@ -60,25 +60,12 @@ export function sidebarNavSections(options?: { isAdmin?: boolean }): NavSection[
             title: 'Templates',
             links: [
                 {
-                    href: route('settings.templates.library'),
-                    label: 'Library',
-                    icon: 'library',
-                    isActive: () =>
-                        route().current() === 'settings.templates.library' ||
-                        route().current() === 'settings.templates.edit',
-                },
-                {
                     href: route('settings.templates'),
-                    label: 'Default',
+                    label: 'Templates',
                     icon: 'template',
-                    isActive: () => route().current() === 'settings.templates',
-                },
-                {
-                    href: route('settings.templates.preview'),
-                    label: 'Preview',
-                    icon: 'preview',
                     isActive: () =>
-                        route().current() === 'settings.templates.preview',
+                        route().current() === 'settings.templates' ||
+                        route().current() === 'settings.templates.edit',
                 },
                 {
                     href: route('settings.tax'),

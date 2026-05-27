@@ -166,14 +166,10 @@ export default function TemplateSection({
 
                 <p className="text-muted-foreground mt-2 text-xs">
                     <Link
-                        href={route('settings.templates.library')}
+                        href={route('settings.templates')}
                         className="font-medium text-sidebar-primary hover:opacity-80"
                     >
                         Manage templates
-                    </Link>
-                    {' · '}
-                    <Link href={route('settings.templates')} className="font-medium text-sidebar-primary hover:opacity-80">
-                        Change company default
                     </Link>
                 </p>
             </div>

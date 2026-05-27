@@ -1,8 +1,6 @@
-import InputLabel from '@/Components/InputLabel';
-import Modal from '@/Components/Modal';
-import ListingIndex from '@/Components/ListingIndex';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
+import TemplateLibraryCard from '@/Components/TemplateLibraryCard';
 import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import InvoicePreview from '@/invoices/InvoicePreview';
@@ -20,22 +18,62 @@ import {
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { invoiceTypeLabel } from '@/invoices/invoiceTypes';
 import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useConfirm } from '@/contexts/ConfirmDialogContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTemplatePreviewData } from './useTemplatePreviewData';
 
+const TEMPLATES_FLASH_KEY = 'templates_flash_message';
+
 type PreviewTarget =
-    | { kind: 'system'; id: string; name: string }
+    | { kind: 'system'; id: string; name: string; layout: string }
     | { kind: 'custom'; row: CustomTemplateRow };
 
-type TabId = 'all' | 'general' | 'custom';
+type TabId = 'all' | 'default' | 'general' | 'custom';
 
 const TABS: { id: TabId; label: string }[] = [
     { id: 'all', label: 'All' },
+    { id: 'default', label: 'Default' },
     { id: 'general', label: 'General' },
     { id: 'custom', label: 'Custom' },
 ];
+
+function resolveDefaultTarget(
+    data: TemplatesListData | null,
+): PreviewTarget | null {
+    if (!data) {
+        return null;
+    }
+
+    if (data.default_custom_template_id != null) {
+        const row = data.custom.find(
+            (r) => r.id === data.default_custom_template_id,
+        );
+        if (row) {
+            return { kind: 'custom', row };
+        }
+        return null;
+    }
+
+    const typeId = data.default_invoice_type ?? 'standard';
+    const row = data.system.find((r) => r.id === typeId);
+    if (!row) {
+        return null;
+    }
+
+    return {
+        kind: 'system',
+        id: row.id,
+        name: row.name,
+        layout: row.layout,
+    };
+}
+
+function cardKey(target: PreviewTarget): string {
+    return target.kind === 'system'
+        ? `sys-${target.id}`
+        : `custom-${target.row.id}`;
+}
 
 export default function TemplatesIndex() {
     const { confirm } = useConfirm();
@@ -63,6 +101,85 @@ export default function TemplatesIndex() {
     useEffect(() => {
         void reload();
     }, [reload]);
+
+    useEffect(() => {
+        const flash = sessionStorage.getItem(TEMPLATES_FLASH_KEY);
+        if (flash) {
+            setMessage(flash);
+            sessionStorage.removeItem(TEMPLATES_FLASH_KEY);
+        }
+    }, []);
+
+    const q = filter.trim().toLowerCase();
+    const systemRows =
+        data?.system.filter(
+            (r) =>
+                !q ||
+                r.name.toLowerCase().includes(q) ||
+                r.description.toLowerCase().includes(q),
+        ) ?? [];
+    const customRows =
+        data?.custom.filter(
+            (r) =>
+                !q ||
+                r.name.toLowerCase().includes(q) ||
+                (r.description ?? '').toLowerCase().includes(q),
+        ) ?? [];
+
+    const defaultTarget = useMemo(
+        () => resolveDefaultTarget(data),
+        [data],
+    );
+
+    const tabCounts: Record<TabId, number> = {
+        all: systemRows.length + customRows.length,
+        default: defaultTarget ? 1 : 0,
+        general: systemRows.length,
+        custom: customRows.length,
+    };
+
+    const visibleCards = useMemo((): PreviewTarget[] => {
+        if (activeTab === 'default') {
+            return defaultTarget ? [defaultTarget] : [];
+        }
+
+        const cards: PreviewTarget[] = [];
+
+        if (activeTab === 'all' || activeTab === 'general') {
+            for (const row of systemRows) {
+                cards.push({
+                    kind: 'system',
+                    id: row.id,
+                    name: row.name,
+                    layout: row.layout,
+                });
+            }
+        }
+
+        if (activeTab === 'all' || activeTab === 'custom') {
+            for (const row of customRows) {
+                cards.push({ kind: 'custom', row });
+            }
+        }
+
+        return cards;
+    }, [activeTab, systemRows, customRows, defaultTarget]);
+
+    useEffect(() => {
+        if (visibleCards.length === 0) {
+            setPreviewTarget(null);
+            return;
+        }
+
+        if (
+            previewTarget &&
+            visibleCards.some((c) => cardKey(c) === cardKey(previewTarget))
+        ) {
+            return;
+        }
+
+        setPreviewTarget(visibleCards[0]);
+    }, [visibleCards, previewTarget]);
 
     const previewDraft = useMemo(() => {
         if (!seller || !previewTarget) {
@@ -97,13 +214,19 @@ export default function TemplatesIndex() {
     const isDefaultCustom = (id: number) =>
         data?.default_custom_template_id === id;
 
+    const isSelectedDefault =
+        previewTarget?.kind === 'system'
+            ? isDefaultSystem(previewTarget.id)
+            : previewTarget?.kind === 'custom'
+              ? isDefaultCustom(previewTarget.row.id)
+              : false;
+
     const handleCloneSystem = async (row: SystemTemplateRow) => {
         setBusyId(`sys-${row.id}`);
         setMessage(null);
         try {
             const res = await cloneSystemTemplate(row.id);
             if (res.success && res.data) {
-                setMessage(`Cloned “${row.name}” — customize and save.`);
                 router.visit(
                     route('settings.templates.edit', res.data.id),
                 );
@@ -121,39 +244,47 @@ export default function TemplatesIndex() {
         try {
             const res = await cloneCustomTemplate(row.id);
             if (res.success && res.data) {
-                setMessage(`Cloned “${row.name}”.`);
-                await reload();
-            } else {
-                setMessage(res.message ?? 'Clone failed.');
+                router.visit(
+                    route('settings.templates.edit', res.data.id),
+                );
+                return;
             }
+            setMessage(res.message ?? 'Clone failed.');
         } finally {
             setBusyId(null);
         }
     };
 
-    const handleSetDefaultSystem = async (typeId: string) => {
-        setBusyId(`def-sys-${typeId}`);
-        setMessage(null);
-        try {
-            const res = await setDefaultTemplate({ systemType: typeId });
-            if (res.success) {
-                setMessage('Default template set to general template.');
-                await reload();
-            } else {
-                setMessage(res.message ?? 'Failed.');
+    const handleSetDefaultFor = async (target: PreviewTarget) => {
+        if (target.kind === 'system') {
+            setBusyId(`def-sys-${target.id}`);
+            setMessage(null);
+            try {
+                const res = await setDefaultTemplate({
+                    systemType: target.id,
+                });
+                if (res.success) {
+                    setMessage('Default template updated.');
+                    setPreviewTarget(target);
+                    await reload();
+                } else {
+                    setMessage(res.message ?? 'Failed.');
+                }
+            } finally {
+                setBusyId(null);
             }
-        } finally {
-            setBusyId(null);
+            return;
         }
-    };
 
-    const handleSetDefaultCustom = async (id: number) => {
-        setBusyId(`def-custom-${id}`);
+        setBusyId(`def-custom-${target.row.id}`);
         setMessage(null);
         try {
-            const res = await setDefaultTemplate({ customTemplateId: id });
+            const res = await setDefaultTemplate({
+                customTemplateId: target.row.id,
+            });
             if (res.success) {
-                setMessage('Default template set to your custom template.');
+                setMessage('Default template updated.');
+                setPreviewTarget(target);
                 await reload();
             } else {
                 setMessage(res.message ?? 'Failed.');
@@ -165,9 +296,9 @@ export default function TemplatesIndex() {
 
     const handleDelete = async (row: CustomTemplateRow) => {
         const ok = await confirm({
-            title: 'Delete template?',
-            message: `Delete template “${row.name}”? This cannot be undone.`,
-            confirmLabel: 'Delete',
+            title: 'Remove template?',
+            message: `Remove template “${row.name}”? This cannot be undone.`,
+            confirmLabel: 'Remove',
             variant: 'danger',
         });
 
@@ -181,16 +312,10 @@ export default function TemplatesIndex() {
             const res = await deleteCustomTemplate(row.id);
             setMessage(
                 res.success
-                    ? 'Template deleted.'
-                    : (res.message ?? 'Delete failed.'),
+                    ? 'Template removed.'
+                    : (res.message ?? 'Remove failed.'),
             );
             if (res.success) {
-                if (
-                    previewTarget?.kind === 'custom' &&
-                    previewTarget.row.id === row.id
-                ) {
-                    setPreviewTarget(null);
-                }
                 await reload();
             }
         } finally {
@@ -198,395 +323,348 @@ export default function TemplatesIndex() {
         }
     };
 
-    const openSystemPreview = (row: SystemTemplateRow) => {
-        setPreviewTarget({ kind: 'system', id: row.id, name: row.name });
+    const handleStartBlank = async () => {
+        setBusyId('blank');
+        setMessage(null);
+        try {
+            const res = await cloneSystemTemplate('standard', 'Blank template');
+            if (res.success && res.data) {
+                router.visit(
+                    route('settings.templates.edit', res.data.id),
+                );
+                return;
+            }
+            setMessage(res.message ?? 'Could not create blank template.');
+        } finally {
+            setBusyId(null);
+        }
     };
-
-    const openCustomPreview = (row: CustomTemplateRow) => {
-        setPreviewTarget({ kind: 'custom', row });
-    };
-
-    const q = filter.trim().toLowerCase();
-    const systemRows =
-        data?.system.filter(
-            (r) =>
-                !q ||
-                r.name.toLowerCase().includes(q) ||
-                r.description.toLowerCase().includes(q),
-        ) ?? [];
-    const customRows =
-        data?.custom.filter(
-            (r) =>
-                !q ||
-                r.name.toLowerCase().includes(q) ||
-                (r.description ?? '').toLowerCase().includes(q),
-        ) ?? [];
-
-    const tabCounts: Record<TabId, number> = {
-        all: systemRows.length + customRows.length,
-        general: systemRows.length,
-        custom: customRows.length,
-    };
-
-    const showGeneral = activeTab === 'all' || activeTab === 'general';
-    const showCustom = activeTab === 'all' || activeTab === 'custom';
 
     const pageLoading = loading || previewDataLoading;
-    const emptyInTab =
-        (activeTab === 'general' && systemRows.length === 0) ||
-        (activeTab === 'custom' && customRows.length === 0) ||
-        (activeTab === 'all' &&
-            systemRows.length === 0 &&
-            customRows.length === 0);
 
-    const renderSystemRow = (row: SystemTemplateRow, index: number) => (
-        <li
-            key={`sys-${row.id}`}
-            className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
-        >
-            <div className="flex min-w-0 flex-1 items-start gap-3">
-                <div className="w-8 shrink-0 pt-0.5 text-center">
-                    <ListingIndex index={index} variant="mobile" />
-                </div>
-                <div className="min-w-0 flex-1">
-                <p className="text-foreground font-medium">
-                    {row.name}
-                    <span className="ml-2 rounded bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">General</span>
-                    {isDefaultSystem(row.id) ? (
-                        <span className="ml-2 rounded bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">Default</span>
-                    ) : null}
-                </p>
-                <p className="text-muted-foreground text-sm">{row.description}</p>
-                </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-                <SecondaryButton
-                    type="button"
-                    onClick={() => openSystemPreview(row)}
-                >
-                    Preview
-                </SecondaryButton>
-                <SecondaryButton
-                    disabled={busyId === `sys-${row.id}`}
-                    onClick={() => void handleCloneSystem(row)}
-                >
-                    {busyId === `sys-${row.id}`
-                        ? 'Cloning…'
-                        : 'Clone & customize'}
-                </SecondaryButton>
-                {!isDefaultSystem(row.id) ? (
-                    <SecondaryButton
-                        disabled={busyId === `def-sys-${row.id}`}
-                        onClick={() => void handleSetDefaultSystem(row.id)}
-                    >
-                        Set default
-                    </SecondaryButton>
-                ) : null}
-            </div>
-        </li>
-    );
+    const renderCard = (target: PreviewTarget) => {
+        const selected =
+            previewTarget !== null &&
+            cardKey(target) === cardKey(previewTarget);
+        const isSystem = target.kind === 'system';
+        const layout = isSystem ? target.layout : target.row.layout;
+        const name = isSystem ? target.name : target.row.name;
+        const isDefault = isSystem
+            ? isDefaultSystem(target.id)
+            : isDefaultCustom(target.row.id);
+        const kind = isSystem ? 'general' : 'custom';
 
-    const renderCustomRow = (row: CustomTemplateRow, index: number) => (
-        <li
-            key={`custom-${row.id}`}
-            className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
-        >
-            <div className="flex min-w-0 flex-1 items-start gap-3">
-                <div className="w-8 shrink-0 pt-0.5 text-center">
-                    <ListingIndex index={index} variant="mobile" />
-                </div>
-                <div className="min-w-0 flex-1">
-                <p className="text-foreground font-medium">
-                    {row.name}
-                    <span className="ml-2 rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-900 dark:bg-amber-950/50 dark:text-amber-300">Custom</span>
-                    {isDefaultCustom(row.id) ? (
-                        <span className="ml-2 rounded bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">Default</span>
-                    ) : null}
-                </p>
-                <p className="text-muted-foreground text-sm">
-                    Based on{' '}
-                    {row.base_type_label ||
-                        invoiceTypeLabel(row.base_invoice_type)}
-                    {row.description ? ` · ${row.description}` : ''}
-                </p>
-                </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-                <SecondaryButton
-                    type="button"
-                    onClick={() => openCustomPreview(row)}
-                >
-                    Preview
-                </SecondaryButton>
-                <Link href={route('settings.templates.edit', row.id)}>
-                    <PrimaryButton type="button">Edit</PrimaryButton>
-                </Link>
-                <SecondaryButton
-                    disabled={busyId === `custom-${row.id}`}
-                    onClick={() => void handleCloneCustom(row)}
-                >
-                    Clone
-                </SecondaryButton>
-                {!isDefaultCustom(row.id) ? (
-                    <SecondaryButton
-                        disabled={busyId === `def-custom-${row.id}`}
-                        onClick={() => void handleSetDefaultCustom(row.id)}
-                    >
-                        Set default
-                    </SecondaryButton>
-                ) : null}
-                <SecondaryButton
-                    disabled={busyId === `del-${row.id}`}
-                    onClick={() => void handleDelete(row)}
-                >
-                    Delete
-                </SecondaryButton>
-            </div>
-        </li>
-    );
+        return (
+            <TemplateLibraryCard
+                key={cardKey(target)}
+                name={name}
+                layout={layout}
+                kind={kind}
+                isDefault={isDefault}
+                selected={selected}
+                onSelect={() => setPreviewTarget(target)}
+            />
+        );
+    };
 
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-foreground text-xl font-semibold">
-                    Template library
-                </h2>
+                <div className="flex w-full flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <h2 className="text-foreground text-xl font-semibold">
+                            Select template
+                        </h2>
+                        <p className="text-muted-foreground mt-0.5 text-sm">
+                            Browse, preview, and set your default invoice
+                            template
+                        </p>
+                    </div>
+                    <SecondaryButton
+                        type="button"
+                        disabled={busyId === 'blank'}
+                        onClick={() => void handleStartBlank()}
+                        className="normal-case tracking-normal"
+                    >
+                        {busyId === 'blank' ? 'Creating…' : 'Start with blank'}
+                    </SecondaryButton>
+                </div>
             }
         >
             <Head title="Templates" />
 
-            <div className="py-6">
-                <div className="w-full px-4 sm:px-6 lg:px-8">
-                    <p className="text-muted-foreground mb-4 text-sm">
-                        Browse general and custom templates. Preview any
-                        template, clone to customize, save, and reuse on new
-                        invoices.
-                    </p>
-
-                    <div className="mb-6 flex flex-wrap items-end gap-4">
-                        <div className="min-w-[200px] flex-1">
-                            <InputLabel value="Search templates" />
-                            <TextInput
-                                className="mt-1 block w-full"
-                                value={filter}
-                                onChange={(e) => setFilter(e.target.value)}
-                                placeholder="Name or description…"
-                            />
-                        </div>
-                        <Link
-                            href={route('settings.templates')}
-                            className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
+            <div className="flex h-[calc(100svh-3.5rem)] flex-col overflow-hidden px-3 py-3 sm:px-6 lg:px-8">
+                {message ? (
+                    <div className="mb-3 flex shrink-0 items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-700 dark:text-emerald-300">
+                        <span>{message}</span>
+                        <button
+                            type="button"
+                            className="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400"
+                            onClick={() => setMessage(null)}
+                            aria-label="Dismiss"
                         >
-                            Default template settings →
-                        </Link>
+                            ×
+                        </button>
                     </div>
+                ) : null}
 
-                    <div className="border-b border-border mb-6">
-                        <nav
-                            className="-mb-px flex gap-6"
-                            aria-label="Template tabs"
-                        >
-                            {TABS.map((tab) => {
-                                const selected = activeTab === tab.id;
-                                const count = tabCounts[tab.id];
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+                    <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+                        <aside className="flex max-h-[40vh] min-h-0 shrink-0 flex-col border-b border-border bg-muted/30 lg:max-h-none lg:w-[19rem] lg:border-b-0 lg:border-r xl:w-[21rem]">
+                            <div className="shrink-0 border-b border-border bg-card/80 p-4 backdrop-blur-sm">
+                                    <div className="mb-3 grid grid-cols-2 gap-1 rounded-xl bg-muted p-1">
+                                        {TABS.map((tab) => {
+                                            const tabSelected =
+                                                activeTab === tab.id;
 
-                                return (
-                                    <button
-                                        key={tab.id}
-                                        type="button"
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={
-                                            selected
-                                                ? 'border-b-2 border-sidebar-primary px-1 pb-3 text-sm font-medium text-sidebar-primary'
-                                                : 'border-b-2 border-transparent px-1 pb-3 text-sm font-medium text-muted-foreground transition hover:border-border hover:text-foreground'
+                                            return (
+                                                <button
+                                                    key={tab.id}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setActiveTab(tab.id)
+                                                    }
+                                                    className={`rounded-lg px-2 py-2 text-[11px] font-semibold transition ${
+                                                        tabSelected
+                                                            ? 'bg-background text-foreground shadow-sm'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    {tab.label}
+                                                    <span className="ml-1 tabular-nums opacity-60">
+                                                        {tabCounts[tab.id]}
+                                                    </span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <TextInput
+                                        className="block w-full rounded-full border-border/80 bg-background text-sm"
+                                        value={filter}
+                                        onChange={(e) =>
+                                            setFilter(e.target.value)
                                         }
-                                    >
-                                        {tab.label}
-                                        <span
-                                            className={
-                                                selected
-                                                    ? 'ml-2 rounded-full bg-accent px-2 py-0.5 text-xs text-accent-foreground'
-                                                    : 'ml-2 rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground'
-                                            }
-                                        >
-                                            {count}
-                                        </span>
-                                    </button>
-                                );
-                            })}
-                        </nav>
-                    </div>
+                                        placeholder="Search templates…"
+                                    />
+                                </div>
 
-                    {message ? (
-                        <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-300 mb-4">
-                            {message}
-                        </div>
-                    ) : null}
-
-                    {pageLoading ? (
-                        <p className="text-muted-foreground text-sm">
-                            Loading templates…
-                        </p>
-                    ) : emptyInTab ? (
-                        <p className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm px-4 py-8 text-center text-sm text-muted-foreground">
-                            {filter
-                                ? 'No templates match your search.'
-                                : activeTab === 'custom'
-                                  ? 'No custom templates yet. Clone a general template to get started.'
-                                  : 'No templates found.'}
-                        </p>
-                    ) : (
-                        <div className="space-y-8">
-                            {showGeneral && systemRows.length > 0 ? (
-                                <section>
-                                    {activeTab === 'all' ? (
-                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                                            General templates
-                                        </h3>
-                                    ) : null}
-                                    <ul className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm divide-y divide-border">
-                                        {systemRows.map((row, index) =>
-                                            renderSystemRow(row, index),
-                                        )}
-                                    </ul>
-                                </section>
-                            ) : null}
-
-                            {showCustom && customRows.length > 0 ? (
-                                <section>
-                                    {activeTab === 'all' ? (
-                                        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                                            Custom templates
-                                        </h3>
-                                    ) : null}
-                                    <ul className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm divide-y divide-border">
-                                        {customRows.map((row, index) =>
-                                            renderCustomRow(row, index),
-                                        )}
-                                    </ul>
-                                </section>
-                            ) : null}
-
-                            {activeTab === 'all' &&
-                            systemRows.length > 0 &&
-                            customRows.length === 0 ? (
-                                <p className="text-muted-foreground text-sm">
-                                    No custom templates yet. Use{' '}
-                                    <strong>Clone & customize</strong> on a
-                                    general template to create one.
-                                </p>
-                            ) : null}
-                        </div>
-                    )}
-
-                    <Modal
-                        show={previewTarget !== null}
-                        maxWidth="6xl"
-                        onClose={() => setPreviewTarget(null)}
-                    >
-                        <div className="p-6">
-                            <div className="mb-4 flex flex-wrap items-start justify-between gap-2">
-                                <div>
-                                    <h3 className="text-foreground text-lg font-semibold">
-                                        {previewTitle}
-                                    </h3>
-                                    {previewDraft ? (
-                                        <p className="text-muted-foreground text-sm">
-                                            {invoiceTypeLabel(
-                                                previewDraft.invoice_type ??
-                                                    'standard',
-                                            )}
+                            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3">
+                                    {pageLoading ? (
+                                        <div className="space-y-1">
+                                            {[...Array(8)].map((_, i) => (
+                                                <div
+                                                    key={i}
+                                                    className="flex animate-pulse items-center gap-3 rounded-lg px-3 py-2.5"
+                                                >
+                                                    <div className="h-10 w-10 shrink-0 rounded-lg bg-muted" />
+                                                    <div className="flex-1 space-y-1.5">
+                                                        <div className="h-3 w-3/4 rounded bg-muted" />
+                                                        <div className="h-2 w-1/2 rounded bg-muted" />
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : visibleCards.length === 0 ? (
+                                        <p className="text-muted-foreground py-12 text-center text-sm">
+                                            {filter
+                                                ? 'No templates match your search.'
+                                                : activeTab === 'default'
+                                                  ? 'No default template is set.'
+                                                  : activeTab === 'custom'
+                                                    ? 'No custom templates yet. Clone a general template to get started.'
+                                                    : 'No templates found.'}
                                         </p>
+                                    ) : (
+                                        <div className="space-y-0.5">
+                                            <p className="text-muted-foreground mb-2 px-1 text-xs font-medium">
+                                                {visibleCards.length} template
+                                                {visibleCards.length === 1
+                                                    ? ''
+                                                    : 's'}
+                                            </p>
+                                            {visibleCards.map((target) =>
+                                                renderCard(target),
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </aside>
+
+                        <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-br from-muted/40 via-background to-background">
+                            <div className="shrink-0 border-b border-border/80 bg-card/50 px-6 py-4 backdrop-blur-sm">
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <h3 className="text-foreground text-xl font-semibold tracking-tight">
+                                            {previewTitle ?? 'Template preview'}
+                                        </h3>
+                                        {previewDraft ? (
+                                            <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-sm">
+                                                <span>
+                                                    {invoiceTypeLabel(
+                                                        previewDraft.invoice_type ??
+                                                            'standard',
+                                                    )}
+                                                </span>
+                                                {isSelectedDefault ? (
+                                                    <span className="rounded-full bg-sidebar-primary/15 px-2.5 py-0.5 text-xs font-semibold text-sidebar-primary">
+                                                        Default
+                                                    </span>
+                                                ) : null}
+                                            </div>
+                                        ) : null}
+                                    </div>
+
+                                    {previewTarget ? (
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            {!isSelectedDefault ? (
+                                                <PrimaryButton
+                                                    type="button"
+                                                    disabled={Boolean(busyId)}
+                                                    className="normal-case tracking-normal"
+                                                    onClick={() =>
+                                                        void handleSetDefaultFor(
+                                                            previewTarget,
+                                                        )
+                                                    }
+                                                >
+                                                    Use as default
+                                                </PrimaryButton>
+                                            ) : null}
+
+                                            {previewTarget.kind === 'system' ? (
+                                                <SecondaryButton
+                                                    className="normal-case tracking-normal"
+                                                    disabled={
+                                                        busyId ===
+                                                        `sys-${previewTarget.id}`
+                                                    }
+                                                    onClick={() => {
+                                                        const row =
+                                                            systemRows.find(
+                                                                (r) =>
+                                                                    r.id ===
+                                                                    previewTarget.id,
+                                                            );
+                                                        if (row) {
+                                                            void handleCloneSystem(
+                                                                row,
+                                                            );
+                                                        }
+                                                    }}
+                                                >
+                                                    Clone & customize
+                                                </SecondaryButton>
+                                            ) : (
+                                                <>
+                                                    <SecondaryButton
+                                                        className="normal-case tracking-normal"
+                                                        disabled={
+                                                            busyId ===
+                                                            `custom-${previewTarget.row.id}`
+                                                        }
+                                                        onClick={() =>
+                                                            void handleCloneCustom(
+                                                                previewTarget.row,
+                                                            )
+                                                        }
+                                                    >
+                                                        Clone & customize
+                                                    </SecondaryButton>
+                                                    {!isDefaultCustom(
+                                                        previewTarget.row.id,
+                                                    ) ? (
+                                                        <SecondaryButton
+                                                            type="button"
+                                                            className="normal-case tracking-normal text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                                                            disabled={
+                                                                busyId ===
+                                                                `del-${previewTarget.row.id}`
+                                                            }
+                                                            onClick={() =>
+                                                                void handleDelete(
+                                                                    previewTarget.row,
+                                                                )
+                                                            }
+                                                        >
+                                                            {busyId ===
+                                                            `del-${previewTarget.row.id}`
+                                                                ? 'Removing…'
+                                                                : 'Remove'}
+                                                        </SecondaryButton>
+                                                    ) : null}
+                                                </>
+                                            )}
+
+                                            <SecondaryButton
+                                                className="normal-case tracking-normal"
+                                                disabled={
+                                                    !previewDraft || downloading
+                                                }
+                                                onClick={async () => {
+                                                    if (!previewDraft) {
+                                                        return;
+                                                    }
+                                                    setDownloading(true);
+                                                    try {
+                                                        await downloadInvoicePdf(
+                                                            previewDraft,
+                                                        );
+                                                    } finally {
+                                                        setDownloading(false);
+                                                    }
+                                                }}
+                                            >
+                                                {downloading
+                                                    ? 'Preparing PDF…'
+                                                    : 'Download PDF'}
+                                            </SecondaryButton>
+                                        </div>
                                     ) : null}
                                 </div>
-                                <button
-                                    type="button"
-                                    className="text-muted-foreground text-sm hover:text-foreground"
-                                    onClick={() => setPreviewTarget(null)}
-                                >
-                                    Close
-                                </button>
+
+                                {previewTarget ? (
+                                    <p className="text-muted-foreground mt-3 text-sm">
+                                        {isSelectedDefault
+                                            ? 'This is your company default template.'
+                                            : 'Set as default or clone to customize.'}
+                                    </p>
+                                ) : null}
                             </div>
 
-                            <div className="max-h-[70vh] overflow-y-auto">
+                            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-6">
                                 {previewDraft ? (
-                                    <InvoicePreview draft={previewDraft} />
-                                ) : (
-                                    <div className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground flex h-[480px] items-center justify-center">
-                                        Preview unavailable
+                                    <div className="mx-auto w-full max-w-3xl overflow-hidden rounded-xl bg-white shadow-2xl shadow-black/20 ring-1 ring-black/5">
+                                        <InvoicePreview draft={previewDraft} />
                                     </div>
+                                ) : (
+                                    <div className="flex h-full min-h-[12rem] flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card/80 px-6 text-center">
+                                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+                                                <svg
+                                                    className="h-8 w-8 text-muted-foreground"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth={1.5}
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <p className="text-muted-foreground text-sm">
+                                                {pageLoading
+                                                    ? 'Loading preview…'
+                                                    : 'Select a template from the left to preview it here'}
+                                            </p>
+                                        </div>
                                 )}
                             </div>
 
-                            <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4">
-                                <SecondaryButton
-                                    disabled={!previewDraft || downloading}
-                                    onClick={async () => {
-                                        if (!previewDraft) {
-                                            return;
-                                        }
-                                        setDownloading(true);
-                                        try {
-                                            await downloadInvoicePdf(
-                                                previewDraft,
-                                            );
-                                        } finally {
-                                            setDownloading(false);
-                                        }
-                                    }}
-                                >
-                                    {downloading
-                                        ? 'Preparing PDF…'
-                                        : 'Download PDF'}
-                                </SecondaryButton>
-                                {previewTarget?.kind === 'system' ? (
-                                    <PrimaryButton
-                                        disabled={
-                                            busyId ===
-                                            `sys-${previewTarget.id}`
-                                        }
-                                        onClick={() => {
-                                            const row = systemRows.find(
-                                                (r) =>
-                                                    r.id === previewTarget.id,
-                                            );
-                                            if (row) {
-                                                void handleCloneSystem(row);
-                                            }
-                                        }}
-                                    >
-                                        Clone & customize
-                                    </PrimaryButton>
-                                ) : previewTarget?.kind === 'custom' ? (
-                                    <>
-                                        <Link
-                                            href={route(
-                                                'settings.templates.edit',
-                                                previewTarget.row.id,
-                                            )}
-                                        >
-                                            <PrimaryButton type="button">
-                                                Edit
-                                            </PrimaryButton>
-                                        </Link>
-                                        <SecondaryButton
-                                            disabled={
-                                                busyId ===
-                                                `custom-${previewTarget.row.id}`
-                                            }
-                                            onClick={() =>
-                                                void handleCloneCustom(
-                                                    previewTarget.row,
-                                                )
-                                            }
-                                        >
-                                            Clone
-                                        </SecondaryButton>
-                                    </>
-                                ) : null}
-                            </div>
-                        </div>
-                    </Modal>
+                        </main>
+                    </div>
                 </div>
             </div>
         </AuthenticatedLayout>

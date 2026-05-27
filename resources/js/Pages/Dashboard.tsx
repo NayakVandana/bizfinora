@@ -75,8 +75,8 @@ const quickLinks = [
     },
     {
         title: 'Templates',
-        description: 'Default invoice type & library',
-        href: 'settings.templates.library',
+        description: 'Browse, preview & set default',
+        href: 'settings.templates',
     },
 ] as const;
 

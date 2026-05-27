@@ -271,7 +271,7 @@ class InvoiceTemplateApiController extends Controller
 
             $template->delete();
 
-            return $this->sendJsonResponse(true, 'Template deleted successfully.', null, 200);
+            return $this->sendJsonResponse(true, 'Template removed successfully.', null, 200);
         } catch (Exception $e) {
             return $this->sendError($e);
         }

@@ -21,12 +21,14 @@ import {
 } from '@/invoices/templatePresets';
 import type { CompanyTaxSettings } from '@/invoices/taxPresets';
 import type { InvoiceDraft, PartyDetails } from '@/invoices/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
 
 type Props = {
     templateId: number;
 };
+
+const TEMPLATES_FLASH_KEY = 'templates_flash_message';
 
 type Meta = {
     seller: PartyDetails;
@@ -122,10 +124,14 @@ export default function TemplateEdit({ templateId }: Props) {
             );
             if (res.success && res.data) {
                 setTemplate(res.data);
-                setMessage('Template saved. It will be available when creating invoices.');
-            } else {
-                setError(res.message ?? 'Save failed.');
+                sessionStorage.setItem(
+                    TEMPLATES_FLASH_KEY,
+                    'Template saved. It will be available when creating invoices.',
+                );
+                router.visit(route('settings.templates'));
+                return;
             }
+            setError(res.message ?? 'Save failed.');
         } finally {
             setSaving(false);
         }
@@ -144,10 +150,10 @@ export default function TemplateEdit({ templateId }: Props) {
             <div className="py-6">
                 <div className="w-full px-4 sm:px-6 lg:px-8">
                     <Link
-                        href={route('settings.templates.library')}
+                        href={route('settings.templates')}
                         className="font-medium text-sidebar-primary hover:opacity-80 text-sm"
                     >
-                        ← Back to template library
+                        ← Back to templates
                     </Link>
 
                     {loading ? (
