@@ -1,6 +1,8 @@
 import ListingIndex from '@/Components/ListingIndex';
+import BuyerListingActions from '@/Components/BuyerListingActions';
 import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { useConfirm } from '@/contexts/ConfirmDialogContext';
@@ -134,35 +136,21 @@ export default function BuyersIndex() {
                                                 {b.gst ? (
                                                     <div>GST: {b.gst}</div>
                                                 ) : null}
+                                                {b.created_at ? (
+                                                    <div>
+                                                        {formatDisplayDateTime(
+                                                            b.created_at,
+                                                        )}
+                                                    </div>
+                                                ) : null}
                                             </dl>
-                                            <div className="mt-3 flex flex-wrap gap-3 text-sm">
-                                                <Link
-                                                    href={route(
-                                                        'buyers.show',
-                                                        b.id,
-                                                    )}
-                                                    className="font-medium text-sidebar-primary hover:opacity-80"
-                                                >
-                                                    View
-                                                </Link>
-                                                <Link
-                                                    href={route(
-                                                        'buyers.edit',
-                                                        b.id,
-                                                    )}
-                                                    className="font-medium text-sidebar-primary hover:opacity-80"
-                                                >
-                                                    Edit
-                                                </Link>
-                                                <button
-                                                    type="button"
-                                                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                                                    onClick={() =>
+                                            <div className="mt-3">
+                                                <BuyerListingActions
+                                                    buyerId={b.id}
+                                                    onDelete={() =>
                                                         void destroy(b.id)
                                                     }
-                                                >
-                                                    Delete
-                                                </button>
+                                                />
                                             </div>
                                         </li>
                                     ))}
@@ -194,6 +182,9 @@ export default function BuyersIndex() {
                                                 </th>
                                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                     GST
+                                                </th>
+                                                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                                                    Created
                                                 </th>
                                                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-right">
                                                     Actions
@@ -229,36 +220,20 @@ export default function BuyersIndex() {
                                                     <td className="px-4 py-3 text-muted-foreground">
                                                         {b.gst ?? '—'}
                                                     </td>
-                                                    <td className="px-4 py-3 text-muted-foreground space-x-2 text-right whitespace-nowrap">
-                                                        <Link
-                                                            href={route(
-                                                                'buyers.show',
-                                                                b.id,
-                                                            )}
-                                                            className="font-medium text-sidebar-primary hover:opacity-80"
-                                                        >
-                                                            View
-                                                        </Link>
-                                                        <Link
-                                                            href={route(
-                                                                'buyers.edit',
-                                                                b.id,
-                                                            )}
-                                                            className="font-medium text-sidebar-primary hover:opacity-80"
-                                                        >
-                                                            Edit
-                                                        </Link>
-                                                        <button
-                                                            type="button"
-                                                            className="text-red-600 hover:text-red-800"
-                                                            onClick={() =>
+                                                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
+                                                        {formatDisplayDateTime(
+                                                            b.created_at,
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <BuyerListingActions
+                                                            buyerId={b.id}
+                                                            onDelete={() =>
                                                                 void destroy(
                                                                     b.id,
                                                                 )
                                                             }
-                                                        >
-                                                            Delete
-                                                        </button>
+                                                        />
                                                     </td>
                                                 </tr>
                                             ))}

@@ -1,4 +1,5 @@
 import type { CompanySellerProfile } from '@/invoices/types';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 
 function displayValue(value?: string | null): string {
     const trimmed = value?.trim();
@@ -104,6 +105,20 @@ export default function CurrentWorkspaceProfile({ profile }: Props) {
                 value={displayValue(profile.seller_notes)}
                 multiline
             />
+
+            <div className="grid gap-2 sm:grid-cols-2">
+                <ProfileMeta
+                    label="Created"
+                    value={formatDisplayDateTime(profile.created_at)}
+                />
+                {profile.updated_at &&
+                profile.updated_at !== profile.created_at ? (
+                    <ProfileMeta
+                        label="Updated"
+                        value={formatDisplayDateTime(profile.updated_at)}
+                    />
+                ) : null}
+            </div>
         </div>
     );
 }

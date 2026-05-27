@@ -19,4 +19,6 @@ export type BuyerOption = {
     account_number?: string | null;
     swift_bic?: string | null;
     notes?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
 };

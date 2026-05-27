@@ -15,6 +15,8 @@ export interface User {
     state?: string | null;
     postal_code?: string | null;
     email_verified_at?: string;
+    created_at?: string | null;
+    updated_at?: string | null;
     current_company_id?: number | null;
     current_company?: Company | null;
     companies?: Company[];

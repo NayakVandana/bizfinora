@@ -131,4 +131,6 @@ export interface CompanySellerProfile {
     swift_bic?: string | null;
     logo_data_url?: string | null;
     seller_notes?: string | null;
+    created_at?: string | null;
+    updated_at?: string | null;
 }

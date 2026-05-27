@@ -33,6 +33,8 @@ class InvoicePresentation
             'account_number' => $buyer->account_number,
             'swift_bic' => $buyer->swift_bic,
             'notes' => $buyer->notes,
+            'created_at' => $buyer->created_at?->toIso8601String(),
+            'updated_at' => $buyer->updated_at?->toIso8601String(),
         ];
     }
 

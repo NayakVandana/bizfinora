@@ -1,4 +1,5 @@
 import type { BuyerOption } from '@/Pages/Invoices/types';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 
 function DetailRow({
     label,
@@ -66,6 +67,18 @@ export default function BuyerDetail({ buyer }: { buyer: BuyerOption }) {
             ) : null}
             {hasValue(buyer.notes) ? (
                 <DetailRow label="Notes" value={buyer.notes} multiline />
+            ) : null}
+            {buyer.created_at ? (
+                <DetailRow
+                    label="Created"
+                    value={formatDisplayDateTime(buyer.created_at)}
+                />
+            ) : null}
+            {buyer.updated_at && buyer.updated_at !== buyer.created_at ? (
+                <DetailRow
+                    label="Updated"
+                    value={formatDisplayDateTime(buyer.updated_at)}
+                />
             ) : null}
         </dl>
     );

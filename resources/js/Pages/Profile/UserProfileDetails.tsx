@@ -1,4 +1,5 @@
 import type { User } from '@/types';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 
 function displayValue(value?: string | null): string {
     const trimmed = value?.trim();
@@ -64,6 +65,19 @@ export default function UserProfileDetails({ user }: Props) {
                     user.email_verified_at ? 'Verified' : 'Not verified'
                 }
             />
+
+            <div className="grid gap-2 sm:grid-cols-2">
+                <ProfileMeta
+                    label="Created"
+                    value={formatDisplayDateTime(user.created_at)}
+                />
+                {user.updated_at && user.updated_at !== user.created_at ? (
+                    <ProfileMeta
+                        label="Updated"
+                        value={formatDisplayDateTime(user.updated_at)}
+                    />
+                ) : null}
+            </div>
         </div>
     );
 }
