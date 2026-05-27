@@ -27,7 +27,7 @@ class DashboardApiController extends Controller
                 ->orderByDesc('invoice_date')
                 ->orderByDesc('id')
                 ->limit(5)
-                ->get(['id', 'invoice_number', 'status', 'invoice_date', 'total', 'buyer_id'])
+                ->get(['id', 'invoice_number', 'status', 'invoice_date', 'total', 'buyer_id', 'created_at'])
                 ->map(fn (Invoice $invoice) => [
                     'id' => $invoice->id,
                     'invoice_number' => $invoice->invoice_number,
@@ -36,6 +36,7 @@ class DashboardApiController extends Controller
                     'total' => (float) $invoice->total,
                     'buyer_name' => $invoice->buyer?->company_name
                         ?: $invoice->buyer?->name,
+                    'created_at' => $invoice->created_at?->toIso8601String(),
                 ])
                 ->values()
                 ->all();

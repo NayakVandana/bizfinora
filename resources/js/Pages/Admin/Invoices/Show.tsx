@@ -26,6 +26,8 @@ export default function AdminInvoicesShow({ invoiceId }: { invoiceId: number }) 
     const [downloading, setDownloading] = useState(false);
     const [sharing, setSharing] = useState(false);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
+    const [createdAt, setCreatedAt] = useState<string | null>(null);
+    const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -46,6 +48,16 @@ export default function AdminInvoicesShow({ invoiceId }: { invoiceId: number }) 
             );
             setHasShareLink(Boolean(res.data.share_url));
             setCompanyId(res.data.company_id ?? null);
+            setCreatedAt(
+                typeof payload.created_at === 'string'
+                    ? payload.created_at
+                    : null,
+            );
+            setUpdatedAt(
+                typeof payload.updated_at === 'string'
+                    ? payload.updated_at
+                    : null,
+            );
         } else {
             setError(res.message ?? 'Invoice not found.');
         }
@@ -128,6 +140,8 @@ export default function AdminInvoicesShow({ invoiceId }: { invoiceId: number }) 
                             downloading={downloading}
                             sharing={sharing}
                             shareMessage={shareMessage}
+                            createdAt={createdAt}
+                            updatedAt={updatedAt}
                             onDownload={() => void downloadInvoice()}
                             onShare={() => void createShareLink()}
                         />

@@ -2,6 +2,7 @@ import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
 import { LISTING_PER_PAGE } from '@/utils/listingIndex';
 import TextInput from '@/Components/TextInput';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import {
@@ -12,14 +13,6 @@ import {
 import type { AdminUserRow } from '@/types/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
-
-function formatDate(value?: string | null): string {
-    if (!value) {
-        return '—';
-    }
-
-    return new Date(value).toLocaleDateString();
-}
 
 export default function AdminUsersIndex() {
     const [rows, setRows] = useState<AdminUserRow[]>([]);
@@ -130,7 +123,7 @@ export default function AdminUsersIndex() {
                                             <div className="text-muted-foreground mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
                                                 <span>
                                                     Joined{' '}
-                                                    {formatDate(row.created_at)}
+                                                    {formatDisplayDateTime(row.created_at)}
                                                 </span>
                                                 {row.is_admin ? (
                                                     <span className="rounded bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
@@ -176,7 +169,7 @@ export default function AdminUsersIndex() {
                                                     {row.email}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">
-                                                    {formatDate(row.created_at)}
+                                                    {formatDisplayDateTime(row.created_at)}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">
                                                     {row.is_admin ? (

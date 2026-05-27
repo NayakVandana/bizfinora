@@ -21,6 +21,7 @@ import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { invoiceTypeLabel } from '@/invoices/invoiceTypes';
 import { applyTemplatePresetToDraft } from '@/invoices/templatePresets';
 import { Head, Link, router } from '@inertiajs/react';
+import { useConfirm } from '@/contexts/ConfirmDialogContext';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTemplatePreviewData } from './useTemplatePreviewData';
 
@@ -37,6 +38,7 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 export default function TemplatesIndex() {
+    const { confirm } = useConfirm();
     const { seller, taxSettings, loading: previewDataLoading } =
         useTemplatePreviewData();
     const [data, setData] = useState<TemplatesListData | null>(null);
@@ -162,13 +164,17 @@ export default function TemplatesIndex() {
     };
 
     const handleDelete = async (row: CustomTemplateRow) => {
-        if (
-            !window.confirm(
-                `Delete template “${row.name}”? This cannot be undone.`,
-            )
-        ) {
+        const ok = await confirm({
+            title: 'Delete template?',
+            message: `Delete template “${row.name}”? This cannot be undone.`,
+            confirmLabel: 'Delete',
+            variant: 'danger',
+        });
+
+        if (!ok) {
             return;
         }
+
         setBusyId(`del-${row.id}`);
         setMessage(null);
         try {

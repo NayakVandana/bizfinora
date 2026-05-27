@@ -23,6 +23,7 @@ const emptySummary: InvoiceSummary = {
     draft: { count: 0, amount: 0 },
     sent: { count: 0, amount: 0 },
     paid: { count: 0, amount: 0 },
+    rejected: { count: 0, amount: 0 },
 };
 
 export default function AdminInvoicesIndex() {
@@ -107,7 +108,7 @@ export default function AdminInvoicesIndex() {
                                 type="search"
                                 value={keyword}
                                 onChange={(e) => setKeyword(e.target.value)}
-                                placeholder="Search invoice, buyer, company…"
+                                placeholder="Search invoice, buyer, company, user…"
                                 className="w-full sm:max-w-xs"
                             />
                         </div>

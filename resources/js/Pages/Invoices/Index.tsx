@@ -1,5 +1,6 @@
 import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
+import InvoiceListingActions from '@/Components/InvoiceListingActions';
 import InvoiceStatusSummaryBar from '@/Components/InvoiceStatusSummaryBar';
 import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -12,7 +13,7 @@ import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { formatMoney } from '@/invoices/formatMoney';
 import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
-import type { InvoiceDraft } from '@/invoices/types';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import { LISTING_PER_PAGE } from '@/utils/listingIndex';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import type {
@@ -33,6 +34,7 @@ type InvoiceRow = {
     total: number;
     buyer_name?: string;
     has_share_link: boolean;
+    created_at?: string | null;
 };
 
 type Paginated = PaginatedWithInvoiceSummary<InvoiceRow>;
@@ -43,11 +45,8 @@ const emptySummary: InvoiceSummary = {
     draft: { count: 0, amount: 0 },
     sent: { count: 0, amount: 0 },
     paid: { count: 0, amount: 0 },
+    rejected: { count: 0, amount: 0 },
 };
-
-function rowActionsClass(disabled: boolean) {
-    return `font-medium text-sidebar-primary hover:opacity-80${disabled ? ' opacity-50 pointer-events-none' : ''}`;
-}
 
 export default function InvoicesIndex() {
     const [rows, setRows] = useState<InvoiceRow[]>([]);
@@ -64,6 +63,7 @@ export default function InvoicesIndex() {
     const [loading, setLoading] = useState(true);
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
     const [sharingId, setSharingId] = useState<number | null>(null);
+    const [rejectingId, setRejectingId] = useState<number | null>(null);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
 
     const loadInvoiceDraft = async (id: number): Promise<InvoiceDraft | null> => {
@@ -127,6 +127,25 @@ export default function InvoicesIndex() {
         }
     };
 
+    const rejectInvoice = async (id: number) => {
+        setShareMessage(null);
+        setRejectingId(id);
+        try {
+            const res = await companyApiPost<ApiEnvelope<null>>(
+                '/invoices/invoice-reject',
+                { id },
+            );
+
+            if (res.success) {
+                await load();
+            } else {
+                setShareMessage(res.message ?? 'Could not reject invoice.');
+            }
+        } finally {
+            setRejectingId(null);
+        }
+    };
+
     const load = useCallback(async () => {
         setLoading(true);
 
@@ -164,43 +183,16 @@ export default function InvoicesIndex() {
     };
 
     const renderRowActions = (row: InvoiceRow) => (
-        <>
-            <Link
-                href={route('invoices.show', row.id)}
-                className={rowActionsClass(false)}
-            >
-                View
-            </Link>
-            <span className="mx-2 text-border">|</span>
-            <Link
-                href={route('invoices.edit', row.id)}
-                className={rowActionsClass(false)}
-            >
-                Edit
-            </Link>
-            <span className="mx-2 text-border">|</span>
-            <button
-                type="button"
-                disabled={downloadingId === row.id}
-                onClick={() => void downloadInvoice(row.id)}
-                className={rowActionsClass(downloadingId === row.id)}
-            >
-                {downloadingId === row.id ? 'PDF…' : 'Download PDF'}
-            </button>
-            <span className="mx-2 text-border">|</span>
-            <button
-                type="button"
-                disabled={sharingId === row.id}
-                onClick={() => void createShareLink(row.id)}
-                className={rowActionsClass(sharingId === row.id)}
-            >
-                {sharingId === row.id
-                    ? 'Link…'
-                    : row.has_share_link
-                      ? 'Copy share link'
-                      : 'Create share link'}
-            </button>
-        </>
+        <InvoiceListingActions
+            row={row}
+            variant="app"
+            downloadingId={downloadingId}
+            sharingId={sharingId}
+            rejectingId={rejectingId}
+            onDownload={downloadInvoice}
+            onShare={createShareLink}
+            onReject={rejectInvoice}
+        />
     );
 
     return (
@@ -283,7 +275,7 @@ export default function InvoicesIndex() {
                                             </Link>
                                             <p className="text-muted-foreground mt-1 text-sm">
                                                 {row.buyer_name ?? '—'} ·{' '}
-                                                {row.invoice_date}
+                                                {formatDisplayDateTime(row.created_at)}
                                             </p>
                                             <div className="mt-2 flex items-center justify-between">
                                                 <InvoiceStatusBadge
@@ -314,7 +306,7 @@ export default function InvoicesIndex() {
                                                 Buyer
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
-                                                Date
+                                                Created
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
                                                 Status
@@ -346,7 +338,7 @@ export default function InvoicesIndex() {
                                                     {row.buyer_name ?? '—'}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground text-sm">
-                                                    {row.invoice_date}
+                                                    {formatDisplayDateTime(row.created_at)}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">
                                                     <InvoiceStatusBadge

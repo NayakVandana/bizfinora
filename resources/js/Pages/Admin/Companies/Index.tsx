@@ -2,6 +2,7 @@ import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
 import { LISTING_PER_PAGE } from '@/utils/listingIndex';
 import TextInput from '@/Components/TextInput';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import {
@@ -12,14 +13,6 @@ import {
 import type { AdminCompanyRow } from '@/types/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
-
-function formatDate(value?: string | null): string {
-    if (!value) {
-        return '—';
-    }
-
-    return new Date(value).toLocaleDateString();
-}
 
 export default function AdminCompaniesIndex() {
     const [rows, setRows] = useState<AdminCompanyRow[]>([]);
@@ -184,7 +177,7 @@ export default function AdminCompaniesIndex() {
                                                     {row.buyers_count ?? 0}
                                                 </td>
                                                 <td className="px-4 py-3 text-muted-foreground">
-                                                    {formatDate(row.created_at)}
+                                                    {formatDisplayDateTime(row.created_at)}
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
                                                     <Link

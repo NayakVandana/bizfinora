@@ -4,6 +4,7 @@ import TextInput from '@/Components/TextInput';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { TAX_PRESETS, presetForType, type CompanyTaxSettings } from '../taxPresets';
 import Accordion from './Accordion';
+import { useState } from 'react';
 import type { InvoiceDraft, TaxCalculationMode, TaxType } from '../types';
 
 type Props = {
@@ -17,6 +18,8 @@ export default function TaxSettingsSection({
     onChange,
     companyTax,
 }: Props) {
+    const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
     const applyPreset = (type: TaxType) => {
         const preset = presetForType(type);
         onChange({
@@ -27,6 +30,8 @@ export default function TaxSettingsSection({
     };
 
     const saveCompanyDefaults = async () => {
+        setSaveMessage(null);
+
         const res = await companyApiPost<ApiEnvelope<CompanyTaxSettings>>(
             '/company/company-tax-settings-update',
             {
@@ -38,9 +43,9 @@ export default function TaxSettingsSection({
             },
         );
         if (res.success) {
-            alert('Tax defaults saved for this company.');
+            setSaveMessage('Tax defaults saved for this company.');
         } else {
-            alert(res.message ?? 'Could not save tax settings.');
+            setSaveMessage(res.message ?? 'Could not save tax settings.');
         }
     };
 
@@ -163,6 +168,12 @@ export default function TaxSettingsSection({
                 />
                 Show tax summary table on PDF
             </label>
+
+            {saveMessage ? (
+                <p className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm text-foreground">
+                    {saveMessage}
+                </p>
+            ) : null}
 
             <PrimaryButton
                 type="button"

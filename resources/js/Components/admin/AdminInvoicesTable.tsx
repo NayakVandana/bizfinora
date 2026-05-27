@@ -1,4 +1,5 @@
 import ListingIndex from '@/Components/ListingIndex';
+import InvoiceListingActions from '@/Components/InvoiceListingActions';
 import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import {
@@ -21,23 +22,7 @@ const compactTh =
     'px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground';
 const compactTd = 'px-3 py-2 text-sm';
 
-function formatDateTime(value?: string | null): string {
-    if (!value) {
-        return '—';
-    }
-
-    return new Date(value).toLocaleString(undefined, {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-    });
-}
-
-function rowActionsClass(disabled: boolean) {
-    return `font-medium text-sidebar-primary hover:opacity-80${disabled ? ' opacity-50 pointer-events-none' : ''}`;
-}
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 
 type Props = {
     rows: AdminInvoiceRow[];
@@ -112,36 +97,15 @@ export default function AdminInvoicesTable({
     };
 
     const renderRowActions = (row: AdminInvoiceRow) => (
-        <>
-            <Link
-                href={route('admin.invoices.show', row.id)}
-                className={rowActionsClass(false)}
-            >
-                View
-            </Link>
-            <span className="mx-2 text-border">|</span>
-            <button
-                type="button"
-                disabled={downloadingId === row.id}
-                onClick={() => void downloadInvoice(row.id)}
-                className={rowActionsClass(downloadingId === row.id)}
-            >
-                {downloadingId === row.id ? 'PDF…' : 'Download PDF'}
-            </button>
-            <span className="mx-2 text-border">|</span>
-            <button
-                type="button"
-                disabled={sharingId === row.id}
-                onClick={() => void createShareLink(row.id)}
-                className={rowActionsClass(sharingId === row.id)}
-            >
-                {sharingId === row.id
-                    ? 'Link…'
-                    : hasShareLink(row)
-                      ? 'Copy share link'
-                      : 'Create share link'}
-            </button>
-        </>
+        <InvoiceListingActions
+            row={row}
+            variant="admin"
+            downloadingId={downloadingId}
+            sharingId={sharingId}
+            onDownload={downloadInvoice}
+            onShare={createShareLink}
+            hasShareLink={hasShareLink}
+        />
     );
 
     if (rows.length === 0) {
@@ -175,6 +139,23 @@ export default function AdminInvoicesTable({
                                 {row.company_name}
                             </Link>
                         ) : null}
+                        {row.user_name ? (
+                            <p className="text-muted-foreground text-xs">
+                                {row.user_id ? (
+                                    <Link
+                                        href={route(
+                                            'admin.users.show',
+                                            row.user_id,
+                                        )}
+                                        className="hover:text-foreground"
+                                    >
+                                        {row.user_name}
+                                    </Link>
+                                ) : (
+                                    row.user_name
+                                )}
+                            </p>
+                        ) : null}
                         <Link
                             href={route('admin.invoices.show', row.id)}
                             className="text-foreground text-sm font-medium hover:text-sidebar-primary"
@@ -188,6 +169,9 @@ export default function AdminInvoicesTable({
                             row.buyer_name !== row.buyer_company_name
                                 ? ` · ${row.buyer_name}`
                                 : ''}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                            {formatDisplayDateTime(row.created_at)}
                         </p>
                         <div className="mt-1 flex flex-wrap items-center gap-2">
                             <InvoiceStatusBadge status={row.status} />
@@ -203,18 +187,19 @@ export default function AdminInvoicesTable({
             </ul>
 
             <div className="hidden overflow-x-auto lg:block">
-                <table className="w-full min-w-[56rem] divide-y divide-border text-sm">
+                <table className="w-full min-w-[62rem] divide-y divide-border text-sm">
                     <thead className="bg-muted">
                         <tr>
                             <th className={listingIndexThClass}>#</th>
                             {showCompany ? (
                                 <th className={compactTh}>Company</th>
                             ) : null}
+                            <th className={compactTh}>User</th>
                             <th className={compactTh}>Invoice</th>
                             <th className={compactTh}>Buyer company</th>
                             <th className={compactTh}>Buyer name</th>
                             <th className={compactTh}>Mobile</th>
-                            <th className={compactTh}>Date</th>
+                            <th className={compactTh}>Created</th>
                             <th className={compactTh}>Status</th>
                             <th className={`${compactTh} text-right`}>Total</th>
                             <th className={`${compactTh} text-right`}>Action</th>
@@ -241,6 +226,21 @@ export default function AdminInvoicesTable({
                                         )}
                                     </td>
                                 ) : null}
+                                <td className={`${compactTd} text-muted-foreground`}>
+                                    {row.user_id && row.user_name ? (
+                                        <Link
+                                            href={route(
+                                                'admin.users.show',
+                                                row.user_id,
+                                            )}
+                                            className="text-sidebar-primary hover:opacity-80"
+                                        >
+                                            {row.user_name}
+                                        </Link>
+                                    ) : (
+                                        row.user_name ?? '—'
+                                    )}
+                                </td>
                                 <td className={`${compactTd} font-medium text-foreground`}>
                                     <Link
                                         href={route('admin.invoices.show', row.id)}
@@ -271,7 +271,7 @@ export default function AdminInvoicesTable({
                                     {row.buyer_phone ?? '—'}
                                 </td>
                                 <td className={`${compactTd} text-muted-foreground whitespace-nowrap`}>
-                                    {formatDateTime(row.created_at ?? row.invoice_date)}
+                                    {formatDisplayDateTime(row.created_at)}
                                 </td>
                                 <td className={compactTd}>
                                     <InvoiceStatusBadge status={row.status} />

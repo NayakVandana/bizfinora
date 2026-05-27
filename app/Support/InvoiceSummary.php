@@ -13,7 +13,8 @@ class InvoiceSummary
      *     all: array{count: int, amount: float},
      *     draft: array{count: int, amount: float},
      *     sent: array{count: int, amount: float},
-     *     paid: array{count: int, amount: float}
+     *     paid: array{count: int, amount: float},
+     *     rejected: array{count: int, amount: float}
      * }
      */
     public static function fromQuery(Builder $query): array
@@ -38,14 +39,15 @@ class InvoiceSummary
             'draft' => ['count' => $count('draft'), 'amount' => $amount('draft')],
             'sent' => ['count' => $count('sent'), 'amount' => $amount('sent')],
             'paid' => ['count' => $count('paid'), 'amount' => $amount('paid')],
+            'rejected' => ['count' => $count('rejected'), 'amount' => $amount('rejected')],
         ];
     }
 
     /**
      * @param  Builder<\App\Models\Invoice>  $query
      * @return array{
-     *     invoices: array{total: int, draft: int, sent: int, paid: int},
-     *     amounts: array{draft: float, sent: float, paid: float, all: float}
+     *     invoices: array{total: int, draft: int, sent: int, paid: int, rejected: int},
+     *     amounts: array{draft: float, sent: float, paid: float, rejected: float, all: float}
      * }
      */
     public static function forDashboard(Builder $query): array
@@ -58,11 +60,13 @@ class InvoiceSummary
                 'draft' => $summary['draft']['count'],
                 'sent' => $summary['sent']['count'],
                 'paid' => $summary['paid']['count'],
+                'rejected' => $summary['rejected']['count'],
             ],
             'amounts' => [
                 'draft' => $summary['draft']['amount'],
                 'sent' => $summary['sent']['amount'],
                 'paid' => $summary['paid']['amount'],
+                'rejected' => $summary['rejected']['amount'],
                 'all' => $summary['all']['amount'],
             ],
         ];

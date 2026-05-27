@@ -1,3 +1,5 @@
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
+
 export type AdminDetailField = {
     label: string;
     value?: string | number | boolean | null;
@@ -18,11 +20,7 @@ export function displayText(value?: string | number | boolean | null): string {
 }
 
 export function formatAdminDate(value?: string | null): string {
-    if (!value) {
-        return '—';
-    }
-
-    return new Date(value).toLocaleDateString();
+    return formatDisplayDateTime(value);
 }
 
 export function fieldHasValue(field: AdminDetailField): boolean {

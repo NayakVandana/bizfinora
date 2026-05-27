@@ -20,6 +20,7 @@ const emptySummary: InvoiceSummary = {
     draft: { count: 0, amount: 0 },
     sent: { count: 0, amount: 0 },
     paid: { count: 0, amount: 0 },
+    rejected: { count: 0, amount: 0 },
 };
 
 type Props = {

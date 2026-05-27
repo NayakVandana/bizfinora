@@ -1,8 +1,7 @@
+import ListingIconAction from '@/Components/ListingIconAction';
 import InvoicePreview from '@/invoices/InvoicePreview';
-import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import type { InvoiceDraft } from '@/invoices/types';
-import SecondaryButton from '@/Components/SecondaryButton';
-import { Link } from '@inertiajs/react';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 
 type Props = {
     draft: InvoiceDraft | null;
@@ -12,6 +11,8 @@ type Props = {
     downloading?: boolean;
     sharing?: boolean;
     shareMessage?: string | null;
+    createdAt?: string | null;
+    updatedAt?: string | null;
     onDownload: () => void;
     onShare: () => void;
     editHref?: string;
@@ -25,6 +26,8 @@ export default function InvoiceViewPanel({
     downloading = false,
     sharing = false,
     shareMessage,
+    createdAt,
+    updatedAt,
     onDownload,
     onShare,
     editHref,
@@ -45,6 +48,8 @@ export default function InvoiceViewPanel({
         );
     }
 
+    const shareLabel = hasShareLink ? 'Copy share link' : 'Create share link';
+
     return (
         <div className="space-y-4">
             {shareMessage ? (
@@ -53,30 +58,49 @@ export default function InvoiceViewPanel({
                 </div>
             ) : null}
 
-            <div className="flex flex-wrap items-center gap-2">
+            {createdAt || updatedAt ? (
+                <dl className="text-muted-foreground flex flex-wrap gap-x-6 gap-y-1 text-sm">
+                    {createdAt ? (
+                        <div>
+                            <dt className="inline font-medium">Created: </dt>
+                            <dd className="inline">
+                                {formatDisplayDateTime(createdAt)}
+                            </dd>
+                        </div>
+                    ) : null}
+                    {updatedAt && updatedAt !== createdAt ? (
+                        <div>
+                            <dt className="inline font-medium">Updated: </dt>
+                            <dd className="inline">
+                                {formatDisplayDateTime(updatedAt)}
+                            </dd>
+                        </div>
+                    ) : null}
+                </dl>
+            ) : null}
+
+            <div className="flex flex-wrap items-center gap-1">
                 {editHref ? (
-                    <Link href={editHref}>
-                        <SecondaryButton type="button">Edit</SecondaryButton>
-                    </Link>
+                    <ListingIconAction
+                        label="Edit"
+                        icon="edit"
+                        href={editHref}
+                    />
                 ) : null}
-                <SecondaryButton
-                    type="button"
+                <ListingIconAction
+                    label="Download PDF"
+                    icon="download"
+                    busy={downloading}
                     disabled={downloading}
                     onClick={onDownload}
-                >
-                    {downloading ? 'PDF…' : 'Download PDF'}
-                </SecondaryButton>
-                <SecondaryButton
-                    type="button"
+                />
+                <ListingIconAction
+                    label={shareLabel}
+                    icon="share"
+                    busy={sharing}
                     disabled={sharing}
                     onClick={onShare}
-                >
-                    {sharing
-                        ? 'Link…'
-                        : hasShareLink
-                          ? 'Copy share link'
-                          : 'Create share link'}
-                </SecondaryButton>
+                />
             </div>
 
             <InvoicePreview draft={draft} />

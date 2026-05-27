@@ -2,6 +2,7 @@ import ListingIndex from '@/Components/ListingIndex';
 import AdminDetailPanel from '@/Components/admin/AdminDetailPanel';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import { userAccountFields, userAddressFields } from '@/utils/adminEntityFields';
 import { adminApiPost, type ApiEnvelope } from '@/api/adminClient';
 import type { AdminUserDetail } from '@/types/admin';
@@ -11,14 +12,6 @@ import { useEffect, useState } from 'react';
 const compactTh =
     'px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground';
 const compactTd = 'px-3 py-2 text-sm';
-
-function formatDate(value?: string | null): string {
-    if (!value) {
-        return '—';
-    }
-
-    return new Date(value).toLocaleDateString();
-}
 
 export default function AdminUserShow({ userId }: { userId: number }) {
     const [user, setUser] = useState<AdminUserDetail | null>(null);
@@ -215,7 +208,7 @@ export default function AdminUserShow({ userId }: { userId: number }) {
                                                             <td
                                                                 className={`${compactTd} text-muted-foreground`}
                                                             >
-                                                                {formatDate(
+                                                                {formatDisplayDateTime(
                                                                     company.created_at,
                                                                 )}
                                                             </td>

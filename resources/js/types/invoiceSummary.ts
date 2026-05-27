@@ -9,9 +9,15 @@ export type InvoiceSummary = {
     draft: InvoiceStatusSummarySlice;
     sent: InvoiceStatusSummarySlice;
     paid: InvoiceStatusSummarySlice;
+    rejected: InvoiceStatusSummarySlice;
 };
 
-export type InvoiceStatusFilter = 'all' | 'draft' | 'sent' | 'paid';
+export type InvoiceStatusFilter =
+    | 'all'
+    | 'draft'
+    | 'sent'
+    | 'paid'
+    | 'rejected';
 
 export type PaginatedWithInvoiceSummary<T> = {
     data: T[];

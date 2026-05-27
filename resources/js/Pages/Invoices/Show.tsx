@@ -6,6 +6,7 @@ import {
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import type { InvoiceDraft } from '@/invoices/types';
+import { invoiceIsEditable } from '@/invoices/invoiceActions';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { Head, Link } from '@inertiajs/react';
@@ -24,6 +25,8 @@ export default function InvoicesShow({ invoiceId }: { invoiceId: number }) {
     const [downloading, setDownloading] = useState(false);
     const [sharing, setSharing] = useState(false);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
+    const [createdAt, setCreatedAt] = useState<string | null>(null);
+    const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -43,6 +46,16 @@ export default function InvoicesShow({ invoiceId }: { invoiceId: number }) {
                 ),
             );
             setHasShareLink(Boolean(res.data.share_url));
+            setCreatedAt(
+                typeof payload.created_at === 'string'
+                    ? payload.created_at
+                    : null,
+            );
+            setUpdatedAt(
+                typeof payload.updated_at === 'string'
+                    ? payload.updated_at
+                    : null,
+            );
         } else {
             setError(res.message ?? 'Invoice not found.');
         }
@@ -121,9 +134,15 @@ export default function InvoicesShow({ invoiceId }: { invoiceId: number }) {
                             downloading={downloading}
                             sharing={sharing}
                             shareMessage={shareMessage}
+                            createdAt={createdAt}
+                            updatedAt={updatedAt}
                             onDownload={() => void downloadInvoice()}
                             onShare={() => void createShareLink()}
-                            editHref={route('invoices.edit', invoiceId)}
+                            editHref={
+                                draft && invoiceIsEditable(draft.status)
+                                    ? route('invoices.edit', invoiceId)
+                                    : undefined
+                            }
                         />
                     </div>
                 </div>

@@ -32,7 +32,7 @@ class InvoiceApiController extends Controller
             $validation = Validator::make($request->all(), [
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
                 'current_page' => ['nullable', 'integer', 'min:1'],
-                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid'])],
+                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
             ]);
 
             if ($validation->fails()) {
@@ -80,6 +80,7 @@ class InvoiceApiController extends Controller
                     'total' => (float) $invoice->total,
                     'buyer_name' => $invoice->buyer?->name,
                     'has_share_link' => $invoice->share_token !== null,
+                    'created_at' => $invoice->created_at?->toIso8601String(),
                 ];
             });
 
@@ -195,13 +196,21 @@ class InvoiceApiController extends Controller
             return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
         }
 
-        $invoice = $this->findCompanyInvoice($request, $request->input('id'));
+            $invoice = $this->findCompanyInvoice($request, $request->input('id'));
 
-        if ($invoice === null) {
-            return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
-        }
+            if ($invoice === null) {
+                return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
+            }
 
-        return $this->saveInvoice($request, $invoice);
+            if ($invoice->status === 'paid') {
+                return $this->sendJsonResponse(false, 'Paid invoices cannot be edited.', null, 200);
+            }
+
+            if ($invoice->status === 'rejected') {
+                return $this->sendJsonResponse(false, 'Rejected invoices cannot be edited.', null, 200);
+            }
+
+            return $this->saveInvoice($request, $invoice);
     }
 
     public function postInvoiceDestroy(Request $request)
@@ -221,9 +230,46 @@ class InvoiceApiController extends Controller
                 return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
             }
 
+            if ($invoice->status === 'paid') {
+                return $this->sendJsonResponse(false, 'Paid invoices cannot be deleted.', null, 200);
+            }
+
             $invoice->delete();
 
             return $this->sendJsonResponse(true, 'Invoice deleted successfully.', null, 200);
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
+    public function postInvoiceReject(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => ['required', 'integer'],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            $invoice = $this->findCompanyInvoice($request, $request->input('id'));
+
+            if ($invoice === null) {
+                return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
+            }
+
+            if ($invoice->status === 'paid') {
+                return $this->sendJsonResponse(false, 'Paid invoices cannot be rejected.', null, 200);
+            }
+
+            if ($invoice->status === 'rejected') {
+                return $this->sendJsonResponse(false, 'Invoice is already rejected.', null, 200);
+            }
+
+            $invoice->update(['status' => 'rejected']);
+
+            return $this->sendJsonResponse(true, 'Invoice rejected successfully.', null, 200);
         } catch (Exception $e) {
             return $this->sendError($e);
         }
@@ -270,7 +316,7 @@ class InvoiceApiController extends Controller
             $rules = [
                 'buyer_id' => [$existing === null ? 'required' : 'nullable', 'integer'],
                 'invoice_number' => ['required', 'string', 'max:50'],
-                'status' => ['required', 'string', Rule::in(['draft', 'sent', 'paid'])],
+                'status' => ['required', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
                 'invoice_date' => ['required', 'date'],
                 'invoice_date_label' => ['nullable', 'string', 'max:50'],
                 'due_date' => ['nullable', 'date'],

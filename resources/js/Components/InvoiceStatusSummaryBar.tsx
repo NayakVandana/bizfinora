@@ -9,6 +9,7 @@ const tabs: { id: InvoiceStatusFilter; label: string }[] = [
     { id: 'draft', label: 'Draft' },
     { id: 'sent', label: 'Sent' },
     { id: 'paid', label: 'Paid' },
+    { id: 'rejected', label: 'Rejected' },
 ];
 
 type Props = {
@@ -23,7 +24,7 @@ export default function InvoiceStatusSummaryBar({
     onChange,
 }: Props) {
     return (
-        <div className="grid gap-2 border-b border-border px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-2 border-b border-border px-4 py-3 sm:grid-cols-2 lg:grid-cols-5">
             {tabs.map((tab) => {
                 const slice = summary[tab.id];
                 const isActive = active === tab.id;

@@ -132,6 +132,9 @@ export type AdminInvoiceRow = {
     company_id: number;
     company_name?: string | null;
     company_slug?: string | null;
+    user_id?: number | null;
+    user_name?: string | null;
+    user_email?: string | null;
     created_at?: string | null;
     has_share_link: boolean;
 };

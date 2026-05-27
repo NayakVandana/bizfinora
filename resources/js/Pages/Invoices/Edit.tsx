@@ -14,6 +14,7 @@ import {
     type InvoiceFieldErrors,
 } from '@/invoices/validateInvoiceForm';
 import type { InvoiceDraft } from '@/invoices/types';
+import { invoiceIsEditable } from '@/invoices/invoiceActions';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head, router } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
@@ -57,9 +58,19 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
             companyApiPost<ApiEnvelope<BuyerOption[]>>('/buyers/buyers-list', {}),
         ]).then(([invoiceRes, buyersRes]) => {
             if (invoiceRes.success && invoiceRes.data) {
-                applyDraft(
-                    invoiceRes.data as unknown as Record<string, unknown>,
-                );
+                const payload = invoiceRes.data as unknown as Record<
+                    string,
+                    unknown
+                >;
+                const status = String(payload.status ?? '');
+
+                if (!invoiceIsEditable(status)) {
+                    router.visit(route('invoices.show', invoiceId));
+
+                    return;
+                }
+
+                applyDraft(payload);
             }
             if (buyersRes.success && buyersRes.data) {
                 setBuyers(buyersRes.data);

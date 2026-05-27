@@ -1,4 +1,5 @@
 import ListingIndex from '@/Components/ListingIndex';
+import ListingIconAction from '@/Components/ListingIconAction';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -7,7 +8,9 @@ import { listingIndexThClass } from '@/utils/listingIndex';
 import { useAuthUser } from '@/auth/useAuthUser';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { formatMoney } from '@/invoices/formatMoney';
+import { invoiceIsEditable } from '@/invoices/invoiceActions';
 import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
+import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -18,6 +21,7 @@ type RecentInvoice = {
     invoice_date: string;
     total: number;
     buyer_name?: string | null;
+    created_at?: string | null;
 };
 
 type DashboardSummary = {
@@ -284,7 +288,7 @@ export default function Dashboard() {
                                                         </div>
                                                         <Link
                                                             href={route(
-                                                                'invoices.edit',
+                                                                'invoices.show',
                                                                 row.id,
                                                             )}
                                                             className="font-medium text-sidebar-primary hover:opacity-80 font-medium"
@@ -296,7 +300,10 @@ export default function Dashboard() {
                                                         <p className="text-muted-foreground mt-1 text-sm">
                                                             {row.buyer_name ??
                                                                 'No buyer'}{' '}
-                                                            · {row.invoice_date}
+                                                            ·{' '}
+                                                            {formatDisplayDateTime(
+                                                                row.created_at,
+                                                            )}
                                                         </p>
                                                         <div className="mt-2 flex items-center justify-between">
                                                             <InvoiceStatusBadge
@@ -333,7 +340,7 @@ export default function Dashboard() {
                                                             Buyer
                                                         </th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                                            Date
+                                                            Created
                                                         </th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                             Status
@@ -356,9 +363,17 @@ export default function Dashboard() {
                                                                     }
                                                                 />
                                                                 <td className="px-4 py-3 font-medium text-foreground">
-                                                                    {
-                                                                        row.invoice_number
-                                                                    }
+                                                                    <Link
+                                                                        href={route(
+                                                                            'invoices.show',
+                                                                            row.id,
+                                                                        )}
+                                                                        className="text-sidebar-primary hover:opacity-80"
+                                                                    >
+                                                                        {
+                                                                            row.invoice_number
+                                                                        }
+                                                                    </Link>
                                                                 </td>
                                                                 <td className="px-4 py-3 text-muted-foreground">
                                                                     {row.buyer_name ??
@@ -366,7 +381,9 @@ export default function Dashboard() {
                                                                 </td>
                                                                 <td className="px-4 py-3 text-muted-foreground">
                                                                     {
-                                                                        row.invoice_date
+                                                                        formatDisplayDateTime(
+                                                                            row.created_at,
+                                                                        )
                                                                     }
                                                                 </td>
                                                                 <td className="px-4 py-3 text-muted-foreground">
@@ -382,15 +399,28 @@ export default function Dashboard() {
                                                                     )}
                                                                 </td>
                                                                 <td className="px-4 py-3 text-muted-foreground text-right">
-                                                                    <Link
-                                                                        href={route(
-                                                                            'invoices.edit',
-                                                                            row.id,
-                                                                        )}
-                                                                        className="font-medium text-sidebar-primary hover:opacity-80"
-                                                                    >
-                                                                        Edit
-                                                                    </Link>
+                                                                    <div className="inline-flex items-center justify-end gap-0.5">
+                                                                        <ListingIconAction
+                                                                            label="View"
+                                                                            icon="view"
+                                                                            href={route(
+                                                                                'invoices.show',
+                                                                                row.id,
+                                                                            )}
+                                                                        />
+                                                                        {invoiceIsEditable(
+                                                                            row.status,
+                                                                        ) ? (
+                                                                            <ListingIconAction
+                                                                                label="Edit"
+                                                                                icon="edit"
+                                                                                href={route(
+                                                                                    'invoices.edit',
+                                                                                    row.id,
+                                                                                )}
+                                                                            />
+                                                                        ) : null}
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         ),

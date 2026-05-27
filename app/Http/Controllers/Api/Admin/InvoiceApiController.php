@@ -20,7 +20,7 @@ class InvoiceApiController extends Controller
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
                 'current_page' => ['nullable', 'integer', 'min:1'],
                 'company_id' => ['nullable', 'integer'],
-                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid'])],
+                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
                 'keyword' => ['nullable', 'string', 'max:120'],
             ]);
 
@@ -35,6 +35,7 @@ class InvoiceApiController extends Controller
                 ->with([
                     'buyer:id,name,company_name,email,phone',
                     'company:id,name,slug',
+                    'user:id,name,email',
                 ])
                 ->orderByDesc('invoice_date')
                 ->orderByDesc('id');
@@ -55,6 +56,10 @@ class InvoiceApiController extends Controller
                         ->orWhereHas('company', function ($cq) use ($keyword) {
                             $cq->where('name', 'like', '%'.$keyword.'%')
                                 ->orWhere('slug', 'like', '%'.$keyword.'%');
+                        })
+                        ->orWhereHas('user', function ($uq) use ($keyword) {
+                            $uq->where('name', 'like', '%'.$keyword.'%')
+                                ->orWhere('email', 'like', '%'.$keyword.'%');
                         });
                 });
             }
@@ -68,6 +73,7 @@ class InvoiceApiController extends Controller
             $paginator = $query->paginate($perPage, [
                 'id',
                 'company_id',
+                'user_id',
                 'buyer_id',
                 'invoice_number',
                 'status',
@@ -95,6 +101,9 @@ class InvoiceApiController extends Controller
                     'company_id' => $invoice->company_id,
                     'company_name' => $invoice->company?->name,
                     'company_slug' => $invoice->company?->slug,
+                    'user_id' => $invoice->user_id,
+                    'user_name' => $invoice->user?->name,
+                    'user_email' => $invoice->user?->email,
                     'created_at' => $invoice->created_at?->toIso8601String(),
                     'has_share_link' => $invoice->share_token !== null,
                 ];

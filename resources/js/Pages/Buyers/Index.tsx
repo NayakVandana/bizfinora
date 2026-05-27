@@ -3,6 +3,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
+import { useConfirm } from '@/contexts/ConfirmDialogContext';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -12,6 +13,7 @@ function buyerLabel(b: BuyerOption): string {
 }
 
 export default function BuyersIndex() {
+    const { confirm } = useConfirm();
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -31,9 +33,17 @@ export default function BuyersIndex() {
     }, []);
 
     const destroy = async (id: number) => {
-        if (!confirm('Delete this buyer?')) {
+        const ok = await confirm({
+            title: 'Delete buyer?',
+            message: 'This buyer will be permanently removed.',
+            confirmLabel: 'Delete',
+            variant: 'danger',
+        });
+
+        if (!ok) {
             return;
         }
+
         const res = await companyApiPost<ApiEnvelope<null>>(
             '/buyers/buyer-destroy',
             { id },
