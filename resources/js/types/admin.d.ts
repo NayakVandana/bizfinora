@@ -75,6 +75,7 @@ export type AdminCompanyRow = {
     users_count?: number;
     buyers_count?: number;
     invoices_count?: number;
+    templates_count?: number;
 };
 
 export type AdminCompanyMember = {
@@ -145,4 +146,21 @@ export type AdminCompanyDetail = AdminCompanyRow &
         users: AdminCompanyMember[];
         buyers: AdminCompanyBuyer[];
         invoices_count?: number;
+        templates_count?: number;
     };
+
+export type AdminTemplateRow = {
+    id: number | string;
+    name: string;
+    description?: string | null;
+    base_invoice_type: string;
+    base_type_label?: string;
+    layout: string;
+    is_custom: boolean;
+    is_system?: boolean;
+    is_default?: boolean;
+    company_id?: number;
+    company_name?: string | null;
+    company_slug?: string | null;
+    created_at?: string | null;
+};

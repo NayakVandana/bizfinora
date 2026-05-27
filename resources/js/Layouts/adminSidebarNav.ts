@@ -42,6 +42,13 @@ export function adminSidebarNavSections(): NavSection[] {
                                 route().current('admin.invoices.show'),
                         ),
                 },
+                {
+                    href: route('admin.templates.index'),
+                    label: 'Templates',
+                    icon: 'template',
+                    isActive: () =>
+                        Boolean(route().current('admin.templates.index')),
+                },
             ],
         },
     ];

@@ -95,5 +95,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('companies/{id}', fn ($id) => Inertia::render('Admin/Companies/Show', ['companyId' => $id]))->name('companies.show');
     Route::get('invoices', fn () => Inertia::render('Admin/Invoices/Index'))->name('invoices.index');
     Route::get('invoices/{id}', fn ($id) => Inertia::render('Admin/Invoices/Show', ['invoiceId' => $id]))->name('invoices.show');
+    Route::get('templates', fn () => Inertia::render('Admin/Templates/Index'))->name('templates.index');
     Route::get('buyers/{id}', fn ($id) => Inertia::render('Admin/Buyers/Show', ['buyerId' => $id]))->name('buyers.show');
 });

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Admin\BuyerApiController;
 use App\Http\Controllers\Api\Admin\CompanyApiController;
 use App\Http\Controllers\Api\Admin\DashboardApiController;
 use App\Http\Controllers\Api\Admin\InvoiceApiController;
+use App\Http\Controllers\Api\Admin\InvoiceTemplateApiController;
 use App\Http\Controllers\Api\Admin\UserApiController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,7 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('v1/admin')->group(function
     Route::post('/invoices/invoices-list', [InvoiceApiController::class, 'postInvoicesList']);
     Route::post('/invoices/invoice-show', [InvoiceApiController::class, 'postInvoiceShow']);
     Route::post('/invoices/invoice-share-enable', [InvoiceApiController::class, 'postInvoiceShareEnable']);
+
+    Route::post('/invoice-templates/invoice-templates-list', [InvoiceTemplateApiController::class, 'postInvoiceTemplatesList']);
+    Route::post('/invoice-templates/invoice-template-preview', [InvoiceTemplateApiController::class, 'postInvoiceTemplatePreview']);
 });

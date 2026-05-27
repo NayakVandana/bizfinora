@@ -1,6 +1,7 @@
 import ListingIndex from '@/Components/ListingIndex';
 import AdminDetailPanel from '@/Components/admin/AdminDetailPanel';
 import AdminInvoicesListPanel from '@/Components/admin/AdminInvoicesListPanel';
+import AdminTemplatesListPanel from '@/Components/admin/AdminTemplatesListPanel';
 import AdminTabs, { AdminTabPanel } from '@/Components/admin/AdminTabs';
 import AdminLayout from '@/Layouts/AdminLayout';
 import { listingIndexThClass } from '@/utils/listingIndex';
@@ -26,6 +27,7 @@ type CompanyTab =
     | 'tax-payment'
     | 'invoice-settings'
     | 'invoices'
+    | 'templates'
     | 'members'
     | 'buyers';
 
@@ -179,6 +181,10 @@ function InvoicesTab({ companyId }: { companyId: number }) {
     return <AdminInvoicesListPanel companyId={companyId} />;
 }
 
+function TemplatesTab({ companyId }: { companyId: number }) {
+    return <AdminTemplatesListPanel companyId={companyId} showCompany={false} />;
+}
+
 export default function AdminCompanyShow({
     companyId,
 }: {
@@ -217,6 +223,13 @@ export default function AdminCompanyShow({
                   id: 'invoices' as const,
                   label: 'Invoices',
                   count: company.invoices_count ?? 0,
+              },
+              {
+                  id: 'templates' as const,
+                  label: 'Templates',
+                  count:
+                      (company.templates_count ?? 0) +
+                      30,
               },
               {
                   id: 'members' as const,
@@ -324,6 +337,10 @@ export default function AdminCompanyShow({
 
                             <AdminTabPanel active={activeTab} id="invoices">
                                 <InvoicesTab companyId={company.id} />
+                            </AdminTabPanel>
+
+                            <AdminTabPanel active={activeTab} id="templates">
+                                <TemplatesTab companyId={company.id} />
                             </AdminTabPanel>
 
                             <AdminTabPanel active={activeTab} id="members">
