@@ -21,4 +21,5 @@ export type BuyerOption = {
     notes?: string | null;
     created_at?: string | null;
     updated_at?: string | null;
+    invoices_count?: number;
 };

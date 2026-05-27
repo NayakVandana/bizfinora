@@ -115,6 +115,7 @@ export type AdminBuyerDetail = AdminCompanyBuyer & {
     } | null;
     created_at?: string | null;
     updated_at?: string | null;
+    invoices_count?: number;
 };
 
 export type AdminInvoiceRow = {

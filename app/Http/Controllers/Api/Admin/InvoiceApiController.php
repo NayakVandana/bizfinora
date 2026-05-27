@@ -20,6 +20,7 @@ class InvoiceApiController extends Controller
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
                 'current_page' => ['nullable', 'integer', 'min:1'],
                 'company_id' => ['nullable', 'integer'],
+                'buyer_id' => ['nullable', 'integer'],
                 'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
                 'keyword' => ['nullable', 'string', 'max:120'],
             ]);
@@ -42,6 +43,10 @@ class InvoiceApiController extends Controller
 
             if ($request->filled('company_id')) {
                 $query->where('company_id', $request->input('company_id'));
+            }
+
+            if ($request->filled('buyer_id')) {
+                $query->where('buyer_id', $request->input('buyer_id'));
             }
 
             if ($request->filled('keyword')) {

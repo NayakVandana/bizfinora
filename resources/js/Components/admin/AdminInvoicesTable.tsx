@@ -27,11 +27,13 @@ import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 type Props = {
     rows: AdminInvoiceRow[];
     showCompany?: boolean;
+    showBuyer?: boolean;
 };
 
 export default function AdminInvoicesTable({
     rows,
     showCompany = true,
+    showBuyer = true,
 }: Props) {
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
     const [sharingId, setSharingId] = useState<number | null>(null);
@@ -163,8 +165,13 @@ export default function AdminInvoicesTable({
                             {row.invoice_number}
                         </Link>
                         <p className="text-muted-foreground text-xs">
-                            {row.buyer_company_name?.trim() || row.buyer_name || '—'}
-                            {row.buyer_name &&
+                            {showBuyer
+                                ? row.buyer_company_name?.trim() ||
+                                  row.buyer_name ||
+                                  '—'
+                                : null}
+                            {showBuyer &&
+                            row.buyer_name &&
                             row.buyer_company_name?.trim() &&
                             row.buyer_name !== row.buyer_company_name
                                 ? ` · ${row.buyer_name}`
@@ -196,9 +203,13 @@ export default function AdminInvoicesTable({
                             ) : null}
                             <th className={compactTh}>User</th>
                             <th className={compactTh}>Invoice</th>
-                            <th className={compactTh}>Buyer company</th>
-                            <th className={compactTh}>Buyer name</th>
-                            <th className={compactTh}>Mobile</th>
+                            {showBuyer ? (
+                                <>
+                                    <th className={compactTh}>Buyer company</th>
+                                    <th className={compactTh}>Buyer name</th>
+                                    <th className={compactTh}>Mobile</th>
+                                </>
+                            ) : null}
                             <th className={compactTh}>Created</th>
                             <th className={compactTh}>Status</th>
                             <th className={`${compactTh} text-right`}>Total</th>
@@ -249,27 +260,31 @@ export default function AdminInvoicesTable({
                                         {row.invoice_number}
                                     </Link>
                                 </td>
-                                <td className={`${compactTd} text-muted-foreground`}>
-                                    {row.buyer_company_name?.trim() || '—'}
-                                </td>
-                                <td className={`${compactTd} text-muted-foreground`}>
-                                    {row.buyer_id ? (
-                                        <Link
-                                            href={route(
-                                                'admin.buyers.show',
-                                                row.buyer_id,
+                                {showBuyer ? (
+                                    <>
+                                        <td className={`${compactTd} text-muted-foreground`}>
+                                            {row.buyer_company_name?.trim() || '—'}
+                                        </td>
+                                        <td className={`${compactTd} text-muted-foreground`}>
+                                            {row.buyer_id ? (
+                                                <Link
+                                                    href={route(
+                                                        'admin.buyers.show',
+                                                        row.buyer_id,
+                                                    )}
+                                                    className="text-sidebar-primary hover:opacity-80"
+                                                >
+                                                    {row.buyer_name ?? '—'}
+                                                </Link>
+                                            ) : (
+                                                row.buyer_name ?? '—'
                                             )}
-                                            className="text-sidebar-primary hover:opacity-80"
-                                        >
-                                            {row.buyer_name ?? '—'}
-                                        </Link>
-                                    ) : (
-                                        row.buyer_name ?? '—'
-                                    )}
-                                </td>
-                                <td className={`${compactTd} text-muted-foreground`}>
-                                    {row.buyer_phone ?? '—'}
-                                </td>
+                                        </td>
+                                        <td className={`${compactTd} text-muted-foreground`}>
+                                            {row.buyer_phone ?? '—'}
+                                        </td>
+                                    </>
+                                ) : null}
                                 <td className={`${compactTd} text-muted-foreground whitespace-nowrap`}>
                                     {formatDisplayDateTime(row.created_at)}
                                 </td>

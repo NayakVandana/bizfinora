@@ -23,7 +23,8 @@ class BuyerApiController extends Controller
             }
 
             $buyer = Buyer::query()
-                ->with('company:id,name,slug')
+                ->with(['company:id,name,slug'])
+                ->withCount('invoices')
                 ->find($request->input('id'));
 
             if ($buyer === null) {
@@ -39,6 +40,7 @@ class BuyerApiController extends Controller
             ] : null;
             $data['created_at'] = $buyer->created_at?->toIso8601String();
             $data['updated_at'] = $buyer->updated_at?->toIso8601String();
+            $data['invoices_count'] = $buyer->invoices_count;
 
             return $this->sendJsonResponse(true, 'Buyer fetched successfully.', $data, 200);
         } catch (Exception $e) {

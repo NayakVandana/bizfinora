@@ -32,6 +32,7 @@ class InvoiceApiController extends Controller
             $validation = Validator::make($request->all(), [
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
                 'current_page' => ['nullable', 'integer', 'min:1'],
+                'buyer_id' => ['nullable', 'integer'],
                 'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
             ]);
 
@@ -51,6 +52,11 @@ class InvoiceApiController extends Controller
                 ->orderByDesc('id');
 
             $summaryQuery = clone $query;
+
+            if ($request->filled('buyer_id')) {
+                $query->where('buyer_id', $request->input('buyer_id'));
+                $summaryQuery->where('buyer_id', $request->input('buyer_id'));
+            }
 
             if ($request->filled('status')) {
                 $query->where('status', $request->input('status'));

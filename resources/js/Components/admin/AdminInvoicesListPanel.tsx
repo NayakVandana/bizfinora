@@ -25,9 +25,17 @@ const emptySummary: InvoiceSummary = {
 
 type Props = {
     companyId?: number;
+    buyerId?: number;
+    showCompany?: boolean;
+    showBuyer?: boolean;
 };
 
-export default function AdminInvoicesListPanel({ companyId }: Props) {
+export default function AdminInvoicesListPanel({
+    companyId,
+    buyerId,
+    showCompany = companyId === undefined && buyerId === undefined,
+    showBuyer = buyerId === undefined,
+}: Props) {
     const [rows, setRows] = useState<AdminInvoiceRow[]>([]);
     const [summary, setSummary] = useState<InvoiceSummary>(emptySummary);
     const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('all');
@@ -50,6 +58,7 @@ export default function AdminInvoicesListPanel({ companyId }: Props) {
             per_page: LISTING_PER_PAGE,
             current_page: page,
             company_id: companyId,
+            buyer_id: buyerId,
             status: statusFilter === 'all' ? undefined : statusFilter,
         });
 
@@ -66,7 +75,7 @@ export default function AdminInvoicesListPanel({ companyId }: Props) {
         }
 
         setLoading(false);
-    }, [companyId, page, statusFilter]);
+    }, [buyerId, companyId, page, statusFilter]);
 
     useEffect(() => {
         void load();
@@ -105,7 +114,8 @@ export default function AdminInvoicesListPanel({ companyId }: Props) {
                 <>
                     <AdminInvoicesTable
                         rows={rows}
-                        showCompany={companyId === undefined}
+                        showCompany={showCompany}
+                        showBuyer={showBuyer}
                     />
                     <ListingPagination
                         currentPage={pagination.current_page}
