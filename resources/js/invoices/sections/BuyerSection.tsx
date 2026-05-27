@@ -6,6 +6,10 @@ import {
     invoiceFieldClass,
     type InvoiceFieldErrors,
 } from '../validateInvoiceForm';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { InvoiceDraft } from '../types';
 import { Link } from '@inertiajs/react';
 
@@ -53,18 +57,18 @@ export default function BuyerSection({
     const visibility = draft.field_visibility ?? {};
 
     return (
-        <Accordion title="Buyer" defaultOpen>
+        <Accordion title={BUYER_CUSTOMER_LABEL} defaultOpen>
             <p className="text-muted-foreground text-xs leading-snug">
-                Select a saved buyer from{' '}
+                Select a saved {BUYER_CUSTOMER_LABEL.toLowerCase()} from{' '}
                 <Link href={route('buyers.index')} className="font-medium text-sidebar-primary hover:opacity-80">
-                    Buyers
+                    {BUYERS_CUSTOMERS_LABEL}
                 </Link>
                 . Toggle PDF visibility per field.
             </p>
 
             <div data-invoice-field="buyer_id">
             <label className="block text-sm font-medium text-foreground">
-                Buyer *
+                {BUYER_CUSTOMER_LABEL} *
             </label>
             <select
                 className={invoiceFieldClass(
@@ -76,7 +80,9 @@ export default function BuyerSection({
                 aria-invalid={Boolean(errors.buyer_id)}
                 onChange={(e) => onBuyerSelect(e.target.value)}
             >
-                <option value="">Select saved buyer…</option>
+                <option value="">
+                    Select saved {BUYER_CUSTOMER_LABEL.toLowerCase()}…
+                </option>
                 {buyers.map((b) => (
                     <option key={b.id} value={b.id}>
                         {b.company_name || b.name}
@@ -88,7 +94,8 @@ export default function BuyerSection({
 
             {!draft.buyer_id ? (
                 <p className="rounded-md border border-dashed border-border bg-muted px-3 py-4 text-center text-sm text-muted-foreground">
-                    Choose a buyer to preview details and PDF fields.
+                    Choose a {BUYER_CUSTOMER_LABEL.toLowerCase()} to preview
+                    details and PDF fields.
                 </p>
             ) : (
                 <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-muted">

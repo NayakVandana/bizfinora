@@ -108,7 +108,7 @@ export default function AdminInvoicesIndex() {
                                 type="search"
                                 value={keyword}
                                 onChange={(e) => setKeyword(e.target.value)}
-                                placeholder="Search invoice, buyer, company, user…"
+                                placeholder="Search invoice, buyer (customer), company, user…"
                                 className="w-full sm:max-w-xs"
                             />
                         </div>

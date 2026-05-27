@@ -13,6 +13,10 @@ import {
     companyTermsFields,
 } from '@/utils/adminEntityFields';
 import { adminApiPost, type ApiEnvelope } from '@/api/adminClient';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { AdminCompanyDetail } from '@/types/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -101,7 +105,7 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
     if (company.buyers.length === 0) {
         return (
             <p className="text-muted-foreground rounded-lg border border-border bg-card px-4 py-6 text-center text-sm shadow-sm">
-                No buyers saved for this company.
+                No {BUYERS_CUSTOMERS_LABEL.toLowerCase()} saved for this company.
             </p>
         );
     }
@@ -131,7 +135,7 @@ function BuyersTab({ company }: { company: AdminCompanyDetail }) {
                 <thead className="bg-muted">
                     <tr>
                         <th className={listingIndexThClass}>#</th>
-                        <th className={compactTh}>Buyer</th>
+                        <th className={compactTh}>{BUYER_CUSTOMER_LABEL}</th>
                         <th className={compactTh}>Email</th>
                         <th className={compactTh}>Phone</th>
                         <th className={compactTh}>GSTIN</th>
@@ -221,7 +225,7 @@ export default function AdminCompanyShow({
               },
               {
                   id: 'buyers' as const,
-                  label: 'Buyers',
+                  label: BUYERS_CUSTOMERS_LABEL,
                   count: company.buyers_count ?? company.buyers.length,
               },
           ]

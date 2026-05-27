@@ -3,6 +3,7 @@ import {
     DISCOUNT_PERCENT_MAX,
     readDiscountPercent,
 } from './discount';
+import { BUYER_CUSTOMER_LABEL } from '@/constants/buyerLabels';
 import type { InvoiceDraft } from './types';
 
 export type InvoiceFieldErrors = Record<string, string>;
@@ -78,7 +79,7 @@ export function validateInvoiceForm(draft: InvoiceDraft): InvoiceFieldErrors {
     }
 
     if (!draft.buyer_id) {
-        errors.buyer_id = 'Select a buyer.';
+        errors.buyer_id = `Select a ${BUYER_CUSTOMER_LABEL.toLowerCase()}.`;
     }
 
     if (!draft.document.items.length) {

@@ -4,6 +4,10 @@ import InputError from '@/Components/InputError';
 import BuyerFormFields from './BuyerFormFields';
 import { emptyBuyerForm } from './buyerForm';
 import { submitBuyerForm } from './submitBuyerForm';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { BuyerFieldErrors } from './validateBuyerForm';
 import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -31,11 +35,11 @@ export default function BuyersCreate() {
         <AuthenticatedLayout
             header={
                 <h2 className="text-foreground text-xl font-semibold">
-                    New buyer
+                    New {BUYER_CUSTOMER_LABEL.toLowerCase()}
                 </h2>
             }
         >
-            <Head title="New buyer" />
+            <Head title={`New ${BUYER_CUSTOMER_LABEL.toLowerCase()}`} />
 
             <div className="py-6 sm:py-8">
                 <div className="w-full px-3 sm:px-6 lg:px-8">
@@ -43,16 +47,17 @@ export default function BuyersCreate() {
                         href={route('buyers.index')}
                         className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"
                     >
-                        ← Back to buyers
+                        ← Back to {BUYERS_CUSTOMERS_LABEL.toLowerCase()}
                     </Link>
 
                     <div className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm mt-6">
                         <div className="border-b border-border px-5 py-4 sm:px-6">
                             <h3 className="text-foreground font-semibold">
-                                Buyer details
+                                {BUYER_CUSTOMER_LABEL} details
                             </h3>
                             <p className="text-muted-foreground mt-1 text-sm">
-                                Used as the buyer on your invoices.
+                                Used as the {BUYER_CUSTOMER_LABEL.toLowerCase()}{' '}
+                                on your invoices.
                             </p>
                         </div>
 

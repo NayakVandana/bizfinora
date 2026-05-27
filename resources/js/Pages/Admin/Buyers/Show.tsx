@@ -4,6 +4,10 @@ import SecondaryButton from '@/Components/SecondaryButton';
 import AdminLayout from '@/Layouts/AdminLayout';
 import BuyerDetail from '@/Pages/Buyers/BuyerDetail';
 import { adminApiPost, type ApiEnvelope } from '@/api/adminClient';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { AdminBuyerDetail } from '@/types/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -29,7 +33,8 @@ export default function AdminBuyerShow({ buyerId }: { buyerId: number }) {
         });
     }, [buyerId]);
 
-    const title = buyer?.company_name?.trim() || buyer?.name || 'Buyer';
+    const title =
+        buyer?.company_name?.trim() || buyer?.name || BUYER_CUSTOMER_LABEL;
     const backHref = buyer?.company
         ? route('admin.companies.show', buyer.company.id)
         : route('admin.companies.index');
@@ -52,11 +57,15 @@ export default function AdminBuyerShow({ buyerId }: { buyerId: number }) {
         <AdminLayout
             header={
                 <h2 className="text-foreground truncate text-xl font-semibold">
-                    {loading ? 'Buyer details' : title}
+                    {loading ? `${BUYER_CUSTOMER_LABEL} details` : title}
                 </h2>
             }
         >
-            <Head title={loading ? 'Buyer details' : title} />
+            <Head
+                title={
+                    loading ? `${BUYER_CUSTOMER_LABEL} details` : title
+                }
+            />
 
             <div className="py-6 sm:py-8">
                 <div className="w-full px-3 sm:px-6 lg:px-8">
@@ -73,7 +82,7 @@ export default function AdminBuyerShow({ buyerId }: { buyerId: number }) {
                         </p>
                     ) : notFound || !buyer ? (
                         <p className="text-muted-foreground mt-6 text-center text-sm">
-                            Buyer not found.
+                            {BUYER_CUSTOMER_LABEL} not found.
                         </p>
                     ) : (
                         <div className="mt-6">
@@ -96,7 +105,7 @@ export default function AdminBuyerShow({ buyerId }: { buyerId: number }) {
                                 tabs={tabs}
                                 active={activeTab}
                                 onChange={setActiveTab}
-                                ariaLabel="Buyer detail tabs"
+                                ariaLabel={`${BUYER_CUSTOMER_LABEL} detail tabs`}
                             />
 
                             <AdminTabPanel active={activeTab} id="profile">

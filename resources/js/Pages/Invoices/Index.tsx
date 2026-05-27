@@ -1,4 +1,5 @@
 import BuyerListingLink from '@/Components/BuyerListingLink';
+import { BUYER_CUSTOMER_LABEL } from '@/constants/buyerLabels';
 import ListingIndex from '@/Components/ListingIndex';
 import ListingPagination from '@/Components/ListingPagination';
 import InvoiceListingActions from '@/Components/InvoiceListingActions';
@@ -309,7 +310,7 @@ export default function InvoicesIndex() {
                                                 Number
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
-                                                Buyer
+                                                {BUYER_CUSTOMER_LABEL}
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground text-xs uppercase">
                                                 Created

@@ -42,7 +42,7 @@ export function sidebarNavSections(options?: { isAdmin?: boolean }): NavSection[
                 },
                 {
                     href: route('buyers.index'),
-                    label: 'Buyers',
+                    label: 'Buyers (Customers)',
                     icon: 'buyers',
                     isActive: () =>
                         Boolean(route().current()?.startsWith('buyers.')),

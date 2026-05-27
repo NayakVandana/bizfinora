@@ -1,4 +1,8 @@
 import BuyerListingLink from '@/Components/BuyerListingLink';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import ListingIndex from '@/Components/ListingIndex';
 import ListingIconAction from '@/Components/ListingIconAction';
 import PrimaryButton from '@/Components/PrimaryButton';
@@ -55,12 +59,12 @@ const quickLinks = [
         href: 'invoices.index',
     },
     {
-        title: 'Buyers',
+        title: BUYERS_CUSTOMERS_LABEL,
         description: 'Customers for your invoices',
         href: 'buyers.index',
     },
     {
-        title: 'New buyer',
+        title: `New ${BUYER_CUSTOMER_LABEL.toLowerCase()}`,
         description: 'Add a bill-to contact',
         href: 'buyers.create',
     },
@@ -210,7 +214,7 @@ export default function Dashboard() {
                                     sub={`${summary.invoices.paid} invoice${summary.invoices.paid === 1 ? '' : 's'}`}
                                 />
                                 <StatCard
-                                    label="Buyers"
+                                    label={BUYERS_CUSTOMERS_LABEL}
                                     value={summary.buyers_count}
                                     sub="Saved bill-to contacts"
                                 />
@@ -244,7 +248,7 @@ export default function Dashboard() {
                                     </Link>
                                     <Link href={route('buyers.create')}>
                                         <SecondaryButton type="button">
-                                            Add buyer
+                                            Add {BUYER_CUSTOMER_LABEL.toLowerCase()}
                                         </SecondaryButton>
                                     </Link>
                                 </div>
@@ -311,7 +315,7 @@ export default function Dashboard() {
                                                                     }
                                                                 />
                                                             ) : (
-                                                                'No buyer'
+                                                                `No ${BUYER_CUSTOMER_LABEL.toLowerCase()}`
                                                             )}{' '}
                                                             ·{' '}
                                                             {formatDisplayDateTime(
@@ -350,7 +354,7 @@ export default function Dashboard() {
                                                             Number
                                                         </th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                                            Buyer
+                                                            {BUYER_CUSTOMER_LABEL}
                                                         </th>
                                                         <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                             Created

@@ -2,6 +2,10 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import InputError from '@/Components/InputError';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import BuyerFormFields from './BuyerFormFields';
 import { buyerToForm } from './buyerForm';
@@ -57,11 +61,11 @@ export default function BuyersEdit({ buyerId }: Props) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-foreground text-xl font-semibold">
-                    Edit buyer
+                    Edit {BUYER_CUSTOMER_LABEL.toLowerCase()}
                 </h2>
             }
         >
-            <Head title="Edit buyer" />
+            <Head title={`Edit ${BUYER_CUSTOMER_LABEL.toLowerCase()}`} />
 
             <div className="py-6 sm:py-8">
                 <div className="w-full px-3 sm:px-6 lg:px-8">
@@ -70,7 +74,7 @@ export default function BuyersEdit({ buyerId }: Props) {
                             href={route('buyers.index')}
                             className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1"
                         >
-                            ← Back to buyers
+                            ← Back to {BUYERS_CUSTOMERS_LABEL.toLowerCase()}
                         </Link>
                         {!loading && !notFound && form ? (
                             <Link
@@ -88,13 +92,13 @@ export default function BuyersEdit({ buyerId }: Props) {
                         </p>
                     ) : notFound || !form ? (
                         <p className="text-muted-foreground mt-6 text-center text-sm">
-                            Buyer not found.
+                            {BUYER_CUSTOMER_LABEL} not found.
                         </p>
                     ) : (
                         <div className="overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-sm mt-6">
                             <div className="border-b border-border px-5 py-4 sm:px-6">
                                 <h3 className="text-foreground font-semibold">
-                                    Buyer details
+                                    {BUYER_CUSTOMER_LABEL} details
                                 </h3>
                             </div>
 

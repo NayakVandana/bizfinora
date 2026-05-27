@@ -22,6 +22,10 @@ const compactTh =
     'px-3 py-2 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground';
 const compactTd = 'px-3 py-2 text-sm';
 
+import {
+    BUYER_CUSTOMER_COMPANY_LABEL,
+    BUYER_CUSTOMER_NAME_LABEL,
+} from '@/constants/buyerLabels';
 import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 
 type Props = {
@@ -205,8 +209,12 @@ export default function AdminInvoicesTable({
                             <th className={compactTh}>Invoice</th>
                             {showBuyer ? (
                                 <>
-                                    <th className={compactTh}>Buyer company</th>
-                                    <th className={compactTh}>Buyer name</th>
+                                    <th className={compactTh}>
+                                        {BUYER_CUSTOMER_COMPANY_LABEL}
+                                    </th>
+                                    <th className={compactTh}>
+                                        {BUYER_CUSTOMER_NAME_LABEL}
+                                    </th>
                                     <th className={compactTh}>Mobile</th>
                                 </>
                             ) : null}

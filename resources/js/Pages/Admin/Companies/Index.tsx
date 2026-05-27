@@ -10,6 +10,7 @@ import {
     type ApiEnvelope,
     type Paginated,
 } from '@/api/adminClient';
+import { BUYERS_CUSTOMERS_LABEL } from '@/constants/buyerLabels';
 import type { AdminCompanyRow } from '@/types/admin';
 import { Head, Link } from '@inertiajs/react';
 import { useCallback, useEffect, useState } from 'react';
@@ -150,7 +151,7 @@ export default function AdminCompaniesIndex() {
                                                 Members
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                                                Buyers
+                                                {BUYERS_CUSTOMERS_LABEL}
                                             </th>
                                             <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-muted-foreground">
                                                 Created

@@ -1,3 +1,4 @@
+import { BUYERS_CUSTOMERS_LABEL } from '@/constants/buyerLabels';
 import type { AdminDetailField } from '@/utils/adminDetailFormat';
 import {
     adminBoolField,
@@ -43,7 +44,10 @@ export function companyOverviewFields(
         adminTextField('Email', company.email),
         adminTextField('Phone', company.phone),
         adminTextField('Members', company.users_count ?? company.users.length),
-        adminTextField('Buyers', company.buyers_count ?? company.buyers.length),
+        adminTextField(
+            BUYERS_CUSTOMERS_LABEL,
+            company.buyers_count ?? company.buyers.length,
+        ),
         adminDateField('Created', company.created_at),
         adminDateField('Updated', company.updated_at),
     ];

@@ -4,6 +4,10 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import BuyerDetail from './BuyerDetail';
 import { Head, Link } from '@inertiajs/react';
@@ -34,7 +38,8 @@ export default function BuyersShow({ buyerId }: Props) {
         });
     }, [buyerId]);
 
-    const title = buyer?.company_name?.trim() || buyer?.name || 'Buyer';
+    const title =
+        buyer?.company_name?.trim() || buyer?.name || BUYER_CUSTOMER_LABEL;
 
     const tabs = buyer
         ? [
@@ -51,11 +56,15 @@ export default function BuyersShow({ buyerId }: Props) {
         <AuthenticatedLayout
             header={
                 <h2 className="text-foreground truncate text-xl font-semibold">
-                    {loading ? 'Buyer details' : title}
+                    {loading ? `${BUYER_CUSTOMER_LABEL} details` : title}
                 </h2>
             }
         >
-            <Head title={loading ? 'Buyer details' : title} />
+            <Head
+                title={
+                    loading ? `${BUYER_CUSTOMER_LABEL} details` : title
+                }
+            />
 
             <div className="py-6 sm:py-8">
                 <div className="w-full px-3 sm:px-6 lg:px-8">
@@ -63,7 +72,7 @@ export default function BuyersShow({ buyerId }: Props) {
                         href={route('buyers.index')}
                         className="font-medium text-sidebar-primary hover:opacity-80 inline-flex items-center gap-1 text-sm"
                     >
-                        ← Back to buyers
+                        ← Back to {BUYERS_CUSTOMERS_LABEL.toLowerCase()}
                     </Link>
 
                     {loading ? (
@@ -72,7 +81,7 @@ export default function BuyersShow({ buyerId }: Props) {
                         </p>
                     ) : notFound || !buyer ? (
                         <p className="text-muted-foreground mt-6 text-center text-sm">
-                            Buyer not found.
+                            {BUYER_CUSTOMER_LABEL} not found.
                         </p>
                     ) : (
                         <div className="mt-6">
@@ -87,7 +96,7 @@ export default function BuyersShow({ buyerId }: Props) {
                                 tabs={tabs}
                                 active={activeTab}
                                 onChange={setActiveTab}
-                                ariaLabel="Buyer detail tabs"
+                                ariaLabel={`${BUYER_CUSTOMER_LABEL} detail tabs`}
                             />
 
                             <AdminTabPanel active={activeTab} id="profile">
@@ -108,7 +117,7 @@ export default function BuyersShow({ buyerId }: Props) {
                                                 type="button"
                                                 className="w-full justify-center"
                                             >
-                                                Edit buyer
+                                                Edit {BUYER_CUSTOMER_LABEL.toLowerCase()}
                                             </PrimaryButton>
                                         </Link>
                                         <Link
@@ -129,7 +138,7 @@ export default function BuyersShow({ buyerId }: Props) {
                             <AdminTabPanel active={activeTab} id="invoices">
                                 <AppInvoicesListPanel
                                     buyerId={buyer.id}
-                                    emptyMessage="No invoices for this buyer yet."
+                                    emptyMessage={`No invoices for this ${BUYER_CUSTOMER_LABEL.toLowerCase()} yet.`}
                                 />
                             </AdminTabPanel>
                         </div>

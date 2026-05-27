@@ -6,6 +6,10 @@ import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import { listingIndexThClass } from '@/utils/listingIndex';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import { useConfirm } from '@/contexts/ConfirmDialogContext';
+import {
+    BUYER_CUSTOMER_LABEL,
+    BUYERS_CUSTOMERS_LABEL,
+} from '@/constants/buyerLabels';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -36,8 +40,8 @@ export default function BuyersIndex() {
 
     const destroy = async (id: number) => {
         const ok = await confirm({
-            title: 'Delete buyer?',
-            message: 'This buyer will be permanently removed.',
+            title: `Delete ${BUYER_CUSTOMER_LABEL.toLowerCase()}?`,
+            message: `This ${BUYER_CUSTOMER_LABEL.toLowerCase()} will be permanently removed.`,
             confirmLabel: 'Delete',
             variant: 'danger',
         });
@@ -58,21 +62,23 @@ export default function BuyersIndex() {
     return (
         <AuthenticatedLayout
             header={
-                <h2 className="text-foreground text-xl font-semibold">Buyers</h2>
+                <h2 className="text-foreground text-xl font-semibold">
+                    {BUYERS_CUSTOMERS_LABEL}
+                </h2>
             }
         >
-            <Head title="Buyers" />
+            <Head title={BUYERS_CUSTOMERS_LABEL} />
 
             <div className="py-6">
                 <div className="w-full px-3 sm:px-6 lg:px-8">
                     <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm">
                         <div className="flex flex-col gap-2 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                             <p className="text-muted-foreground text-sm">
-                                Saved buyers for invoices
+                                Saved {BUYERS_CUSTOMERS_LABEL.toLowerCase()} for invoices
                             </p>
                             <Link href={route('buyers.create')}>
                                 <PrimaryButton className="w-full justify-center sm:w-auto">
-                                    New buyer
+                                    New {BUYER_CUSTOMER_LABEL.toLowerCase()}
                                 </PrimaryButton>
                             </Link>
                         </div>
@@ -83,7 +89,7 @@ export default function BuyersIndex() {
                             </p>
                         ) : buyers.length === 0 ? (
                             <p className="text-muted-foreground p-6 text-center">
-                                No buyers yet.{' '}
+                                No {BUYERS_CUSTOMERS_LABEL.toLowerCase()} yet.{' '}
                                 <Link
                                     href={route('buyers.create')}
                                     className="font-medium text-sidebar-primary hover:opacity-80"
