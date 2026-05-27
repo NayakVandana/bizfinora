@@ -130,7 +130,7 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
                 <InputError message={errors.address_line2} className="mt-1" />
             </div>
             <div>
-                <InputLabel value="City" />
+                <InputLabel value="City *" />
                 <TextInput
                     className="mt-1 block w-full"
                     value={form.city}
@@ -139,7 +139,7 @@ export default function BuyerFormFields({ form, errors = {}, onChange }: Props) 
                 <InputError message={errors.city} className="mt-1" />
             </div>
             <div>
-                <InputLabel value="State" />
+                <InputLabel value="State *" />
                 <TextInput
                     className="mt-1 block w-full"
                     value={form.state}

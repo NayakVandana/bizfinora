@@ -33,6 +33,14 @@ export function validateBuyerForm(form: BuyerFormState): BuyerFieldErrors {
         errors.address = 'Address is required.';
     }
 
+    if (!form.city.trim()) {
+        errors.city = 'City is required.';
+    }
+
+    if (!form.state.trim()) {
+        errors.state = 'State is required.';
+    }
+
     const gstError = validateGstOptional(form.gst);
     if (gstError) {
         errors.gst = gstError;
