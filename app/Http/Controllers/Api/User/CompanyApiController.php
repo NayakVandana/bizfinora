@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Company;
 use App\Support\CompanyMembership;
 use App\Support\CompanyPresentation;
 use App\Support\CompanyProfileValidation;

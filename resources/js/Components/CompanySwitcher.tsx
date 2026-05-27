@@ -1,6 +1,6 @@
 import Dropdown from '@/Components/Dropdown';
 import { userApiPost, type ApiEnvelope } from '@/api/userClient';
-import { useAuthUser } from '@/auth/useAuthUser';
+import { clearAuthUserCache, useAuthUser } from '@/auth/useAuthUser';
 import type { Company } from '@/types';
 import { Link } from '@inertiajs/react';
 
@@ -31,7 +31,7 @@ function NewCompanyButton({ className = '' }: { className?: string }) {
 }
 
 export default function CompanySwitcher({ className = '' }: { className?: string }) {
-    const { currentCompany, companies, refresh } = useAuthUser();
+    const { currentCompany, companies } = useAuthUser();
 
     if (companies.length === 0) {
         return <NewCompanyButton className="w-auto" />;
@@ -48,7 +48,8 @@ export default function CompanySwitcher({ className = '' }: { className?: string
         );
 
         if (res.success) {
-            await refresh();
+            clearAuthUserCache();
+            window.location.assign(route('dashboard'));
         }
     };
 
