@@ -40,5 +40,6 @@ Route::middleware(['auth:sanctum', 'api.company'])->prefix('v1/company')->group(
     Route::post('/invoices/invoice-update', [InvoiceApiController::class, 'postInvoiceUpdate']);
     Route::post('/invoices/invoice-destroy', [InvoiceApiController::class, 'postInvoiceDestroy']);
     Route::post('/invoices/invoice-reject', [InvoiceApiController::class, 'postInvoiceReject']);
+    Route::post('/invoices/invoice-status-update', [InvoiceApiController::class, 'postInvoiceStatusUpdate']);
     Route::post('/invoices/invoice-share-enable', [InvoiceApiController::class, 'postInvoiceShareEnable']);
 });

@@ -33,7 +33,7 @@ class InvoiceApiController extends Controller
                 'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
                 'current_page' => ['nullable', 'integer', 'min:1'],
                 'buyer_id' => ['nullable', 'integer'],
-                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
+                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'unpaid', 'paid', 'rejected'])],
             ]);
 
             if ($validation->fails()) {
@@ -284,6 +284,52 @@ class InvoiceApiController extends Controller
         }
     }
 
+    public function postInvoiceStatusUpdate(Request $request)
+    {
+        try {
+            $validation = Validator::make($request->all(), [
+                'id' => ['required', 'integer'],
+                'status' => ['required', 'string', Rule::in(['draft', 'sent', 'unpaid', 'paid'])],
+            ]);
+
+            if ($validation->fails()) {
+                return $this->sendJsonResponse(false, $validation->errors()->first(), $validation->errors()->getMessages(), 200);
+            }
+
+            $invoice = $this->findCompanyInvoice($request, $request->input('id'));
+
+            if ($invoice === null) {
+                return $this->sendJsonResponse(false, 'Invoice not found.', null, 200);
+            }
+
+            if ($invoice->status === 'paid') {
+                return $this->sendJsonResponse(false, 'Paid invoices cannot change status.', null, 200);
+            }
+
+            if ($invoice->status === 'rejected') {
+                return $this->sendJsonResponse(false, 'Rejected invoices cannot change status.', null, 200);
+            }
+
+            $nextStatus = $request->input('status');
+
+            if ($nextStatus === $invoice->status) {
+                return $this->sendJsonResponse(true, 'Invoice status unchanged.', [
+                    'id' => $invoice->id,
+                    'status' => $invoice->status,
+                ], 200);
+            }
+
+            $invoice->update(['status' => $nextStatus]);
+
+            return $this->sendJsonResponse(true, 'Invoice status updated successfully.', [
+                'id' => $invoice->id,
+                'status' => $invoice->fresh()->status,
+            ], 200);
+        } catch (Exception $e) {
+            return $this->sendError($e);
+        }
+    }
+
     public function postInvoiceShareEnable(Request $request)
     {
         try {
@@ -325,7 +371,7 @@ class InvoiceApiController extends Controller
             $rules = [
                 'buyer_id' => [$existing === null ? 'required' : 'nullable', 'integer'],
                 'invoice_number' => ['required', 'string', 'max:50'],
-                'status' => ['required', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
+                'status' => ['required', 'string', Rule::in(['draft', 'sent', 'unpaid', 'paid', 'rejected'])],
                 'invoice_date' => ['required', 'date'],
                 'invoice_date_label' => ['nullable', 'string', 'max:50'],
                 'due_date' => ['nullable', 'date'],

@@ -14,6 +14,7 @@ import {
 import { invoicePayloadToDraft } from '@/invoices/defaultDraft';
 import { downloadInvoicePdf } from '@/invoices/downloadPdf';
 import { formatMoney } from '@/invoices/formatMoney';
+import type { InvoiceDraft, InvoiceStatus } from '@/invoices/types';
 import InvoiceStatusBadge from '@/Components/InvoiceStatusBadge';
 import { formatDisplayDateTime } from '@/utils/formatDisplayDate';
 import { LISTING_PER_PAGE } from '@/utils/listingIndex';
@@ -47,6 +48,7 @@ const emptySummary: InvoiceSummary = {
     all: { count: 0, amount: 0 },
     draft: { count: 0, amount: 0 },
     sent: { count: 0, amount: 0 },
+    unpaid: { count: 0, amount: 0 },
     paid: { count: 0, amount: 0 },
     rejected: { count: 0, amount: 0 },
 };
@@ -67,6 +69,7 @@ export default function InvoicesIndex() {
     const [downloadingId, setDownloadingId] = useState<number | null>(null);
     const [sharingId, setSharingId] = useState<number | null>(null);
     const [rejectingId, setRejectingId] = useState<number | null>(null);
+    const [updatingStatusId, setUpdatingStatusId] = useState<number | null>(null);
     const [shareMessage, setShareMessage] = useState<string | null>(null);
 
     const loadInvoiceDraft = async (id: number): Promise<InvoiceDraft | null> => {
@@ -149,6 +152,26 @@ export default function InvoicesIndex() {
         }
     };
 
+    const updateInvoiceStatus = async (id: number, status: InvoiceStatus) => {
+        setShareMessage(null);
+        setUpdatingStatusId(id);
+        try {
+            const res = await companyApiPost<
+                ApiEnvelope<{ id: number; status: string }>
+            >('/invoices/invoice-status-update', { id, status });
+
+            if (res.success) {
+                await load();
+            } else {
+                setShareMessage(
+                    res.message ?? 'Could not update invoice status.',
+                );
+            }
+        } finally {
+            setUpdatingStatusId(null);
+        }
+    };
+
     const load = useCallback(async () => {
         setLoading(true);
 
@@ -192,9 +215,11 @@ export default function InvoicesIndex() {
             downloadingId={downloadingId}
             sharingId={sharingId}
             rejectingId={rejectingId}
+            updatingStatusId={updatingStatusId}
             onDownload={downloadInvoice}
             onShare={createShareLink}
             onReject={rejectInvoice}
+            onStatusChange={updateInvoiceStatus}
         />
     );
 

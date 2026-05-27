@@ -16,6 +16,10 @@ const variants: Record<InvoiceStatus, InvoiceStatusBadgeVariant> = {
         label: 'Sent',
         badge: `${base} bg-accent text-accent-foreground`,
     },
+    unpaid: {
+        label: 'Unpaid',
+        badge: `${base} bg-orange-100 text-orange-900 dark:bg-orange-950/50 dark:text-orange-300`,
+    },
     paid: {
         label: 'Paid',
         badge: `${base} bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300`,

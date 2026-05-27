@@ -8,6 +8,7 @@ export type InvoiceSummary = {
     all: InvoiceStatusSummarySlice;
     draft: InvoiceStatusSummarySlice;
     sent: InvoiceStatusSummarySlice;
+    unpaid: InvoiceStatusSummarySlice;
     paid: InvoiceStatusSummarySlice;
     rejected: InvoiceStatusSummarySlice;
 };
@@ -16,6 +17,7 @@ export type InvoiceStatusFilter =
     | 'all'
     | 'draft'
     | 'sent'
+    | 'unpaid'
     | 'paid'
     | 'rejected';
 

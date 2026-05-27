@@ -21,7 +21,7 @@ class InvoiceApiController extends Controller
                 'current_page' => ['nullable', 'integer', 'min:1'],
                 'company_id' => ['nullable', 'integer'],
                 'buyer_id' => ['nullable', 'integer'],
-                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'paid', 'rejected'])],
+                'status' => ['nullable', 'string', Rule::in(['draft', 'sent', 'unpaid', 'paid', 'rejected'])],
                 'keyword' => ['nullable', 'string', 'max:120'],
             ]);
 

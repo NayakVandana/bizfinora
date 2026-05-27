@@ -58,6 +58,7 @@ export default function GeneralSection({ draft, onChange, errors = {} }: Props) 
                     >
                         <option value="draft">Draft</option>
                         <option value="sent">Sent</option>
+                        <option value="unpaid">Unpaid</option>
                         <option value="paid">Paid</option>
                     </select>
                 </div>

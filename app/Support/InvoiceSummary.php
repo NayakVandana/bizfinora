@@ -13,6 +13,7 @@ class InvoiceSummary
      *     all: array{count: int, amount: float},
      *     draft: array{count: int, amount: float},
      *     sent: array{count: int, amount: float},
+     *     unpaid: array{count: int, amount: float},
      *     paid: array{count: int, amount: float},
      *     rejected: array{count: int, amount: float}
      * }
@@ -38,6 +39,7 @@ class InvoiceSummary
             'all' => ['count' => $totalCount, 'amount' => $totalAmount],
             'draft' => ['count' => $count('draft'), 'amount' => $amount('draft')],
             'sent' => ['count' => $count('sent'), 'amount' => $amount('sent')],
+            'unpaid' => ['count' => $count('unpaid'), 'amount' => $amount('unpaid')],
             'paid' => ['count' => $count('paid'), 'amount' => $amount('paid')],
             'rejected' => ['count' => $count('rejected'), 'amount' => $amount('rejected')],
         ];
@@ -46,8 +48,8 @@ class InvoiceSummary
     /**
      * @param  Builder<\App\Models\Invoice>  $query
      * @return array{
-     *     invoices: array{total: int, draft: int, sent: int, paid: int, rejected: int},
-     *     amounts: array{draft: float, sent: float, paid: float, rejected: float, all: float}
+     *     invoices: array{total: int, draft: int, sent: int, unpaid: int, paid: int, rejected: int},
+     *     amounts: array{draft: float, sent: float, unpaid: float, paid: float, rejected: float, all: float}
      * }
      */
     public static function forDashboard(Builder $query): array
@@ -59,12 +61,14 @@ class InvoiceSummary
                 'total' => $summary['total'],
                 'draft' => $summary['draft']['count'],
                 'sent' => $summary['sent']['count'],
+                'unpaid' => $summary['unpaid']['count'],
                 'paid' => $summary['paid']['count'],
                 'rejected' => $summary['rejected']['count'],
             ],
             'amounts' => [
                 'draft' => $summary['draft']['amount'],
                 'sent' => $summary['sent']['amount'],
+                'unpaid' => $summary['unpaid']['amount'],
                 'paid' => $summary['paid']['amount'],
                 'rejected' => $summary['rejected']['amount'],
                 'all' => $summary['all']['amount'],

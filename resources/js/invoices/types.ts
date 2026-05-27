@@ -9,7 +9,7 @@ export type TaxBreakdownRow = {
     taxable: number;
     tax: number;
 };
-export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'rejected';
+export type InvoiceStatus = 'draft' | 'sent' | 'unpaid' | 'paid' | 'rejected';
 
 export type FieldVisibility = Record<string, boolean>;
 

@@ -22,6 +22,7 @@ const emptySummary: InvoiceSummary = {
     all: { count: 0, amount: 0 },
     draft: { count: 0, amount: 0 },
     sent: { count: 0, amount: 0 },
+    unpaid: { count: 0, amount: 0 },
     paid: { count: 0, amount: 0 },
     rejected: { count: 0, amount: 0 },
 };
