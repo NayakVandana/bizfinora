@@ -20,7 +20,6 @@ import {
     type InvoiceCompanyContext,
 } from '@/invoices/companyContext';
 import type { CompanyTaxSettings } from '@/invoices/taxPresets';
-import { parseCompanyTaxSettings } from '@/invoices/taxPresets';
 import type { InvoicePaymentDetails } from '@/invoices/types';
 import type { PartyDetails } from '@/invoices/types';
 import type { BuyerOption } from '@/Pages/Invoices/types';
@@ -52,9 +51,6 @@ export default function InvoicesCreate() {
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<InvoiceFieldErrors>({});
-    const [companyTax, setCompanyTax] = useState<CompanyTaxSettings | null>(
-        null,
-    );
 
     useEffect(() => {
         Promise.all([
@@ -68,11 +64,6 @@ export default function InvoicesCreate() {
                 );
                 setCompanyContext(ctx);
 
-                if (metaRes.data.tax_settings) {
-                    setCompanyTax(
-                        parseCompanyTaxSettings(metaRes.data.tax_settings),
-                    );
-                }
                 let nextDraft = buildDefaultDraft(
                     seller,
                     metaRes.data.next_invoice_number,
@@ -157,8 +148,6 @@ export default function InvoicesCreate() {
                             onCompanyContextChange={handleCompanyContextChange}
                             onSave={() => void save()}
                             saving={saving}
-                            companyTax={companyTax}
-                            onCompanyTaxChange={setCompanyTax}
                             isNewInvoice
                         />
                     )}

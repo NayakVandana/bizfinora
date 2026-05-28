@@ -8,8 +8,6 @@ import GeneralSection from './sections/GeneralSection';
 import TemplateSection from './sections/TemplateSection';
 import ItemsSection from './sections/ItemsSection';
 import TaxSettingsSection from './sections/TaxSettingsSection';
-import TaxCompanyDefaultsActions from './sections/TaxCompanyDefaultsActions';
-import type { CompanyTaxSettings } from './taxPresets';
 import PaymentNotesSection from './sections/PaymentNotesSection';
 import TermsAndConditionsSection from './sections/TermsAndConditionsSection';
 import AuthorizedSignatureSection from './sections/AuthorizedSignatureSection';
@@ -32,8 +30,6 @@ type Props = {
     onErrors?: (errors: InvoiceFieldErrors) => void;
     onSave: () => void | Promise<void>;
     saving?: boolean;
-    companyTax?: CompanyTaxSettings | null;
-    onCompanyTaxChange?: (settings: CompanyTaxSettings) => void;
     companyContext?: InvoiceCompanyContext | null;
     onCompanyContextChange?: (context: InvoiceCompanyContext) => void;
     isNewInvoice?: boolean;
@@ -47,8 +43,6 @@ export default function InvoiceBuilder({
     onErrors,
     onSave,
     saving = false,
-    companyTax,
-    onCompanyTaxChange,
     companyContext,
     onCompanyContextChange,
     isNewInvoice = false,
@@ -213,15 +207,6 @@ export default function InvoiceBuilder({
                             }
                         />
                     </form>
-
-                    {companyTax ? (
-                        <TaxCompanyDefaultsActions
-                            draft={draft}
-                            companyTax={companyTax}
-                            onApplyToInvoice={update}
-                            onCompanyTaxSaved={onCompanyTaxChange}
-                        />
-                    ) : null}
                 </>
             }
         />

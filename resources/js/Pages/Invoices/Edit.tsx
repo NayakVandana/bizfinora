@@ -14,10 +14,6 @@ import {
     type InvoiceFieldErrors,
 } from '@/invoices/validateInvoiceForm';
 import type { InvoiceDraft } from '@/invoices/types';
-import {
-    parseCompanyTaxSettings,
-    type CompanyTaxSettings,
-} from '@/invoices/taxPresets';
 import { invoiceIsEditable } from '@/invoices/invoiceActions';
 import type { BuyerOption } from '@/Pages/Invoices/types';
 import { Head, router } from '@inertiajs/react';
@@ -35,9 +31,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
     const [buyers, setBuyers] = useState<BuyerOption[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<InvoiceFieldErrors>({});
-    const [companyTax, setCompanyTax] = useState<CompanyTaxSettings | null>(
-        null,
-    );
 
     const applyDraft = useCallback(
         (
@@ -63,10 +56,7 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                 { id: invoiceId },
             ),
             companyApiPost<ApiEnvelope<BuyerOption[]>>('/buyers/buyers-list', {}),
-            companyApiPost<
-                ApiEnvelope<{ tax_settings?: CompanyTaxSettings }>
-            >('/invoices/invoice-meta', {}),
-        ]).then(([invoiceRes, buyersRes, metaRes]) => {
+        ]).then(([invoiceRes, buyersRes]) => {
             if (invoiceRes.success && invoiceRes.data) {
                 const payload = invoiceRes.data as unknown as Record<
                     string,
@@ -84,9 +74,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
             }
             if (buyersRes.success && buyersRes.data) {
                 setBuyers(buyersRes.data);
-            }
-            if (metaRes.success && metaRes.data?.tax_settings) {
-                setCompanyTax(parseCompanyTaxSettings(metaRes.data.tax_settings));
             }
         });
     }, [applyDraft, invoiceId]);
@@ -146,8 +133,6 @@ export default function InvoicesEdit({ invoiceId }: { invoiceId: number }) {
                             onCompanyContextChange={handleCompanyContextChange}
                             onSave={() => void save()}
                             saving={saving}
-                            companyTax={companyTax}
-                            onCompanyTaxChange={setCompanyTax}
                         />
                     )}
                 </div>
