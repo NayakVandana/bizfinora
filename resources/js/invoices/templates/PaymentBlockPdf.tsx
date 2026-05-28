@@ -111,8 +111,9 @@ export function PaymentBlockPdf({ draft, totals }: Props) {
     const payment = paymentFromDraft(draft);
     const doc = draft.document;
     const paymentTermsText = doc.payment_terms?.trim() ?? '';
+    const paymentTermsVisible = isPaymentTermsVisible(visibility);
     const showPaymentTerms =
-        isPaymentTermsVisible(visibility) && Boolean(paymentTermsText);
+        paymentTermsVisible && Boolean(paymentTermsText);
     const showBankSection = isPaymentBankVisible(visibility);
     const showQrSection =
         isPaymentQrVisible(visibility) && Boolean(doc.qr_data_url);
@@ -169,12 +170,12 @@ export function PaymentBlockPdf({ draft, totals }: Props) {
     }
 
     const showNote =
-        showBankSection && Boolean(payment.note?.trim());
-    const showBankBlock = showBankSection && (rows.length > 0 || showNote);
+        paymentTermsVisible && Boolean(payment.note?.trim());
+    const showBankBlock = showBankSection && rows.length > 0;
     const showCard =
-        showBankBlock || showQrSection || showPaymentTerms;
+        showBankBlock || showQrSection || showPaymentTerms || showNote;
     const showAmountInWords =
-        showBankBlock || showQrSection || showPaymentTerms;
+        showBankBlock || showQrSection || showPaymentTerms || showNote;
 
     if (!showCard) {
         return null;
@@ -208,14 +209,6 @@ export function PaymentBlockPdf({ draft, totals }: Props) {
                         </View>
                     ))}
                 </>
-            ) : null}
-
-            {showBankBlock && rows.length === 0 && showNote ? (
-                <View style={s.sectionHead}>
-                    <Text style={s.sectionTitle}>
-                        BANK DETAILS FOR PAYMENT
-                    </Text>
-                </View>
             ) : null}
 
             {showQrSection ? (

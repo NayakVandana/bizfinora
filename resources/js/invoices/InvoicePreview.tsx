@@ -37,6 +37,23 @@ export default function InvoicePreview({ draft }: Props) {
         };
     }, [draft, totals]);
 
+    // Keep live toggles (payment/terms visibility, notes) in sync; only QR is async.
+    const previewDraft = useMemo(
+        () => ({
+            ...draft,
+            document: {
+                ...draft.document,
+                qr_data_url: draftWithQr.document.qr_data_url,
+                qr_payload: draftWithQr.document.qr_payload,
+            },
+        }),
+        [
+            draft,
+            draftWithQr.document.qr_data_url,
+            draftWithQr.document.qr_payload,
+        ],
+    );
+
     return (
         <div className="flex max-h-[min(70vh,calc(100vh-10rem))] justify-center overflow-auto rounded-lg border border-border bg-muted p-2 shadow-inner sm:p-4 lg:max-h-[calc(100vh-8rem)]">
             <div
@@ -52,7 +69,7 @@ export default function InvoicePreview({ draft }: Props) {
                     height={previewHeight}
                     showToolbar={false}
                 >
-                    <InvoicePdfDocument draft={draftWithQr} totals={totals} />
+                    <InvoicePdfDocument draft={previewDraft} totals={totals} />
                 </PDFViewer>
             </div>
         </div>

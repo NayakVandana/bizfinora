@@ -2,6 +2,7 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import { companyApiPost, type ApiEnvelope } from '@/api/invoiceClient';
 import Accordion from './Accordion';
+import PartyFieldRow from './PartyFieldRow';
 import type { InvoiceCompanyContext } from '../companyContext';
 import {
     isPaymentBankVisible,
@@ -14,6 +15,7 @@ import {
     type CompanyPaymentSettings,
 } from '../paymentTypes';
 import type { InvoiceDraft } from '../types';
+import { Link } from '@inertiajs/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Props = {
@@ -21,30 +23,6 @@ type Props = {
     companyContext: InvoiceCompanyContext;
     onCompanyContextChange: (context: InvoiceCompanyContext) => void;
 };
-
-function PaymentField({
-    label,
-    value,
-    onChange,
-    placeholder,
-}: {
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    placeholder?: string;
-}) {
-    return (
-        <div>
-            <InputLabel value={label} />
-            <TextInput
-                className="mt-1 block w-full"
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                placeholder={placeholder}
-            />
-        </div>
-    );
-}
 
 function paymentVisibilityFromSettings(
     settings: CompanyPaymentSettings,
@@ -74,7 +52,9 @@ export default function PaymentNotesSection({
     const showPaymentTerms = isPaymentTermsVisible(visibility);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const paymentTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const paymentTermsTimer = useRef<ReturnType<typeof setTimeout> | null>(
+        null,
+    );
 
     const settings = companyContext.payment_settings ?? {};
 
@@ -100,10 +80,13 @@ export default function PaymentNotesSection({
         [companyContext, onCompanyContextChange, settings],
     );
 
-    const persistPaymentSettings = useCallback(
-        async (nextSettings: CompanyPaymentSettings) => {
+    const savePaymentSettings = useCallback(
+        async (patch: Partial<CompanyPaymentSettings>) => {
+            const nextSettings = { ...settings, ...patch };
+            applyPaymentContext(patch);
             setSaving(true);
             setError(null);
+
             try {
                 const res = await companyApiPost<
                     ApiEnvelope<CompanyPaymentSettings>
@@ -137,37 +120,30 @@ export default function PaymentNotesSection({
                 setSaving(false);
             }
         },
-        [applyPaymentContext],
+        [applyPaymentContext, settings],
     );
 
-    const savePaymentSettings = useCallback(
-        async (patch: Partial<CompanyPaymentSettings>) => {
-            const nextSettings = { ...settings, ...patch };
-            applyPaymentContext(patch);
-            await persistPaymentSettings(nextSettings);
-        },
-        [applyPaymentContext, persistPaymentSettings, settings],
-    );
+    const queuePaymentTermsSave = useCallback(
+        (value: string) => {
+            applyPaymentContext({ default_payment_terms: value });
 
-    const queuePaymentSave = useCallback(
-        (patch: Partial<CompanyPaymentSettings>) => {
-            const nextSettings = { ...settings, ...patch };
-            applyPaymentContext(patch);
-
-            if (paymentTimer.current) {
-                clearTimeout(paymentTimer.current);
+            if (paymentTermsTimer.current) {
+                clearTimeout(paymentTermsTimer.current);
             }
-            paymentTimer.current = setTimeout(() => {
-                void persistPaymentSettings(nextSettings);
+            paymentTermsTimer.current = setTimeout(() => {
+                void savePaymentSettings({
+                    ...settings,
+                    default_payment_terms: value,
+                });
             }, 600);
         },
-        [applyPaymentContext, persistPaymentSettings, settings],
+        [applyPaymentContext, savePaymentSettings, settings],
     );
 
     useEffect(
         () => () => {
-            if (paymentTimer.current) {
-                clearTimeout(paymentTimer.current);
+            if (paymentTermsTimer.current) {
+                clearTimeout(paymentTermsTimer.current);
             }
         },
         [],
@@ -176,7 +152,14 @@ export default function PaymentNotesSection({
     return (
         <Accordion title="Payment & QR">
             <p className="text-muted-foreground text-xs leading-snug">
-                Saved to company payment settings and applied to all invoices.
+                Bank details come from{' '}
+                <Link
+                    href={route('settings.payment')}
+                    className="font-medium text-sidebar-primary hover:opacity-80"
+                >
+                    payment settings
+                </Link>
+                . Toggle what appears on this invoice PDF below.
             </p>
 
             {error ? (
@@ -233,74 +216,69 @@ export default function PaymentNotesSection({
             </div>
 
             {showBank ? (
-                <div className="space-y-4 rounded-lg border border-border bg-muted/20 p-4">
+                <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
                     <p className="text-sm font-medium text-foreground">
                         Bank details
                     </p>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <PaymentField
+                    <div className="divide-y divide-border overflow-hidden rounded-md border border-border bg-muted">
+                        <PartyFieldRow
                             label="Account number"
-                            value={payment.account_number ?? ''}
-                            onChange={(value) =>
-                                queuePaymentSave({ account_number: value })
-                            }
+                            value={payment.account_number}
+                            visibility={visibility ?? {}}
+                            onVisibilityChange={() => {}}
+                            showToggle={false}
                         />
-                        <PaymentField
+                        <PartyFieldRow
                             label="Account holder"
-                            value={payment.account_holder ?? ''}
-                            onChange={(value) =>
-                                queuePaymentSave({ account_holder: value })
-                            }
+                            value={payment.account_holder}
+                            visibility={visibility ?? {}}
+                            onVisibilityChange={() => {}}
+                            showToggle={false}
                         />
-                        <PaymentField
+                        <PartyFieldRow
                             label="Account type"
-                            value={payment.account_type ?? ''}
-                            onChange={(value) =>
-                                queuePaymentSave({ account_type: value })
-                            }
-                            placeholder="e.g. Savings"
+                            value={payment.account_type}
+                            visibility={visibility ?? {}}
+                            onVisibilityChange={() => {}}
+                            showToggle={false}
                         />
-                        <PaymentField
+                        <PartyFieldRow
                             label="UPI ID"
-                            value={payment.upi_id ?? ''}
-                            onChange={(value) =>
-                                queuePaymentSave({ upi_id: value })
-                            }
-                            placeholder="name@upi"
+                            value={payment.upi_id}
+                            visibility={visibility ?? {}}
+                            onVisibilityChange={() => {}}
+                            showToggle={false}
                         />
-                        <PaymentField
+                        <PartyFieldRow
                             label="Branch IFSC"
-                            value={payment.branch_ifsc ?? ''}
-                            onChange={(value) =>
-                                queuePaymentSave({ branch_ifsc: value })
-                            }
+                            value={payment.branch_ifsc}
+                            visibility={visibility ?? {}}
+                            onVisibilityChange={() => {}}
+                            showToggle={false}
                         />
-                        <PaymentField
+                        <PartyFieldRow
                             label="Branch name"
-                            value={payment.branch_name ?? ''}
-                            onChange={(value) =>
-                                queuePaymentSave({ branch_name: value })
-                            }
+                            value={payment.branch_name}
+                            visibility={visibility ?? {}}
+                            onVisibilityChange={() => {}}
+                            showToggle={false}
                         />
-                    </div>
-                    <div>
-                        <InputLabel value="Payment note" />
-                        <textarea
-                            className="app-field mt-1 w-full"
-                            rows={2}
-                            value={payment.note ?? ''}
-                            onChange={(e) =>
-                                queuePaymentSave({ payment_note: e.target.value })
-                            }
-                            placeholder="Optional note shown with bank details"
-                        />
+                        {showPaymentTerms ? (
+                            <PartyFieldRow
+                                label="Payment note"
+                                value={payment.note}
+                                visibility={visibility ?? {}}
+                                onVisibilityChange={() => {}}
+                                showToggle={false}
+                            />
+                        ) : null}
                     </div>
                 </div>
             ) : null}
 
             {showQr ? (
                 <p className="text-muted-foreground text-[11px]">
-                    QR is generated from the UPI ID above and this
+                    QR is generated from the UPI ID in payment settings and this
                     invoice&apos;s total amount.
                 </p>
             ) : null}
@@ -313,9 +291,7 @@ export default function PaymentNotesSection({
                         rows={2}
                         value={draft.document.payment_terms ?? ''}
                         onChange={(e) =>
-                            queuePaymentSave({
-                                default_payment_terms: e.target.value,
-                            })
+                            queuePaymentTermsSave(e.target.value)
                         }
                         placeholder="Shown in the payment section on the invoice"
                     />
