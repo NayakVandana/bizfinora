@@ -135,12 +135,28 @@ class CompanyContextApiController extends Controller
                 return $this->sendJsonResponse(false, 'Only company owners can update tax settings.', null, 200);
             }
 
-            $company->update($validation->validated());
+            $data = $validation->validated();
+
+            $company->update([
+                'default_tax_type' => $data['default_tax_type'],
+                'default_tax_label' => $data['default_tax_label'],
+                'default_tax_rate' => $data['default_tax_rate'] ?? 0,
+                'tax_calculation_mode' => $data['tax_calculation_mode'],
+                'tax_per_line' => (bool) ($data['tax_per_line'] ?? false),
+            ]);
+
+            $company->refresh();
 
             return $this->sendJsonResponse(
                 true,
                 'Tax settings saved successfully.',
-                CompanyPresentation::format($company->fresh(), CompanyMembership::ROLE_OWNER, true),
+                [
+                    'default_tax_type' => $company->default_tax_type ?? 'vat',
+                    'default_tax_label' => $company->default_tax_label ?? 'VAT',
+                    'default_tax_rate' => (float) ($company->default_tax_rate ?? 0),
+                    'tax_calculation_mode' => $company->tax_calculation_mode ?? 'exclusive',
+                    'tax_per_line' => (bool) ($company->tax_per_line ?? false),
+                ],
                 200,
             );
         } catch (Exception $e) {

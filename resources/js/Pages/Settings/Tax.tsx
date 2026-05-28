@@ -207,6 +207,7 @@ export default function TaxSettings() {
                                 </div>
 
                                 <PrimaryButton
+                                    type="button"
                                     disabled={saving}
                                     onClick={() => void save()}
                                 >

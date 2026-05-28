@@ -20,6 +20,7 @@ import {
     type InvoiceCompanyContext,
 } from '@/invoices/companyContext';
 import type { CompanyTaxSettings } from '@/invoices/taxPresets';
+import { parseCompanyTaxSettings } from '@/invoices/taxPresets';
 import type { InvoicePaymentDetails } from '@/invoices/types';
 import type { PartyDetails } from '@/invoices/types';
 import type { BuyerOption } from '@/Pages/Invoices/types';
@@ -68,7 +69,9 @@ export default function InvoicesCreate() {
                 setCompanyContext(ctx);
 
                 if (metaRes.data.tax_settings) {
-                    setCompanyTax(metaRes.data.tax_settings);
+                    setCompanyTax(
+                        parseCompanyTaxSettings(metaRes.data.tax_settings),
+                    );
                 }
                 let nextDraft = buildDefaultDraft(
                     seller,
@@ -155,6 +158,7 @@ export default function InvoicesCreate() {
                             onSave={() => void save()}
                             saving={saving}
                             companyTax={companyTax}
+                            onCompanyTaxChange={setCompanyTax}
                             isNewInvoice
                         />
                     )}

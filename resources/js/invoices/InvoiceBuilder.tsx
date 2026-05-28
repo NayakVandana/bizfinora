@@ -8,6 +8,7 @@ import GeneralSection from './sections/GeneralSection';
 import TemplateSection from './sections/TemplateSection';
 import ItemsSection from './sections/ItemsSection';
 import TaxSettingsSection from './sections/TaxSettingsSection';
+import TaxCompanyDefaultsActions from './sections/TaxCompanyDefaultsActions';
 import type { CompanyTaxSettings } from './taxPresets';
 import PaymentNotesSection from './sections/PaymentNotesSection';
 import TermsAndConditionsSection from './sections/TermsAndConditionsSection';
@@ -32,6 +33,7 @@ type Props = {
     onSave: () => void | Promise<void>;
     saving?: boolean;
     companyTax?: CompanyTaxSettings | null;
+    onCompanyTaxChange?: (settings: CompanyTaxSettings) => void;
     companyContext?: InvoiceCompanyContext | null;
     onCompanyContextChange?: (context: InvoiceCompanyContext) => void;
     isNewInvoice?: boolean;
@@ -46,6 +48,7 @@ export default function InvoiceBuilder({
     onSave,
     saving = false,
     companyTax,
+    onCompanyTaxChange,
     companyContext,
     onCompanyContextChange,
     isNewInvoice = false,
@@ -147,66 +150,79 @@ export default function InvoiceBuilder({
             actions={actions}
             preview={<InvoicePreview draft={draft} />}
             form={
-                <form
-                    id="invoice-builder-form"
-                    noValidate
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSave();
-                    }}
-                >
-                <InputError message={errors._form} className="mb-2" />
+                <>
+                    <form
+                        id="invoice-builder-form"
+                        noValidate
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSave();
+                        }}
+                    >
+                        <InputError message={errors._form} className="mb-2" />
 
-                <TemplateSection
-                    draft={draft}
-                    onChange={update}
-                    isNewInvoice={isNewInvoice}
-                />
-                <GeneralSection
-                    draft={draft}
-                    onChange={update}
-                    errors={errors}
-                />
-                <SellerSection
-                    draft={draft}
-                    onVisibilityChange={updateVisibility}
-                />
-                <BuyerSection
-                    draft={draft}
-                    buyers={buyers}
-                    onBuyerSelect={applyBuyer}
-                    onVisibilityChange={updateVisibility}
-                    errors={errors}
-                />
-                <TaxSettingsSection
-                    draft={draft}
-                    onChange={update}
-                    companyTax={companyTax}
-                />
-                <ItemsSection
-                    draft={draft}
-                    onChange={update}
-                    onItemChange={updateItem}
-                    onAddItem={addItem}
-                    onRemoveItem={removeItem}
-                    errors={errors}
-                />
-                <PaymentNotesSection
-                    draft={draft}
-                    companyContext={companyContext ?? {}}
-                    onCompanyContextChange={onCompanyContextChange ?? (() => {})}
-                />
-                <TermsAndConditionsSection
-                    draft={draft}
-                    companyContext={companyContext ?? {}}
-                    onCompanyContextChange={onCompanyContextChange ?? (() => {})}
-                />
-                <AuthorizedSignatureSection
-                    draft={draft}
-                    companyContext={companyContext ?? {}}
-                    onCompanyContextChange={onCompanyContextChange ?? (() => {})}
-                />
-                </form>
+                        <TemplateSection
+                            draft={draft}
+                            onChange={update}
+                            isNewInvoice={isNewInvoice}
+                        />
+                        <GeneralSection
+                            draft={draft}
+                            onChange={update}
+                            errors={errors}
+                        />
+                        <SellerSection
+                            draft={draft}
+                            onVisibilityChange={updateVisibility}
+                        />
+                        <BuyerSection
+                            draft={draft}
+                            buyers={buyers}
+                            onBuyerSelect={applyBuyer}
+                            onVisibilityChange={updateVisibility}
+                            errors={errors}
+                        />
+                        <TaxSettingsSection draft={draft} onChange={update} />
+                        <ItemsSection
+                            draft={draft}
+                            onChange={update}
+                            onItemChange={updateItem}
+                            onAddItem={addItem}
+                            onRemoveItem={removeItem}
+                            errors={errors}
+                        />
+                        <PaymentNotesSection
+                            draft={draft}
+                            companyContext={companyContext ?? {}}
+                            onCompanyContextChange={
+                                onCompanyContextChange ?? (() => {})
+                            }
+                        />
+                        <TermsAndConditionsSection
+                            draft={draft}
+                            companyContext={companyContext ?? {}}
+                            onCompanyContextChange={
+                                onCompanyContextChange ?? (() => {})
+                            }
+                        />
+                        <AuthorizedSignatureSection
+                            draft={draft}
+                            companyContext={companyContext ?? {}}
+                            onCompanyContextChange={
+                                onCompanyContextChange ?? (() => {})
+                            }
+                        />
+                    </form>
+
+                    {companyTax ? (
+                        <TaxCompanyDefaultsActions
+                            draft={draft}
+                            companyTax={companyTax}
+                            onApplyToInvoice={update}
+                            onCompanyTaxSaved={onCompanyTaxChange}
+                        />
+                    ) : null}
+                </>
             }
         />
     );

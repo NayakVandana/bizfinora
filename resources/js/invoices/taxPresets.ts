@@ -34,3 +34,16 @@ export const DEFAULT_COMPANY_TAX: CompanyTaxSettings = {
     tax_calculation_mode: 'exclusive',
     tax_per_line: false,
 };
+
+export function parseCompanyTaxSettings(
+    data: Partial<CompanyTaxSettings>,
+): CompanyTaxSettings {
+    return {
+        default_tax_type: (data.default_tax_type as TaxType) ?? 'vat',
+        default_tax_label: data.default_tax_label ?? 'VAT',
+        default_tax_rate: Number(data.default_tax_rate ?? 0),
+        tax_calculation_mode:
+            (data.tax_calculation_mode as TaxCalculationMode) ?? 'exclusive',
+        tax_per_line: Boolean(data.tax_per_line ?? false),
+    };
+}
